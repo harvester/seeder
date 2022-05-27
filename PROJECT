@@ -1,0 +1,25 @@
+domain: harvesterhci.io
+layout:
+- go.kubebuilder.io/v3
+projectName: bmaas
+repo: github.com/harvester/bmaas
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: harvesterhci.io
+  group: metal
+  kind: Cluster
+  path: github.com/harvester/bmaas/api/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: harvesterhci.io
+  group: metal
+  kind: Inventory
+  path: github.com/harvester/bmaas/api/v1alpha1
+  version: v1alpha1
+version: "3"

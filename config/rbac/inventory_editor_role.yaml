@@ -1,0 +1,24 @@
+# permissions for end users to edit inventories.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: inventory-editor-role
+rules:
+- apiGroups:
+  - metal.harvesterhci.io
+  resources:
+  - inventories
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - metal.harvesterhci.io
+  resources:
+  - inventories/status
+  verbs:
+  - get

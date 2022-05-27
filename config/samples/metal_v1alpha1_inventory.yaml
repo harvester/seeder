@@ -1,0 +1,6 @@
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: Inventory
+metadata:
+  name: inventory-sample
+spec:
+
