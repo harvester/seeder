@@ -21,30 +21,30 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type InventoryConditionType string
-
 type InventoryWorkflowStatus string
 
 type TinkWorkflowStatus string
+
+type TaskWorkflowStatus string
+
+type ConditionType string
 
 const (
 	InventoryFinalizer = "finalizer.inventory.harvesterhci.io"
 )
 
 const (
-	BMCObjectCreated      InventoryWorkflowStatus = "bmcObjectCreated"
-	BMCTaskSubmitted      InventoryWorkflowStatus = "bmcTaskSubmitted"
-	BMCTaskCompleted      InventoryWorkflowStatus = "bmcTaskCompleted"
+	BMCObjectCreated InventoryWorkflowStatus = "bmcObjectCreated"
+
 	TinkHardwareSubmitted InventoryWorkflowStatus = "tinkerbellHardwareCreated"
 	InventoryReady        InventoryWorkflowStatus = "inventoryNodeReady"
 	InventoryRunning      InventoryWorkflowStatus = "inventoryRunning"
 )
 
 const (
-	InventorySecretMissing       InventoryConditionType = "secretMissing"
-	InventoryDiscoveryInProgress InventoryConditionType = "discovering"
-	InventoryDiscovered          InventoryConditionType = "discovered"
-	InventoryInUse               InventoryConditionType = "inuse"
+	BMCTaskRequest   TaskWorkflowStatus = "bmcTaskRequested"
+	BMCTaskSubmitted TaskWorkflowStatus = "bmcTaskSubmitted"
+	BMCTaskComplete  TaskWorkflowStatus = "bmcTaskCompleted"
 )
 
 // InventorySpec defines the desired state of Inventory
@@ -69,16 +69,17 @@ type PXEBootInterface struct {
 
 // InventoryStatus defines the observed state of Inventory
 type InventoryStatus struct {
-	Status InventoryWorkflowStatus `json:"hwStatus,omitempty"`
-
-	GeneratedPassword string                `json:"generatedPassword,omitempty"`
-	HardwareID        string                `json:"hardwareID,omitempty"`
-	Conditions        []InventoryConditions `json:"conditions,omitempty"`
+	Status            InventoryWorkflowStatus `json:"status,omitempty"`
+	GeneratedPassword string                  `json:"generatedPassword,omitempty"`
+	HardwareID        string                  `json:"hardwareID,omitempty"`
+	Conditions        []Conditions            `json:"conditions,omitempty"`
 }
 
-type InventoryConditions struct {
-	Type    InventoryConditionType `json:"type"`
-	Message string                 `json:"message,omitempty"`
+type Conditions struct {
+	Type           ConditionType `json:"type"`
+	StartTime      metav1.Time   `json:"startTime"`
+	LastUpdateTime metav1.Time   `json:"lastUpdateTime"`
+	Message        string        `json:"message,omitempty"`
 }
 
 //+kubebuilder:object:root=true

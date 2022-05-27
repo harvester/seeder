@@ -8,7 +8,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 // FakeBaseboardReconciller implements a fake reconcile loop for integration testing
@@ -19,10 +18,8 @@ type FakeBaseboardReconciller struct {
 }
 
 func (f *FakeBaseboardReconciller) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	f.Logger = log.FromContext(ctx)
-
 	b := &rufio.BaseboardManagement{}
-
+	f.Info("Reconcilling baseboard objects", req.Name, req.Namespace)
 	err := f.Get(ctx, req.NamespacedName, b)
 	if err != nil {
 		if apierrors.IsNotFound(err) {

@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
+	"github.com/harvester/bmaas/pkg/mock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
@@ -44,7 +45,8 @@ var (
 	k8sClient client.Client
 	testEnv   *envtest.Environment
 	scheme    = runtime.NewScheme()
-	ctx       = context.Background()
+	ctx       context.Context
+	cancel    context.CancelFunc
 	eg        *errgroup.Group
 	egctx     context.Context
 	setupLog  = ctrl.Log.WithName("setup")
@@ -64,7 +66,7 @@ func TestAPIs(t *testing.T) {
 
 var _ = BeforeSuite(func() {
 	log.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
-
+	ctx, cancel = context.WithCancel(context.TODO())
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
@@ -89,7 +91,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
 
-	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
 		Scheme:             scheme,
 		Port:               9444,
 		MetricsBindAddress: ":9080",
@@ -100,15 +102,16 @@ var _ = BeforeSuite(func() {
 	err = (&InventoryReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Logger: log.Log,
+		Logger: log.Log.WithName("controller.inventory"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	/*err = (&mock.FakeBaseboardReconciller{
+	err = (&mock.FakeBaseboardReconciller{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
+		Logger: log.Log.WithName("controller.baseboard"),
 	}).SetupWithManager(mgr)
-	Expect(err).NotTo(HaveOccurred())*/
+	Expect(err).NotTo(HaveOccurred())
 
 	go func() {
 		defer GinkgoRecover()
@@ -120,6 +123,7 @@ var _ = BeforeSuite(func() {
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
+	cancel()
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
 })
