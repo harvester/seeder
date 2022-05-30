@@ -11,7 +11,7 @@ resources:
   domain: harvesterhci.io
   group: metal
   kind: Cluster
-  path: github.com/harvester/bmaas/api/v1alpha1
+  path: github.com/harvester/bmaas/pkg/api/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -20,6 +20,15 @@ resources:
   domain: harvesterhci.io
   group: metal
   kind: Inventory
-  path: github.com/harvester/bmaas/api/v1alpha1
+  path: github.com/harvester/bmaas/pkg/api/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: harvesterhci.io
+  group: metal
+  kind: AddressPool
+  path: github.com/harvester/bmaas/pkg/api/v1alpha1
   version: v1alpha1
 version: "3"

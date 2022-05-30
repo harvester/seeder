@@ -42,9 +42,12 @@ const (
 )
 
 const (
-	BMCTaskRequest   TaskWorkflowStatus = "bmcTaskRequested"
-	BMCTaskSubmitted TaskWorkflowStatus = "bmcTaskSubmitted"
-	BMCTaskComplete  TaskWorkflowStatus = "bmcTaskCompleted"
+	BMCTaskRequest      ConditionType = "bmcTaskRequested"
+	BMCTaskSubmitted    ConditionType = "bmcTaskSubmitted"
+	BMCTaskComplete     ConditionType = "bmcTaskCompleted"
+	BMCTaskError        ConditionType = "bmcTaskError"
+	TinkWorkflowCreated ConditionType = "tinkWorkflowCreated"
+	TinkWorkflowError   ConditionType = "tinkWorkflowError"
 )
 
 // InventorySpec defines the desired state of Inventory
@@ -78,7 +81,7 @@ type InventoryStatus struct {
 type Conditions struct {
 	Type           ConditionType `json:"type"`
 	StartTime      metav1.Time   `json:"startTime"`
-	LastUpdateTime metav1.Time   `json:"lastUpdateTime"`
+	LastUpdateTime metav1.Time   `json:"lastUpdateTime,omitempty"`
 	Message        string        `json:"message,omitempty"`
 }
 
