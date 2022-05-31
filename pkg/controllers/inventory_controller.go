@@ -85,8 +85,8 @@ func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 			}
 		}
 	} else {
-		for _, reconcile := range deletionReconcileList {
-			if err := reconcile(ctx, inventoryObj); err != nil {
+		for _, reconciler := range deletionReconcileList {
+			if err := reconciler(ctx, inventoryObj); err != nil {
 				return ctrl.Result{}, err
 			}
 		}
@@ -120,7 +120,6 @@ func (r *InventoryReconciler) manageBaseboardObject(ctx context.Context, i *bmaa
 // checkAndMarkNodeReady will check the power status of the BaseboardManagement Object and Mark the node ready
 func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
 	if i.Status.Status == bmaasv1alpha1.InventoryReady {
-
 		return nil
 	}
 	b := &rufio.BaseboardManagement{}
@@ -192,4 +191,25 @@ func (r *InventoryReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			}
 		})).
 		Complete(r)
+}
+
+func (r *InventoryReconciler) checkAndCreateTinkHardware(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
+	// if inventory has been allocated to cluster then trigger tinkbell hardware creation
+	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) {
+		if i.Status.HardwareID == "" {
+
+		}
+	}
+
+	return nil
+}
+
+func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
+	// if tink workflow has been created and inventory is allocated to a cluster
+	// then reboot the hardware using BMC tasks
+	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) {
+
+	}
+
+	return nil
 }

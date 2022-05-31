@@ -39,6 +39,10 @@ spec:
                 properties:
                   configURL:
                     type: string
+                  nameservers:
+                    items:
+                      type: string
+                    type: array
                   sshKeys:
                     items:
                       type: string
@@ -47,20 +51,56 @@ spec:
               nodes:
                 items:
                   properties:
-                    name:
-                      type: string
-                    namespace:
+                    addressPoolReference:
+                      properties:
+                        name:
+                          type: string
+                        namespace:
+                          type: string
+                      required:
+                      - name
+                      - namespace
+                      type: object
+                    inventoryReference:
+                      properties:
+                        name:
+                          type: string
+                        namespace:
+                          type: string
+                      required:
+                      - name
+                      - namespace
+                      type: object
+                    staticAddress:
                       type: string
                   required:
-                  - name
-                  - namespace
+                  - addressPoolReference
+                  - inventoryReference
                   type: object
                 type: array
               version:
                 type: string
+              vipConfig:
+                properties:
+                  addressPoolReference:
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                    required:
+                    - name
+                    - namespace
+                    type: object
+                  staticAddress:
+                    type: string
+                required:
+                - addressPoolReference
+                type: object
             required:
             - nodes
             - version
+            - vipConfig
             type: object
           status:
             description: ClusterStatus defines the observed state of Cluster

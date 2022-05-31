@@ -35,6 +35,8 @@ spec:
           spec:
             description: InventorySpec defines the desired state of Inventory
             properties:
+              ManagementInterfaceMacAddress:
+                type: string
               baseboardSpec:
                 description: BaseboardManagementSpec defines the desired state of
                   BaseboardManagement
@@ -86,28 +88,11 @@ spec:
                 - connection
                 - power
                 type: object
-              managementInterface:
-                properties:
-                  address:
-                    type: string
-                  gateway:
-                    type: string
-                  macAddress:
-                    type: string
-                  nameServers:
-                    items:
-                      type: string
-                    type: array
-                  netmask:
-                    type: string
-                required:
-                - macAddress
-                type: object
               primaryDisk:
                 type: string
             required:
+            - ManagementInterfaceMacAddress
             - baseboardSpec
-            - managementInterface
             - primaryDisk
             type: object
           status:
@@ -116,11 +101,18 @@ spec:
               conditions:
                 items:
                   properties:
+                    lastUpdateTime:
+                      format: date-time
+                      type: string
                     message:
+                      type: string
+                    startTime:
+                      format: date-time
                       type: string
                     type:
                       type: string
                   required:
+                  - startTime
                   - type
                   type: object
                 type: array
@@ -128,7 +120,30 @@ spec:
                 type: string
               hardwareID:
                 type: string
-              hwStatus:
+              ownerCluster:
+                properties:
+                  name:
+                    type: string
+                  namespace:
+                    type: string
+                required:
+                - name
+                - namespace
+                type: object
+              pxeBootConfig:
+                properties:
+                  address:
+                    type: string
+                  gateway:
+                    type: string
+                  nameServers:
+                    items:
+                      type: string
+                    type: array
+                  netmask:
+                    type: string
+                type: object
+              status:
                 type: string
             type: object
         type: object

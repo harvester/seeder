@@ -2,6 +2,8 @@ package util
 
 import (
 	"context"
+	"testing"
+
 	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
 	"github.com/harvester/bmaas/pkg/mock"
 	"github.com/stretchr/testify/assert"
@@ -9,7 +11,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/log"
-	"testing"
 )
 
 var (
@@ -48,10 +49,8 @@ func Test_CheckAndCreateBaseBoardObject(t *testing.T) {
 			Namespace: "default",
 		},
 		Spec: bmaasv1alpha1.InventorySpec{
-			PrimaryDisk: "/dev/sda1",
-			PXEBootInterface: bmaasv1alpha1.PXEBootInterface{
-				MacAddress: "xx:xx:xx:xx:xx",
-			},
+			PrimaryDisk:                   "/dev/sda1",
+			ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 			BaseboardManagementSpec: rufio.BaseboardManagementSpec{
 				Connection: rufio.Connection{
 					Host:        "localhost",
@@ -80,10 +79,8 @@ func Test_CheckAndCreateBaseBoardObjectFailure(t *testing.T) {
 			Namespace: "default",
 		},
 		Spec: bmaasv1alpha1.InventorySpec{
-			PrimaryDisk: "/dev/sda1",
-			PXEBootInterface: bmaasv1alpha1.PXEBootInterface{
-				MacAddress: "xx:xx:xx:xx:xx",
-			},
+			PrimaryDisk:                   "/dev/sda1",
+			ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 			BaseboardManagementSpec: rufio.BaseboardManagementSpec{
 				Connection: rufio.Connection{
 					Host:        "localhost",

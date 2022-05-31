@@ -24,6 +24,7 @@ func GenerateAddressPoolStatus(pool *bmaasv1alpha1.AddressPool) (poolStatus *bma
 	poolStatus.AvailableAddresses = len
 	poolStatus.Netmask = ipPrefix.IPNet().Mask.String()
 	poolStatus.Status = bmaasv1alpha1.PoolReady
+	poolStatus.AddressAllocation = make(map[string]bmaasv1alpha1.ObjectReference)
 	return poolStatus, nil
 }
 

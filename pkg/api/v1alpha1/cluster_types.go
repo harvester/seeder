@@ -20,33 +20,57 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	ClusterFinalizer = "finalizer.cluster.harvesterhci.io"
+)
+
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // ClusterSpec defines the desired state of Cluster
 type ClusterSpec struct {
-	//
-	HarvesterVersion string               `json:"version"`
-	Nodes            []InventoryReference `json:"nodes"`
+	HarvesterVersion string       `json:"version"`
+	Nodes            []NodeConfig `json:"nodes"`
+	VIPConfig        `json:"vipConfig"`
 	ClusterConfig    `json:"clusterConfig,omitempty"`
 }
 
-type ClusterConfig struct {
-	ConfigURL string   `json:"configURL,omitempty"`
-	SSHKeys   []string `json:"sshKeys,omitempty"`
+type VIPConfig struct {
+	AddressPoolReference ObjectReference `json:"addressPoolReference"`
+	StaticAddress        string          `json:"staticAddress,omitempty"`
 }
 
-type InventoryReference struct {
+type ClusterConfig struct {
+	ConfigURL   string   `json:"configURL,omitempty"`
+	SSHKeys     []string `json:"sshKeys,omitempty"`
+	Nameservers []string `json:"nameservers,omitempty"`
+}
+
+type NodeConfig struct {
+	InventoryReference   ObjectReference `json:"inventoryReference"`
+	AddressPoolReference ObjectReference `json:"addressPoolReference"`
+	StaticAddress        string          `json:"staticAddress,omitempty"`
+}
+
+type ObjectReference struct {
 	Name      string `json:"name"`
 	Namespace string `json:"namespace"`
 }
 
 // ClusterStatus defines the observed state of Cluster
 type ClusterStatus struct {
-	ClusterToken   string `json:"token,omitempty"`
-	Status         string `json:"status,omitempty"`
-	ClusterAddress string `json:"clusterAddress,omitempty"`
+	ClusterToken   string                `json:"token,omitempty"`
+	Status         ClusterWorkflowStatus `json:"status,omitempty"`
+	ClusterAddress string                `json:"clusterAddress,omitempty"`
 }
+
+type ClusterWorkflowStatus string
+
+const (
+	ClusterConfigReady  ClusterWorkflowStatus = "clusterConfigReady"
+	ClusterNodesPatched ClusterWorkflowStatus = "clusterNodesPatched"
+	ClusterRunning      ClusterWorkflowStatus = "clusterRunning"
+)
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status

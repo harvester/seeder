@@ -34,6 +34,8 @@ import (
 	log "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"testing"
+	"time"
+
 	//+kubebuilder:scaffold:imports
 )
 
@@ -85,6 +87,7 @@ var _ = BeforeSuite(func() {
 
 	err = clientgoscheme.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
+
 	//+kubebuilder:scaffold:scheme
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme})
@@ -113,12 +116,20 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
+	err = (&AddressPoolReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: log.Log.WithName("controller.addresspool"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
 	go func() {
 		defer GinkgoRecover()
 		err := mgr.Start(ctx)
 		Expect(err).ToNot(HaveOccurred())
 	}()
 
+	time.Sleep(10 * time.Second)
 })
 
 var _ = AfterSuite(func() {

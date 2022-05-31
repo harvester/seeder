@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+
 	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -23,10 +24,8 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 				Namespace: "default",
 			},
 			Spec: bmaasv1alpha1.InventorySpec{
-				PrimaryDisk: "/dev/sda",
-				PXEBootInterface: bmaasv1alpha1.PXEBootInterface{
-					MacAddress: "xx:xx:xx:xx:xx",
-				},
+				PrimaryDisk:                   "/dev/sda",
+				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
@@ -121,17 +120,15 @@ var _ = Describe("inventory object deletion tests", func() {
 				Namespace: "default",
 			},
 			Spec: bmaasv1alpha1.InventorySpec{
-				PrimaryDisk: "/dev/sda",
-				PXEBootInterface: bmaasv1alpha1.PXEBootInterface{
-					MacAddress: "xx:xx:xx:xx:xx",
-				},
+				PrimaryDisk:                   "/dev/sda",
+				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,
 						InsecureTLS: true,
 						AuthSecretRef: v1.SecretReference{
-							Name:      "sample",
+							Name:      "sample-deletion",
 							Namespace: "default",
 						},
 					},
@@ -183,6 +180,6 @@ var _ = Describe("inventory object deletion tests", func() {
 		Eventually(func() error {
 			err := k8sClient.Delete(ctx, creds)
 			return err
-		}).ShouldNot(HaveOccurred())
+		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 })

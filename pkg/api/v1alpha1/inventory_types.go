@@ -42,18 +42,21 @@ const (
 )
 
 const (
-	BMCTaskRequest      ConditionType = "bmcTaskRequested"
-	BMCTaskSubmitted    ConditionType = "bmcTaskSubmitted"
-	BMCTaskComplete     ConditionType = "bmcTaskCompleted"
-	BMCTaskError        ConditionType = "bmcTaskError"
-	TinkWorkflowCreated ConditionType = "tinkWorkflowCreated"
-	TinkWorkflowError   ConditionType = "tinkWorkflowError"
+	BMCTaskRequest              ConditionType = "bmcTaskRequested"
+	BMCTaskSubmitted            ConditionType = "bmcTaskSubmitted"
+	BMCTaskComplete             ConditionType = "bmcTaskCompleted"
+	BMCTaskError                ConditionType = "bmcTaskError"
+	TinkWorkflowCreated         ConditionType = "tinkWorkflowCreated"
+	TinkWorkflowError           ConditionType = "tinkWorkflowError"
+	TinkWorkflowRemoved         ConditionType = "tinkWorkflowRemoved"
+	InventoryAllocatedToCluster ConditionType = "inventoryAllocatedToCluster"
+	InventoryFreed              ConditionType = "inventoryFreed"
 )
 
 // InventorySpec defines the desired state of Inventory
 type InventorySpec struct {
 	PrimaryDisk                   string `json:"primaryDisk"`
-	PXEBootInterface              `json:"managementInterface"`
+	ManagementInterfaceMacAddress string `json:"ManagementInterfaceMacAddress"`
 	rufio.BaseboardManagementSpec `json:"baseboardSpec"`
 }
 
@@ -66,7 +69,6 @@ type PXEBootInterface struct {
 	Address     string   `json:"address,omitempty"`
 	Gateway     string   `json:"gateway,omitempty"`
 	Netmask     string   `json:"netmask,omitempty"`
-	MacAddress  string   `json:"macAddress"`
 	NameServers []string `json:"nameServers,omitempty"`
 }
 
@@ -76,6 +78,8 @@ type InventoryStatus struct {
 	GeneratedPassword string                  `json:"generatedPassword,omitempty"`
 	HardwareID        string                  `json:"hardwareID,omitempty"`
 	Conditions        []Conditions            `json:"conditions,omitempty"`
+	PXEBootInterface  `json:"pxeBootConfig,omitempty"`
+	Cluster           ObjectReference `json:"ownerCluster,omitempty"`
 }
 
 type Conditions struct {
