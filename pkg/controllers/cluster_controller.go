@@ -116,7 +116,7 @@ func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, c *bmaasv
 // tinkerbell workflows to be generated and reboot initiated
 func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *bmaasv1alpha1.Cluster) error {
 	if c.Status.Status == bmaasv1alpha1.ClusterConfigReady {
-		for _, nc := range c.Spec.Nodes {
+		for n, nc := range c.Spec.Nodes {
 			pool := &bmaasv1alpha1.AddressPool{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: nc.AddressPoolReference.Name,
 				Name: nc.AddressPoolReference.Name}, pool)
@@ -158,6 +158,13 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *bmaasv1al
 			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster,
 				fmt.Sprintf("node assigned to cluster %s", c.Name))
 			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.InventoryFreed)
+
+			if n == 0 {
+				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.HarvesterCreateNode, "Create Mode")
+			} else {
+				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.HarvesterJoinNode, "Join Mode")
+			}
+
 			err = r.Status().Update(ctx, i)
 			if err != nil {
 				return err
@@ -213,6 +220,8 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *bmaasv1al
 		i.Status.GeneratedPassword = ""
 		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster)
 		i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.InventoryFreed, "")
+		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.HarvesterCreateNode)
+		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.HarvesterJoinNode)
 		err = r.Status().Update(ctx, i)
 		if err != nil {
 			return err

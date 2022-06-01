@@ -30,6 +30,7 @@ const (
 // ClusterSpec defines the desired state of Cluster
 type ClusterSpec struct {
 	HarvesterVersion string       `json:"version"`
+	ImageURL         string       `json:"imageURL,omitempty"`
 	Nodes            []NodeConfig `json:"nodes"`
 	VIPConfig        `json:"vipConfig"`
 	ClusterConfig    `json:"clusterConfig,omitempty"`

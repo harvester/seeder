@@ -51,6 +51,8 @@ const (
 	TinkWorkflowRemoved         ConditionType = "tinkWorkflowRemoved"
 	InventoryAllocatedToCluster ConditionType = "inventoryAllocatedToCluster"
 	InventoryFreed              ConditionType = "inventoryFreed"
+	HarvesterCreateNode         ConditionType = "harvesterCreateNode"
+	HarvesterJoinNode           ConditionType = "harvesterJoinNode"
 )
 
 // InventorySpec defines the desired state of Inventory
