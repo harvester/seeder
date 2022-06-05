@@ -42,10 +42,9 @@ const (
 )
 
 const (
-	BMCTaskRequest              ConditionType = "bmcTaskRequested"
-	BMCTaskSubmitted            ConditionType = "bmcTaskSubmitted"
-	BMCTaskComplete             ConditionType = "bmcTaskCompleted"
-	BMCTaskError                ConditionType = "bmcTaskError"
+	BMCJobSubmitted             ConditionType = "bmcJobSubmitted"
+	BMCJobComplete              ConditionType = "bmcJobCompleted"
+	BMCJobError                 ConditionType = "bmcJobErrorr"
 	TinkWorkflowCreated         ConditionType = "tinkWorkflowCreated"
 	TinkWorkflowError           ConditionType = "tinkWorkflowError"
 	TinkWorkflowRemoved         ConditionType = "tinkWorkflowRemoved"

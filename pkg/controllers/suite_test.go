@@ -18,6 +18,10 @@ package controllers
 
 import (
 	"context"
+	"path/filepath"
+	"testing"
+	"time"
+
 	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
 	"github.com/harvester/bmaas/pkg/mock"
 	. "github.com/onsi/ginkgo/v2"
@@ -27,15 +31,11 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
-	"path/filepath"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	log "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-	"testing"
-	"time"
-
 	//+kubebuilder:scaffold:imports
 )
 
@@ -116,6 +116,13 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
+	err = (&mock.FakeBaseboardJobReconciller{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: log.Log.WithName("controller.bmcjob"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
 	err = (&AddressPoolReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -129,7 +136,7 @@ var _ = BeforeSuite(func() {
 		Expect(err).ToNot(HaveOccurred())
 	}()
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(30 * time.Second)
 })
 
 var _ = AfterSuite(func() {

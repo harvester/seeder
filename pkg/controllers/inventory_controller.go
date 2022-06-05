@@ -18,9 +18,14 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-logr/logr"
+	"github.com/google/uuid"
+	"github.com/harvester/bmaas/pkg/tink"
 	"github.com/harvester/bmaas/pkg/util"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
+	"github.com/tinkerbell/tink/protos/hardware"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
@@ -73,6 +78,10 @@ func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		r.manageBaseboardObject,
 		r.checkAndMarkNodeReady,
 		r.handleBaseboardDeletion,
+		r.checkAndCreateTinkHardware,
+		r.triggerReboot,
+		r.cleanupTinkHardware,
+		r.reconcileBMCJob,
 	}
 
 	deletionReconcileList := []inventoryReconciler{
@@ -113,6 +122,11 @@ func (r *InventoryReconciler) manageBaseboardObject(ctx context.Context, i *bmaa
 		return err
 	}
 
+	id, err := uuid.NewUUID()
+	if err != nil {
+		return err
+	}
+	i.Status.HardwareID = id.String()
 	i.Status.Status = bmaasv1alpha1.BMCObjectCreated
 	return r.Client.Status().Update(ctx, i)
 }
@@ -189,27 +203,152 @@ func (r *InventoryReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				},
 			},
 			}
-		})).
+		})).Owns(&rufio.BMCJob{}).
 		Complete(r)
 }
 
 func (r *InventoryReconciler) checkAndCreateTinkHardware(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
 	// if inventory has been allocated to cluster then trigger tinkbell hardware creation
-	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) {
-		if i.Status.HardwareID == "" {
+	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated) {
+		tc, err := tink.NewClient(ctx, r.Client)
+		if err != nil {
+			return err
+		}
 
+		hw, err := tc.HardwareClient.ByMAC(ctx, &hardware.GetRequest{
+			Mac: i.Spec.ManagementInterfaceMacAddress,
+		})
+		if err != nil {
+			return err
+		}
+
+		if hw.Id != i.Status.HardwareID {
+			return fmt.Errorf("mac address %s is already associated with another hardware id %s, likely a misconfigured inventory, requeuing request to try later", i.Spec.ManagementInterfaceMacAddress, hw.Id)
+		}
+
+		// if empty or matches hardwareID re-push the hardware request
+		if hw == nil || hw.Id == i.Status.HardwareID {
+			// create or update hardware request
+			c := &bmaasv1alpha1.Cluster{}
+			err = r.Get(ctx, types.NamespacedName{Name: i.Status.Cluster.Name, Namespace: i.Status.Cluster.Namespace}, c)
+			if err != nil {
+				return err
+			}
+
+			hw, err := tink.GenerateHWRequest(i, c)
+			if err != nil {
+				return err
+			}
+
+			_, err = tc.HardwareClient.Push(ctx, &hardware.PushRequest{
+				Data: hw,
+			})
+			if err != nil {
+				return err
+			}
+			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated, "hardware request created")
+			return r.Status().Update(ctx, i)
 		}
 	}
 
 	return nil
 }
 
+// triggerReboot will reboot the machine using the BMCJob object
 func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
 	// if tink workflow has been created and inventory is allocated to a cluster
 	// then reboot the hardware using BMC tasks
 	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) {
-
+		// submit BMC task
+		off := rufio.HardPowerOff
+		on := rufio.PowerOn
+		job := &rufio.BMCJob{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      fmt.Sprintf("%s-reboot", i.Name),
+				Namespace: i.Namespace,
+			},
+			Spec: rufio.BMCJobSpec{
+				BaseboardManagementRef: rufio.BaseboardManagementRef{
+					Name:      i.Name,
+					Namespace: i.Namespace,
+				},
+				Tasks: []rufio.Task{
+					{
+						PowerAction: &off,
+					},
+					{
+						OneTimeBootDeviceAction: &rufio.OneTimeBootDeviceAction{
+							Devices: []rufio.BootDevice{
+								rufio.PXE,
+							},
+							EFIBoot: false,
+						},
+					},
+					{
+						PowerAction: &on,
+					},
+				},
+			},
+		}
+		err := controllerutil.SetControllerReference(i, job, r.Scheme)
+		if err != nil {
+			return err
+		}
+		err = r.Create(ctx, job)
+		if err != nil {
+			return err
+		}
 	}
 
+	i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted, "BMCJob submitted")
+
+	return r.Status().Update(ctx, i)
+}
+
+// reconcileBMCJob will update the BMCJob conditions to reflect current state of the job for specific inventory
+func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
+
+	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted) {
+		j := &rufio.BMCJob{}
+		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, j)
+		if err != nil {
+			return err
+		}
+
+		if j.HasCondition(rufio.JobCompleted, rufio.ConditionTrue) {
+			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobComplete, "")
+		}
+
+		if j.HasCondition(rufio.JobFailed, rufio.ConditionTrue) {
+			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobError, "")
+		}
+		util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted)
+		return r.Status().Update(ctx, i)
+	}
+	return nil
+}
+
+// TODO: Wireup tinkerbell integration, cleanup of tinkerbell hardware when cluster is removed
+func (r *InventoryReconciler) cleanupTinkHardware(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
+	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryFreed) {
+		hw, err := tink.NewClient(ctx, r.Client)
+		if err != nil {
+			return err
+		}
+		result, err := hw.HardwareClient.ByID(ctx, &hardware.GetRequest{
+			Id: i.Status.HardwareID,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		if result != nil {
+			_, err := hw.HardwareClient.Delete(ctx, &hardware.DeleteRequest{Id: i.Status.HardwareID})
+			if err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
