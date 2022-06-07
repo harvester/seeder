@@ -18,7 +18,9 @@ package main
 
 import (
 	"flag"
+	"github.com/harvester/bmaas/pkg/mock"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
+	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 	"os"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
@@ -48,6 +50,7 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(bmaasv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(tinkv1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
@@ -86,6 +89,7 @@ func main() {
 	if err = (&controllers.ClusterReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
+		Logger: log.FromContext(ctx).WithName("cluster-controller"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Cluster")
 		os.Exit(1)
@@ -96,6 +100,33 @@ func main() {
 		Logger: log.FromContext(ctx).WithName("inventory-controller"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "Inventory")
+		os.Exit(1)
+	}
+
+	if err = (&controllers.AddressPoolReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: log.FromContext(ctx).WithName("addresspool-controller"),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "AddressPool")
+		os.Exit(1)
+	}
+
+	if err = (&mock.FakeBaseboardReconciller{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: log.FromContext(ctx).WithName("baseboard-controller"),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "baseboard")
+		os.Exit(1)
+	}
+
+	if err = (&mock.FakeBaseboardJobReconciller{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: log.FromContext(ctx).WithName("bmcjob-controller"),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "bmcjo")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder

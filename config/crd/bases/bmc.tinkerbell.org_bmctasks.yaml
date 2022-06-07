@@ -5,25 +5,24 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.8.0
   creationTimestamp: null
-  name: baseboardmanagements.bmc.tinkerbell.org
+  name: bmctasks.bmc.tinkerbell.org
 spec:
   group: bmc.tinkerbell.org
   names:
     categories:
       - tinkerbell
-    kind: BaseboardManagement
-    listKind: BaseboardManagementList
-    plural: baseboardmanagements
+    kind: BMCTask
+    listKind: BMCTaskList
+    plural: bmctasks
     shortNames:
-      - bm
-    singular: baseboardmanagement
+      - bmt
+    singular: bmctask
   scope: Namespaced
   versions:
     - name: v1alpha1
       schema:
         openAPIV3Schema:
-          description: BaseboardManagement is the Schema for the baseboardmanagements
-            API
+          description: BMCTask is the Schema for the bmctasks API
           properties:
             apiVersion:
               description: 'APIVersion defines the versioned schema of this representation
@@ -38,7 +37,7 @@ spec:
             metadata:
               type: object
             spec:
-              description: BaseboardManagementSpec defines the desired state of BaseboardManagement
+              description: BMCTaskSpec defines the desired state of BMCTask
               properties:
                 connection:
                   description: Connection represents the BaseboardManagement connectivity
@@ -75,43 +74,78 @@ spec:
                     - insecureTLS
                     - port
                   type: object
+                task:
+                  description: Task defines the specific action to be performed.
+                  maxProperties: 1
+                  properties:
+                    oneTimeBootDeviceAction:
+                      description: OneTimeBootDeviceAction represents a baseboard management
+                        one time set boot device operation.
+                      properties:
+                        device:
+                          description: Devices represents the boot devices, in order
+                            for setting one time boot. Currently only the first device
+                            in the slice is used to set one time boot.
+                          items:
+                            description: BootDevice represents boot device of the BaseboardManagement.
+                            type: string
+                          type: array
+                        efiBoot:
+                          default: false
+                          description: EFIBoot specifies to EFI boot for the baseboard
+                            management. When true, enables options=efiboot while setting
+                            the boot device. If false, no options are passed.
+                          type: boolean
+                      required:
+                        - device
+                      type: object
+                    powerAction:
+                      description: PowerAction represents a baseboard management power
+                        operation.
+                      enum:
+                        - "on"
+                        - "off"
+                        - soft
+                        - status
+                        - cycle
+                        - reset
+                      type: string
+                  type: object
               required:
-                - connection
+                - task
               type: object
             status:
-              description: BaseboardManagementStatus defines the observed state of BaseboardManagement
+              description: BMCTaskStatus defines the observed state of BMCTask
               properties:
+                completionTime:
+                  description: CompletionTime represents time when the task was completed.
+                    The completion time is only set when the task finishes successfully.
+                  format: date-time
+                  type: string
                 conditions:
                   description: Conditions represents the latest available observations
                     of an object's current state.
                   items:
                     properties:
-                      lastUpdateTime:
-                        description: Last time the BaseboardManagement condition was
-                          updated.
-                        format: date-time
-                        type: string
                       message:
                         description: Message represents human readable message indicating
                           details about last transition.
                         type: string
                       status:
-                        description: Status is the status of the BaseboardManagement
-                          condition. Can be True or False.
+                        description: Status is the status of the BMCTask condition.
+                          Can be True or False.
                         type: string
                       type:
-                        description: Type of the BaseboardManagement condition.
+                        description: Type of the BMCTask condition.
                         type: string
                     required:
                       - status
                       - type
                     type: object
                   type: array
-                powerState:
-                  description: Power is the current power state of the BaseboardManagement.
-                  enum:
-                    - "on"
-                    - "off"
+                startTime:
+                  description: StartTime represents time when the BMCTask started processing.
+                  format: date-time
                   type: string
               type: object
           type: object

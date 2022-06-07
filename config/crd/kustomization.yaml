@@ -4,6 +4,11 @@
 resources:
 - bases/metal.harvesterhci.io_clusters.yaml
 - bases/metal.harvesterhci.io_inventories.yaml
+- bases/metal.harvesterhci.io_addresspools.yaml
+- bases/bmc.tinkerbell.org_baseboardmanagements.yaml
+- bases/bmc.tinkerbell.org_bmcjob.yaml
+- bases/bmc.tinkerbell.org_bmctasks.yaml
+- bases/tinkerbell.org_hardware.yaml
 #+kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

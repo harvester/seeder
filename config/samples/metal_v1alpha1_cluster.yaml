@@ -1,6 +1,52 @@
 apiVersion: metal.harvesterhci.io/v1alpha1
+kind: AddressPool
+metadata:
+  name: sample-address-pool
+  namespace: default
+spec:
+  cidr: "192.168.1.1/29"
+  gateway: "192.168.1.7"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: node
+  namespace: default
+stringData:
+  username: admin
+  password: admin
+---
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: Inventory
+metadata:
+  name: node
+  namespace: default
+spec:
+  primaryDisk: "/dev/sda"
+  managementInterfaceMacAddress: "xx:xx:xx:xx:xx"
+  baseboardSpec:
+    connection:
+      host: "localhost"
+      port: 623
+      insecureTLS: true
+      authSecretRef:
+        name: node
+        namespace: default
+---
+apiVersion: metal.harvesterhci.io/v1alpha1
 kind: Cluster
 metadata:
   name: cluster-sample
 spec:
-  # TODO(user): Add fields here
+  version: "harvester_1_0_2"
+  nodes:
+    - inventoryReference:
+        name: node
+        namespace: default
+      addressPoolReference:
+        name: sample-address-pool
+        namespace: default
+  vipConfig:
+    addressPoolReference:
+      name: sample-address-pool
+      namespace: default

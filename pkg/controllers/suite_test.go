@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 	"path/filepath"
 	"testing"
 	"time"
@@ -88,6 +89,8 @@ var _ = BeforeSuite(func() {
 	err = clientgoscheme.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
 
+	err = tinkv1alpha1.AddToScheme(scheme)
+	Expect(err).NotTo(HaveOccurred())
 	//+kubebuilder:scaffold:scheme
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme})
@@ -127,6 +130,13 @@ var _ = BeforeSuite(func() {
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 		Logger: log.Log.WithName("controller.addresspool"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&ClusterReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: log.Log.WithName("controller.cluster"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 

@@ -35,8 +35,6 @@ spec:
           spec:
             description: InventorySpec defines the desired state of Inventory
             properties:
-              ManagementInterfaceMacAddress:
-                type: string
               baseboardSpec:
                 description: BaseboardManagementSpec defines the desired state of
                   BaseboardManagement
@@ -78,21 +76,16 @@ spec:
                     - insecureTLS
                     - port
                     type: object
-                  power:
-                    description: Power is the desired power state of the BaseboardManagement.
-                    enum:
-                    - "on"
-                    - "off"
-                    type: string
                 required:
                 - connection
-                - power
                 type: object
+              managementInterfaceMacAddress:
+                type: string
               primaryDisk:
                 type: string
             required:
-            - ManagementInterfaceMacAddress
             - baseboardSpec
+            - managementInterfaceMacAddress
             - primaryDisk
             type: object
           status:

@@ -30,24 +30,23 @@ type TaskWorkflowStatus string
 type ConditionType string
 
 const (
+	KindCluster   string = "cluster"
+	KindInventory string = "inventory"
+)
+const (
 	InventoryFinalizer = "finalizer.inventory.harvesterhci.io"
 )
 
 const (
-	BMCObjectCreated InventoryWorkflowStatus = "bmcObjectCreated"
-
-	TinkHardwareSubmitted InventoryWorkflowStatus = "tinkerbellHardwareCreated"
-	InventoryReady        InventoryWorkflowStatus = "inventoryNodeReady"
-	InventoryRunning      InventoryWorkflowStatus = "inventoryRunning"
+	InventoryReady InventoryWorkflowStatus = "inventoryNodeReady"
 )
 
 const (
+	BMCObjectCreated            ConditionType = "bmcObjectCreated"
 	BMCJobSubmitted             ConditionType = "bmcJobSubmitted"
 	BMCJobComplete              ConditionType = "bmcJobCompleted"
 	BMCJobError                 ConditionType = "bmcJobErrorr"
 	TinkWorkflowCreated         ConditionType = "tinkWorkflowCreated"
-	TinkWorkflowError           ConditionType = "tinkWorkflowError"
-	TinkWorkflowRemoved         ConditionType = "tinkWorkflowRemoved"
 	InventoryAllocatedToCluster ConditionType = "inventoryAllocatedToCluster"
 	InventoryFreed              ConditionType = "inventoryFreed"
 	HarvesterCreateNode         ConditionType = "harvesterCreateNode"
@@ -57,7 +56,7 @@ const (
 // InventorySpec defines the desired state of Inventory
 type InventorySpec struct {
 	PrimaryDisk                   string `json:"primaryDisk"`
-	ManagementInterfaceMacAddress string `json:"ManagementInterfaceMacAddress"`
+	ManagementInterfaceMacAddress string `json:"managementInterfaceMacAddress"`
 	rufio.BaseboardManagementSpec `json:"baseboardSpec"`
 }
 

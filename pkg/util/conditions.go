@@ -37,11 +37,14 @@ func CreateOrUpdateCondition(conditions []bmaasv1alpha1.Conditions, t bmaasv1alp
 			}
 			newConditions = append(newConditions, v)
 		}
+
 	} else {
-		newConditions = append(newConditions, bmaasv1alpha1.Conditions{Type: t,
+		newConditions = append(newConditions, bmaasv1alpha1.Conditions{
+			Type:      t,
 			Message:   message,
 			StartTime: metav1.Now(),
 		})
+		newConditions = append(newConditions, conditions...)
 	}
 	return newConditions
 }

@@ -29,8 +29,8 @@ func (f *FakeBaseboardReconciller) Reconcile(ctx context.Context, req ctrl.Reque
 		return ctrl.Result{}, err
 	}
 
-	// patch power status to mimic real world action
-	b.Status.Power = b.Spec.Power
+	// patch connectivity to mark baseboard ready
+	b.SetCondition(rufio.Contactable, rufio.ConditionTrue)
 	return ctrl.Result{}, f.Status().Update(ctx, b)
 }
 

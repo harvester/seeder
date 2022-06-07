@@ -34,12 +34,17 @@ type AddressSpec struct {
 }
 
 type AddressStatus struct {
-	Status             PoolStatus                 `json:"status"`
-	StartAddress       string                     `json:"startAddress"`
-	LastAddress        string                     `json:"lastAddress"`
-	AvailableAddresses int                        `json:"availableAddresses"`
-	AddressAllocation  map[string]ObjectReference `json:"addressAllocation"`
-	Netmask            string                     `json:"netmask"`
+	Status             PoolStatus                         `json:"status"`
+	StartAddress       string                             `json:"startAddress"`
+	LastAddress        string                             `json:"lastAddress"`
+	AvailableAddresses int                                `json:"availableAddresses"`
+	AddressAllocation  map[string]ObjectReferenceWithKind `json:"addressAllocation"`
+	Netmask            string                             `json:"netmask"`
+}
+
+type ObjectReferenceWithKind struct {
+	ObjectReference `json:",inline"`
+	Kind            string `json:"kind"`
 }
 
 //+kubebuilder:object:root=true

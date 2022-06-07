@@ -37,7 +37,6 @@ func Test_GenerateHWRequest(t *testing.T) {
 					},
 					InsecureTLS: true,
 				},
-				Power: rufio.On,
 			},
 		},
 		Status: bmaasv1alpha1.InventoryStatus{
@@ -109,18 +108,18 @@ func Test_GenerateHWRequest(t *testing.T) {
 
 	hw, err := GenerateHWRequest(i, c)
 	assert.NoError(t, err, "no error should occur during hardware generation")
-	assert.Contains(t, hw.Metadata, "harvester.install.mode=create", "expected to find create mode in metadata")
-	assert.Contains(t, hw.Metadata, "hwAddr:xx:xx:xx:xx:xx", "expected to find mac address in metadata")
-	assert.Contains(t, hw.Metadata, "\"slug\":\"v1.0.1\"", "expected find a slug in metadata")
-	assert.Contains(t, hw.Metadata, "dnsNameservers=8.8.8.8", "expected to find correct nameserver")
-	assert.Contains(t, hw.Metadata, "ssh_authorized_keys=\\\"- abc ", "expected to find ssh_keys")
-	assert.Contains(t, hw.Metadata, "token=token", "expected to find token")
-	assert.Contains(t, hw.Metadata, "password=password", "expected to find password")
-	assert.Contains(t, hw.Metadata, "harvester.install.vip=192.168.1.100", "expected to find a vip")
-	assert.Contains(t, hw.Metadata, "harvester.install.vipMode=static", "expected to find vipMode static")
-	assert.Equal(t, hw.Id, i.Status.HardwareID, "expected to find correct hardware uuid")
-	assert.Equal(t, hw.Network.Interfaces[0].Dhcp.Mac, i.Spec.ManagementInterfaceMacAddress, "expected to find correct hardware address")
-	assert.Equal(t, hw.Network.Interfaces[0].Dhcp.Ip.Gateway, i.Status.Gateway, "expected to find correct gateway")
-	assert.Equal(t, hw.Network.Interfaces[0].Dhcp.Ip.Address, i.Status.Address, "expected to find correct address")
-	assert.Equal(t, hw.Network.Interfaces[0].Dhcp.Ip.Netmask, i.Status.Netmask, "expected to find correct netmask")
+	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "harvester.install.mode=create", "expected to find create mode in metadata")
+	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "hwAddr:xx:xx:xx:xx:xx", "expected to find mac address in metadata")
+	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "\"slug\":\"v1.0.1\"", "expected find a slug in metadata")
+	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "dnsNameservers=8.8.8.8", "expected to find correct nameserver")
+	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "ssh_authorized_keys=\\\"- abc ", "expected to find ssh_keys")
+	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "token=token", "expected to find token")
+	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "password=password", "expected to find password")
+	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "harvester.install.vip=192.168.1.100", "expected to find a vip")
+	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "harvester.install.vipMode=static", "expected to find vipMode static")
+	assert.Equal(t, hw.Spec.Metadata.Instance.ID, i.Status.HardwareID, "expected to find correct hardware uuid")
+	assert.Equal(t, hw.Spec.Interfaces[0].DHCP.MAC, i.Spec.ManagementInterfaceMacAddress, "expected to find correct hardware address")
+	assert.Equal(t, hw.Spec.Interfaces[0].DHCP.IP.Gateway, i.Status.Gateway, "expected to find correct gateway")
+	assert.Equal(t, hw.Spec.Interfaces[0].DHCP.IP.Address, i.Status.Address, "expected to find correct address")
+	assert.Equal(t, hw.Spec.Interfaces[0].DHCP.IP.Netmask, i.Status.Netmask, "expected to find correct netmask")
 }

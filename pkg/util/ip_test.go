@@ -35,8 +35,8 @@ func Test_AllocateAddress(t *testing.T) {
 	address, err := AllocateAddress(status, "")
 	assert.NoError(t, err, "expected no error during address allocation")
 	assert.NotEmpty(t, address, "generated address should not have been empty")
-	status.AddressAllocation = map[string]bmaasv1alpha1.ObjectReference{
-		address: {Namespace: "default", Name: "demo"},
+	status.AddressAllocation = map[string]bmaasv1alpha1.ObjectReferenceWithKind{
+		address: {ObjectReference: bmaasv1alpha1.ObjectReference{Namespace: "default", Name: "demo"}, Kind: "inventory"},
 	}
 	_, err = AllocateAddress(status, address)
 	assert.Error(t, err, "expected error allocating same address twice")
@@ -48,8 +48,8 @@ func Test_DeallocateAddress(t *testing.T) {
 	address, err := AllocateAddress(status, "")
 	assert.NoError(t, err, "expected no error during address allocation")
 	assert.NotEmpty(t, address, "generated address should not have been empty")
-	status.AddressAllocation = map[string]bmaasv1alpha1.ObjectReference{
-		address: {Namespace: "default", Name: "demo"},
+	status.AddressAllocation = map[string]bmaasv1alpha1.ObjectReferenceWithKind{
+		address: {ObjectReference: bmaasv1alpha1.ObjectReference{Namespace: "default", Name: "demo"}, Kind: "inventory"},
 	}
 	err = DeallocateAddress(status, address)
 	assert.NoError(t, err, "expected no error while removing ip address")

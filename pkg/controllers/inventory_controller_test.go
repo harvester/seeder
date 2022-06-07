@@ -36,7 +36,6 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 							Namespace: "default",
 						},
 					},
-					Power: rufio.On,
 				},
 			},
 		}
@@ -99,12 +98,25 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 
 	AfterEach(func() {
 		Eventually(func() error {
-			err := k8sClient.Delete(ctx, creds)
+			return k8sClient.Delete(ctx, creds)
+
+		}).ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, i)
+
+		}).ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			// wait until finalizers have cleaned up objects
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, i)
 			if err != nil {
-				return err
+				// object is missing
+				if apierrors.IsNotFound(err) {
+					return nil
+				}
 			}
-			err = k8sClient.Delete(ctx, i)
-			return err
+			return fmt.Errorf("waiting for inventory object to be not found")
 		}).ShouldNot(HaveOccurred())
 	})
 })
@@ -132,7 +144,6 @@ var _ = Describe("inventory object deletion tests", func() {
 							Namespace: "default",
 						},
 					},
-					Power: rufio.On,
 				},
 			},
 		}

@@ -50,11 +50,14 @@ spec:
               addressAllocation:
                 additionalProperties:
                   properties:
+                    kind:
+                      type: string
                     name:
                       type: string
                     namespace:
                       type: string
                   required:
+                  - kind
                   - name
                   - namespace
                   type: object

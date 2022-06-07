@@ -19,12 +19,11 @@ package controllers
 import (
 	"context"
 	"fmt"
+
 	"github.com/go-logr/logr"
 	"github.com/google/uuid"
-	"github.com/harvester/bmaas/pkg/tink"
 	"github.com/harvester/bmaas/pkg/util"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
-	"github.com/tinkerbell/tink/protos/hardware"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -78,9 +77,7 @@ func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		r.manageBaseboardObject,
 		r.checkAndMarkNodeReady,
 		r.handleBaseboardDeletion,
-		r.checkAndCreateTinkHardware,
 		r.triggerReboot,
-		r.cleanupTinkHardware,
 		r.reconcileBMCJob,
 	}
 
@@ -108,7 +105,7 @@ func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 // and sets the appropriate ownership
 func (r *InventoryReconciler) manageBaseboardObject(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
 	// already in desired state. No further action needed
-	if i.Status.Status == bmaasv1alpha1.BMCObjectCreated {
+	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.BMCObjectCreated) {
 		return nil
 	}
 
@@ -127,35 +124,46 @@ func (r *InventoryReconciler) manageBaseboardObject(ctx context.Context, i *bmaa
 		return err
 	}
 	i.Status.HardwareID = id.String()
-	i.Status.Status = bmaasv1alpha1.BMCObjectCreated
+	i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCObjectCreated, "bmc object created")
 	return r.Client.Status().Update(ctx, i)
 }
 
 // checkAndMarkNodeReady will check the power status of the BaseboardManagement Object and Mark the node ready
 func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
-	if i.Status.Status == bmaasv1alpha1.InventoryReady {
-		return nil
-	}
-	b := &rufio.BaseboardManagement{}
-	err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
-	if err != nil {
-		r.Error(err, "error fetching associated baseboard object in checkAndMarkNodeReady")
-		return err
-	}
+	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.BMCObjectCreated) {
+		if i.Status.Status == bmaasv1alpha1.InventoryReady {
+			return nil
+		}
 
-	if b.Spec.Power == b.Status.Power {
-		i.Status.Status = bmaasv1alpha1.InventoryReady
-		return r.Client.Status().Update(ctx, i)
+		// check status of boseboard object
+		b := &rufio.BaseboardManagement{}
+		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
+		if err != nil {
+			r.Error(err, "error fetching associated baseboard object in checkAndMarkNodeReady")
+			return err
+		}
 
+		// check if condition bmcv1alpha1.Contactable exists and is bmcv1alpha1.ConditionTrue
+		if util.IsBaseboardReady(b) {
+			i.Status.Status = bmaasv1alpha1.InventoryReady
+			err = r.Status().Update(ctx, i)
+			if err != nil {
+				return err
+			}
+			// apply finalizer on inventory
+			if !controllerutil.ContainsFinalizer(i, bmaasv1alpha1.InventoryFinalizer) {
+				controllerutil.AddFinalizer(i, bmaasv1alpha1.InventoryFinalizer)
+				return r.Update(ctx, i)
+			}
+		}
 	}
-
 	return nil
 }
 
 // handleBMCDeletion will reconcile deletion of BaseboardManagement objects {
 func (r *InventoryReconciler) handleBaseboardDeletion(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
 	// if no status is present then nothing is needed yet as BMC has not yet been created
-	if i.Status.Status != "" {
+	if i.Status.Status == bmaasv1alpha1.InventoryReady {
 		b := &rufio.BaseboardManagement{}
 		err := r.Get(ctx, types.NamespacedName{Name: i.Name, Namespace: i.Namespace}, b)
 		if err != nil {
@@ -169,10 +177,11 @@ func (r *InventoryReconciler) handleBaseboardDeletion(ctx context.Context, i *bm
 				r.Error(err, "error removing finalizer from baseboard object")
 				return err
 			}
+			// reset status to re-trigger recreation of baseboard objects
+			i.Status.Status = ""
+			util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.BMCObjectCreated)
+			return r.Status().Update(ctx, i)
 		}
-		// reset status to re-trigger recreation of baseboard objects
-		i.Status.Status = ""
-		return r.Status().Update(ctx, i)
 	}
 
 	return nil
@@ -180,15 +189,33 @@ func (r *InventoryReconciler) handleBaseboardDeletion(ctx context.Context, i *bm
 
 // handleInventoryDeletion cleans up the finalizer on boseboard object allowing it to be cleaned up
 func (r *InventoryReconciler) handleInventoryDeletion(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
-	b := &rufio.BaseboardManagement{}
-	err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
-	if err != nil {
-		return err
+	if controllerutil.ContainsFinalizer(i, bmaasv1alpha1.InventoryFinalizer) {
+		b := &rufio.BaseboardManagement{}
+		var skipcleanup bool
+		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
+		if err != nil {
+			if apierrors.IsNotFound(err) {
+				skipcleanup = true
+			} else {
+				return err
+			}
+		}
+		if !skipcleanup {
+			if controllerutil.ContainsFinalizer(b, bmaasv1alpha1.InventoryFinalizer) {
+				controllerutil.RemoveFinalizer(b, bmaasv1alpha1.InventoryFinalizer)
+			}
+			if err := r.Update(ctx, b); err != nil {
+				return err
+			}
+		}
+
+		if controllerutil.ContainsFinalizer(i, bmaasv1alpha1.InventoryFinalizer) {
+			controllerutil.RemoveFinalizer(i, bmaasv1alpha1.InventoryFinalizer)
+			return r.Update(ctx, i)
+		}
 	}
-	if controllerutil.ContainsFinalizer(b, bmaasv1alpha1.InventoryFinalizer) {
-		controllerutil.RemoveFinalizer(b, bmaasv1alpha1.InventoryFinalizer)
-	}
-	return r.Update(ctx, b)
+
+	return nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
@@ -203,62 +230,15 @@ func (r *InventoryReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				},
 			},
 			}
-		})).Owns(&rufio.BMCJob{}).
+		})).
 		Complete(r)
-}
-
-func (r *InventoryReconciler) checkAndCreateTinkHardware(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
-	// if inventory has been allocated to cluster then trigger tinkbell hardware creation
-	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated) {
-		tc, err := tink.NewClient(ctx, r.Client)
-		if err != nil {
-			return err
-		}
-
-		hw, err := tc.HardwareClient.ByMAC(ctx, &hardware.GetRequest{
-			Mac: i.Spec.ManagementInterfaceMacAddress,
-		})
-		if err != nil {
-			return err
-		}
-
-		if hw.Id != i.Status.HardwareID {
-			return fmt.Errorf("mac address %s is already associated with another hardware id %s, likely a misconfigured inventory, requeuing request to try later", i.Spec.ManagementInterfaceMacAddress, hw.Id)
-		}
-
-		// if empty or matches hardwareID re-push the hardware request
-		if hw == nil || hw.Id == i.Status.HardwareID {
-			// create or update hardware request
-			c := &bmaasv1alpha1.Cluster{}
-			err = r.Get(ctx, types.NamespacedName{Name: i.Status.Cluster.Name, Namespace: i.Status.Cluster.Namespace}, c)
-			if err != nil {
-				return err
-			}
-
-			hw, err := tink.GenerateHWRequest(i, c)
-			if err != nil {
-				return err
-			}
-
-			_, err = tc.HardwareClient.Push(ctx, &hardware.PushRequest{
-				Data: hw,
-			})
-			if err != nil {
-				return err
-			}
-			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated, "hardware request created")
-			return r.Status().Update(ctx, i)
-		}
-	}
-
-	return nil
 }
 
 // triggerReboot will reboot the machine using the BMCJob object
 func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
-	// if tink workflow has been created and inventory is allocated to a cluster
+	// if tink hardware has been created and inventory is allocated to a cluster
 	// then reboot the hardware using BMC tasks
-	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) {
+	if i.Status.Status == bmaasv1alpha1.InventoryReady && util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted) {
 		// submit BMC task
 		off := rufio.HardPowerOff
 		on := rufio.PowerOn
@@ -290,7 +270,7 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *bmaasv1alpha
 				},
 			},
 		}
-		err := controllerutil.SetControllerReference(i, job, r.Scheme)
+		err := controllerutil.SetOwnerReference(i, job, r.Scheme)
 		if err != nil {
 			return err
 		}
@@ -298,11 +278,13 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *bmaasv1alpha
 		if err != nil {
 			return err
 		}
+
+		i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted, "BMCJob submitted")
+
+		return r.Status().Update(ctx, i)
 	}
 
-	i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted, "BMCJob submitted")
-
-	return r.Status().Update(ctx, i)
+	return nil
 }
 
 // reconcileBMCJob will update the BMCJob conditions to reflect current state of the job for specific inventory
@@ -310,7 +292,7 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, i *bmaasv1alp
 
 	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted) {
 		j := &rufio.BMCJob{}
-		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, j)
+		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: fmt.Sprintf("%s-reboot", i.Name)}, j)
 		if err != nil {
 			return err
 		}
@@ -324,31 +306,6 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, i *bmaasv1alp
 		}
 		util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted)
 		return r.Status().Update(ctx, i)
-	}
-	return nil
-}
-
-// TODO: Wireup tinkerbell integration, cleanup of tinkerbell hardware when cluster is removed
-func (r *InventoryReconciler) cleanupTinkHardware(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
-	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryFreed) {
-		hw, err := tink.NewClient(ctx, r.Client)
-		if err != nil {
-			return err
-		}
-		result, err := hw.HardwareClient.ByID(ctx, &hardware.GetRequest{
-			Id: i.Status.HardwareID,
-		})
-
-		if err != nil {
-			return err
-		}
-
-		if result != nil {
-			_, err := hw.HardwareClient.Delete(ctx, &hardware.DeleteRequest{Id: i.Status.HardwareID})
-			if err != nil {
-				return err
-			}
-		}
 	}
 	return nil
 }

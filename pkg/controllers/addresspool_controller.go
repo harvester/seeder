@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/go-logr/logr"
 	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
@@ -46,7 +47,7 @@ func (r *AddressPoolReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		if apierrors.IsNotFound(err) {
 			return ctrl.Result{}, nil
 		}
-		r.Error(err, "Failed to get Inventory Object")
+		r.Error(err, "Failed to get AddressPool Object")
 		return ctrl.Result{}, err
 	}
 
@@ -115,17 +116,23 @@ func (r *AddressPoolReconciler) reconcilePoolCapacity(ctx context.Context, pool 
 func (r *AddressPoolReconciler) deleteAddressPool(ctx context.Context, pool *bmaasv1alpha1.AddressPool) error {
 	if !pool.DeletionTimestamp.IsZero() && controllerutil.ContainsFinalizer(pool, bmaasv1alpha1.AddressPoolFinalizer) {
 		var addressInUse bool
+		var err error
 		for address, ref := range pool.Status.AddressAllocation {
-			i := &bmaasv1alpha1.Inventory{}
-			err := r.Get(ctx, types.NamespacedName{Namespace: ref.Namespace, Name: ref.Name}, i)
-			if err != nil {
-				return err
+			if reflect.DeepEqual(ref, bmaasv1alpha1.ObjectReferenceWithKind{}) {
+				delete(pool.Status.AddressAllocation, address)
+				continue
 			}
-
-			if address == i.Status.PXEBootInterface.Address {
-				addressInUse = true
+			if ref.Kind == bmaasv1alpha1.KindCluster {
+				addressInUse, err = r.lookupClusterVIP(ctx, ref.ObjectReference, address)
+			} else {
+				addressInUse, err = r.lookupInventoryAddress(ctx, ref.ObjectReference, address)
 			}
 		}
+
+		if err != nil {
+			return err
+		}
+
 		if addressInUse {
 			return fmt.Errorf("one of the address in addresspool %s is still in use, requeuing", pool.Name)
 		}
@@ -141,4 +148,38 @@ func (r *AddressPoolReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&bmaasv1alpha1.AddressPool{}).
 		Complete(r)
+}
+
+func (r *AddressPoolReconciler) lookupClusterVIP(ctx context.Context, obj bmaasv1alpha1.ObjectReference, address string) (bool, error) {
+	c := &bmaasv1alpha1.Cluster{}
+	err := r.Get(ctx, types.NamespacedName{Namespace: obj.Namespace, Name: obj.Name}, c)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	if c.Status.ClusterAddress == address {
+		return true, nil
+	}
+
+	return false, nil
+}
+
+func (r *AddressPoolReconciler) lookupInventoryAddress(ctx context.Context, obj bmaasv1alpha1.ObjectReference, address string) (bool, error) {
+	c := &bmaasv1alpha1.Inventory{}
+	err := r.Get(ctx, types.NamespacedName{Namespace: obj.Namespace, Name: obj.Name}, c)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return false, nil
+		}
+		return false, err
+	}
+
+	if c.Status.PXEBootInterface.Address == address {
+		return true, nil
+	}
+
+	return false, nil
 }

@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"github.com/go-logr/logr"
 	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
@@ -51,10 +50,11 @@ func CheckAndCreateBaseBoardObject(ctx context.Context, client client.Client, lo
 	}
 
 	if !reflect.DeepEqual(b.Spec, existingObj.Spec) {
-		err = fmt.Errorf("existing object is not the same as provided object, erroring out")
+		existingObj.Spec = b.Spec
+		return client.Update(ctx, existingObj)
 	}
 
-	return err
+	return nil
 }
 
 // CreateObject is a generate method to create an object and set ownership
@@ -66,4 +66,16 @@ func CreateObject(ctx context.Context, client client.Client, obj client.Object, 
 	}
 
 	return client.Create(ctx, obj)
+}
+
+// IsBaseboardReady checks if the BaseboardConnectivity is setup and true
+func IsBaseboardReady(b *rufio.BaseboardManagement) bool {
+	var ready bool
+	for _, c := range b.Status.Conditions {
+		if c.Type == rufio.Contactable && c.Status == rufio.ConditionTrue {
+			ready = true
+		}
+	}
+
+	return ready
 }

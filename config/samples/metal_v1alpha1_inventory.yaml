@@ -1,6 +1,25 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: node
+  namespace: default
+stringData:
+  username: admin
+  password: admin
+---
 apiVersion: metal.harvesterhci.io/v1alpha1
 kind: Inventory
 metadata:
-  name: inventory-sample
+  name: node
+  namespace: default
 spec:
-
+  primaryDisk: "/dev/sda"
+  managementInterfaceMacAddress: "xx:xx:xx:xx:xx"
+  baseboardSpec:
+    connection:
+      host: "localhost"
+      port: 623
+      insecureTLS: true
+      authSecretRef:
+        name: node
+        namespace: default

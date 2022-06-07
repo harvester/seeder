@@ -68,9 +68,10 @@ type ClusterStatus struct {
 type ClusterWorkflowStatus string
 
 const (
-	ClusterConfigReady  ClusterWorkflowStatus = "clusterConfigReady"
-	ClusterNodesPatched ClusterWorkflowStatus = "clusterNodesPatched"
-	ClusterRunning      ClusterWorkflowStatus = "clusterRunning"
+	ClusterConfigReady           ClusterWorkflowStatus = "clusterConfigReady"
+	ClusterNodesPatched          ClusterWorkflowStatus = "clusterNodesPatched"
+	ClusterTinkHardwareSubmitted ClusterWorkflowStatus = "tinkHardwareCreated"
+	ClusterRunning               ClusterWorkflowStatus = "clusterRunning"
 )
 
 //+kubebuilder:object:root=true

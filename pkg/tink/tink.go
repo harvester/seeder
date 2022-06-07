@@ -2,87 +2,25 @@ package tink
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
 	"github.com/harvester/bmaas/pkg/util"
 	"github.com/pkg/errors"
-	hw "github.com/tinkerbell/tink/client"
-	"github.com/tinkerbell/tink/protos/hardware"
+	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 	"html/template"
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/types"
-	"net/url"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func NewClient(ctx context.Context, apiClient client.Client) (fullClient *hw.FullClient, err error) {
-	var certURL, grpcAuth string
-	cm := &v1.ConfigMap{}
-	err = apiClient.Get(ctx, types.NamespacedName{Name: bmaasv1alpha1.TinkConfig, Namespace: bmaasv1alpha1.DefaultNS}, cm)
-	if err != nil {
-		return nil, err
-	}
+const (
+	defaultLeaseTime    = 86400
+	defaultArch         = "x86_64"
+	defaultFacilityCode = "on_prem"
+)
 
-	certURL, ok := cm.Data["CERT_URL"]
-	if !ok {
-		return nil, fmt.Errorf("cert_url not found in configmap tinkConfig")
-	}
+//GenerateHWRequest will generate the tinkerbell Hardware type object
+func GenerateHWRequest(i *bmaasv1alpha1.Inventory, c *bmaasv1alpha1.Cluster) (hw *tinkv1alpha1.Hardware, err error) {
 
-	grpcAuth, ok = cm.Data["GRPC_AUTH_URL"]
-	if !ok {
-		return nil, fmt.Errorf("grpc_auth_url not found in configmap tinkConfig")
-	}
-
-	return NewClientFromEndpoints(certURL, grpcAuth)
-}
-
-func NewClientFromEndpoints(certURL, grpcAuth string) (fullClient *hw.FullClient, err error) {
-	connOpts := &hw.ConnOptions{CertURL: certURL, GRPCAuthority: grpcAuth}
-
-	grpcConn, err := hw.NewClientConn(connOpts)
-	if err != nil {
-		return nil, fmt.Errorf("error creating grpc clients: %v", err)
-	}
-
-	fullClient = hw.NewFullClient(grpcConn)
-
-	return fullClient, err
-}
-
-func GenerateHWRequest(i *bmaasv1alpha1.Inventory, c *bmaasv1alpha1.Cluster) (hw *hardware.Hardware, err error) {
-
-	networkInterfaces := &hardware.Hardware_Network_Interface{
-		Netboot: &hardware.Hardware_Netboot{
-			AllowPxe: true,
-		},
-	}
-
-	// Specify non default location to load ISO's. If not present tinkerbell will load the same from releases.rancher.com
-	if len(c.Spec.ImageURL) != 0 {
-		networkInterfaces.Netboot.Osie = &hardware.Hardware_Netboot_Osie{BaseUrl: c.Spec.ImageURL}
-	}
-
-	ip := &hardware.Hardware_DHCP_IP{}
-
-	dhcpRequest := &hardware.Hardware_DHCP{
-		Mac:      i.Spec.ManagementInterfaceMacAddress,
-		Ip:       ip,
-		Hostname: fmt.Sprintf("%s-%s", i.Name, i.Namespace),
-	}
-
-	ip.Address = i.Status.Address
-	ip.Gateway = i.Status.Gateway
-	ip.Netmask = i.Status.Netmask
-
-	// update dhcp request
-	networkInterfaces.Dhcp = dhcpRequest
-
-	_, err = url.Parse(c.Spec.ConfigURL)
-	if err != nil {
-		return nil, errors.Wrap(err, "error parsing server url")
-	}
-
+	// generate metadata
 	mode := "join"
 	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.HarvesterCreateNode) {
 		mode = "create"
@@ -91,21 +29,62 @@ func GenerateHWRequest(i *bmaasv1alpha1.Inventory, c *bmaasv1alpha1.Cluster) (hw
 	m, err := generateMetaData(c.Spec.ConfigURL, c.Spec.HarvesterVersion, i.Spec.ManagementInterfaceMacAddress, mode,
 		i.Spec.PrimaryDisk, c.Status.ClusterAddress, c.Status.ClusterToken, i.Status.GeneratedPassword, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys)
 	if err != nil {
-		return hw, errors.Wrap(err, "error during metadata generation")
+		return nil, errors.Wrap(err, "error during metadata generation")
 	}
-	hw = &hardware.Hardware{
-		Id: i.Status.HardwareID,
-		Network: &hardware.Hardware_Network{
-			Interfaces: []*hardware.Hardware_Network_Interface{
-				networkInterfaces,
+
+	hw = &tinkv1alpha1.Hardware{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      i.Name,
+			Namespace: i.Namespace,
+		},
+		Spec: tinkv1alpha1.HardwareSpec{
+			Interfaces: []tinkv1alpha1.Interface{
+				{
+					Netboot: &tinkv1alpha1.Netboot{
+						AllowPXE:      &[]bool{true}[0],
+						AllowWorkflow: &[]bool{true}[0],
+						OSIE: &tinkv1alpha1.OSIE{
+							BaseURL: c.Spec.ImageURL,
+						},
+					},
+					DHCP: &tinkv1alpha1.DHCP{
+						MAC:       i.Spec.ManagementInterfaceMacAddress,
+						Hostname:  fmt.Sprintf("%s-%s", i.Name, i.Namespace),
+						LeaseTime: defaultLeaseTime,
+						Arch:      defaultArch,
+						UEFI:      true,
+						IP: &tinkv1alpha1.IP{
+							Address: i.Status.Address,
+							Netmask: i.Status.Netmask,
+							Gateway: i.Status.Gateway,
+						},
+					},
+				},
+			},
+			Disks: []tinkv1alpha1.Disk{
+				{
+					Device: i.Spec.PrimaryDisk,
+				},
+			},
+			Metadata: &tinkv1alpha1.HardwareMetadata{
+				Facility: &tinkv1alpha1.MetadataFacility{
+					FacilityCode: defaultFacilityCode,
+				},
+				Instance: &tinkv1alpha1.MetadataInstance{
+					ID:       i.Status.HardwareID,
+					Userdata: m,
+					OperatingSystem: &tinkv1alpha1.MetadataInstanceOperatingSystem{
+						Slug: c.Spec.HarvesterVersion,
+					},
+				},
 			},
 		},
-		Metadata: m,
 	}
 
 	return hw, nil
 }
 
+// generateMetaData is a wrapper to generate metadata for nodes to create or join a cluster
 func generateMetaData(configURL, slug, hwAddress, mode, disk, vip, token, password string, Nameservers, SSHKeys []string) (metadata string, err error) {
 
 	var tmpStruct struct {
