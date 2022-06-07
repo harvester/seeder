@@ -312,10 +312,11 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *bma
 
 // cleanupClusterDeps will trigger cleanup of nodes and associated infra
 func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *bmaasv1alpha1.Cluster) error {
+	// clean up nodes
 	for _, nc := range c.Spec.Nodes {
 		var poolmissing, inventorymissing bool
 		pool := &bmaasv1alpha1.AddressPool{}
-		err := r.Get(ctx, types.NamespacedName{Namespace: nc.AddressPoolReference.Name,
+		err := r.Get(ctx, types.NamespacedName{Namespace: nc.AddressPoolReference.Namespace,
 			Name: nc.AddressPoolReference.Name}, pool)
 		if err != nil {
 			if apierrors.IsNotFound(err) {
@@ -324,13 +325,21 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *bmaasv1al
 				return err
 			}
 		}
+
 		i := &bmaasv1alpha1.Inventory{}
-		err = r.Get(ctx, types.NamespacedName{Namespace: nc.InventoryReference.Name,
+		err = r.Get(ctx, types.NamespacedName{Namespace: nc.InventoryReference.Namespace,
 			Name: nc.InventoryReference.Name}, i)
 		if err != nil {
 			if apierrors.IsNotFound(err) {
 				inventorymissing = true
 			} else {
+				return err
+			}
+		}
+
+		if !poolmissing {
+			delete(pool.Status.AddressAllocation, i.Status.PXEBootInterface.Address)
+			if err := r.Status().Update(ctx, pool); err != nil {
 				return err
 			}
 		}
@@ -346,9 +355,26 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *bmaasv1al
 			}
 		}
 
-		if !poolmissing {
-			delete(pool.Status.AddressAllocation, i.Status.PXEBootInterface.Address)
-			return r.Status().Update(ctx, pool)
+	}
+
+	//cleanup VIP address pool
+	if c.Status.ClusterAddress != "" {
+		var poolNotFound bool
+		pool := &bmaasv1alpha1.AddressPool{}
+		if err := r.Get(ctx, types.NamespacedName{Namespace: c.Spec.VIPConfig.AddressPoolReference.Namespace,
+			Name: c.Spec.VIPConfig.AddressPoolReference.Name}, pool); err != nil {
+			if apierrors.IsNotFound(err) {
+				poolNotFound = true
+			} else {
+				return err
+			}
+		}
+
+		if !poolNotFound {
+			delete(pool.Status.AddressAllocation, c.Status.ClusterAddress)
+			if err := r.Status().Update(ctx, pool); err != nil {
+				return err
+			}
 		}
 	}
 

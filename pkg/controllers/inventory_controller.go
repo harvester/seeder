@@ -292,18 +292,36 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, i *bmaasv1alp
 
 	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted) {
 		j := &rufio.BMCJob{}
+		var jobFound bool
 		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: fmt.Sprintf("%s-reboot", i.Name)}, j)
 		if err != nil {
-			return err
+			if !apierrors.IsNotFound(err) {
+				return err
+			}
+		} else {
+			jobFound = true
 		}
 
-		if j.HasCondition(rufio.JobCompleted, rufio.ConditionTrue) {
-			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobComplete, "")
+		if jobFound {
+			if j.HasCondition(rufio.JobCompleted, rufio.ConditionTrue) {
+				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobComplete, "")
+			}
+
+			if j.HasCondition(rufio.JobFailed, rufio.ConditionTrue) {
+				var message string
+				for _, c := range j.Status.Conditions {
+					if c.Type == rufio.JobFailed && c.Status == rufio.ConditionTrue {
+						message = c.Message
+					}
+				}
+				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobError, message)
+			}
+
+			if err := r.Delete(ctx, j); err != nil {
+				return err
+			}
 		}
 
-		if j.HasCondition(rufio.JobFailed, rufio.ConditionTrue) {
-			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobError, "")
-		}
 		util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted)
 		return r.Status().Update(ctx, i)
 	}
