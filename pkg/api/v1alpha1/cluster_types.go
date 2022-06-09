@@ -76,6 +76,9 @@ const (
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="ClusterStatus",type="string",JSONPath=`.status.status`
+//+kubebuilder:printcolumn:name="ClusterToken",type="string",JSONPath=`.status.token`
+//+kubebuilder:printcolumn:name="ClusterAddress",type="string",JSONPath=`.status.clusterAddress`
 
 // Cluster is the Schema for the clusters API
 type Cluster struct {

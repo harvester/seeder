@@ -15,7 +15,17 @@ spec:
     singular: inventory
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.status
+      name: InventoryStatus
+      type: string
+    - jsonPath: .status.generatedPassword
+      name: GeneratedPassword
+      type: string
+    - jsonPath: .status.pxeBootConfig.address
+      name: AllocatedNodeAddress
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: Inventory is the Schema for the inventories API

@@ -17,6 +17,10 @@ const (
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="AddressPoolStatus",type="string",JSONPath=`.status.status`
+//+kubebuilder:printcolumn:name="StartAddress",type="string",JSONPath=`.status.startAddress`
+//+kubebuilder:printcolumn:name="LastAddress",type="string",JSONPath=`.status.lastAddress`
+//+kubebuilder:printcolumn:name="NetMask",type="string",JSONPath=`.status.netmask`
 
 // AddressPool is the CRD for maintaining Aaddress pools for Harvester nodes and VIP's
 type AddressPool struct {

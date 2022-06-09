@@ -91,6 +91,9 @@ type Conditions struct {
 
 //+kubebuilder:object:root=true
 //+kubebuilder:subresource:status
+//+kubebuilder:printcolumn:name="InventoryStatus",type="string",JSONPath=`.status.status`
+//+kubebuilder:printcolumn:name="GeneratedPassword",type="string",JSONPath=`.status.generatedPassword`
+//+kubebuilder:printcolumn:name="AllocatedNodeAddress",type="string",JSONPath=`.status.pxeBootConfig.address`
 
 // Inventory is the Schema for the inventories API
 type Inventory struct {

@@ -15,7 +15,20 @@ spec:
     singular: addresspool
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .status.status
+      name: AddressPoolStatus
+      type: string
+    - jsonPath: .status.startAddress
+      name: StartAddress
+      type: string
+    - jsonPath: .status.lastAddress
+      name: LastAddress
+      type: string
+    - jsonPath: .status.netmask
+      name: NetMask
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: AddressPool is the CRD for maintaining Aaddress pools for Harvester
