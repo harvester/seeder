@@ -2,6 +2,7 @@ package tink
 
 import (
 	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
+	"github.com/harvester/bmaas/pkg/util"
 	"github.com/stretchr/testify/assert"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
@@ -11,15 +12,14 @@ import (
 
 func Test_generateMetaData(t *testing.T) {
 	m, err := generateMetaData("http://localhost", "v1.0.1", "xx:xx:xx:xx:xx", "create",
-		"/dev/sda", "192.168.1.100", "token", "password", []string{"8.8.8.8"}, []string{"abc"})
+		"/dev/sda", "192.168.1.100", "token", "password", "v1.0.2", []string{"8.8.8.8"}, []string{"abc"})
 	assert.NoError(t, err, "no error should have occured")
 	assert.Contains(t, m, "harvester.install.mode=create", "expected to find create mode in metadata")
 	assert.Contains(t, m, "hwAddr:xx:xx:xx:xx:xx", "expected to find mac address in metadata")
-	assert.Contains(t, m, "\"slug\":\"v1.0.1\"", "expected find a slug in metadata")
 }
 
-func Test_GenerateHWRequest(t *testing.T) {
-	i := &bmaasv1alpha1.Inventory{
+var (
+	i = &bmaasv1alpha1.Inventory{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "firstnode",
 			Namespace: "default",
@@ -62,7 +62,7 @@ func Test_GenerateHWRequest(t *testing.T) {
 		},
 	}
 
-	c := &bmaasv1alpha1.Cluster{
+	c = &bmaasv1alpha1.Cluster{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "harvester-one",
 			Namespace: "default",
@@ -105,21 +105,29 @@ func Test_GenerateHWRequest(t *testing.T) {
 			ClusterAddress: "192.168.1.100",
 		},
 	}
+)
+
+func Test_GenerateHWRequest(t *testing.T) {
 
 	hw, err := GenerateHWRequest(i, c)
 	assert.NoError(t, err, "no error should occur during hardware generation")
 	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "harvester.install.mode=create", "expected to find create mode in metadata")
 	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "hwAddr:xx:xx:xx:xx:xx", "expected to find mac address in metadata")
-	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "\"slug\":\"v1.0.1\"", "expected find a slug in metadata")
-	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "dnsNameservers=8.8.8.8", "expected to find correct nameserver")
+	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "dns_nameservers=8.8.8.8", "expected to find correct nameserver")
 	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "ssh_authorized_keys=\\\"- abc ", "expected to find ssh_keys")
 	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "token=token", "expected to find token")
 	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "password=password", "expected to find password")
 	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "harvester.install.vip=192.168.1.100", "expected to find a vip")
-	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "harvester.install.vipMode=static", "expected to find vipMode static")
-	assert.Equal(t, hw.Spec.Metadata.Instance.ID, i.Status.HardwareID, "expected to find correct hardware uuid")
+	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "harvester.install.vip_mode=static", "expected to find vipMode static")
 	assert.Equal(t, hw.Spec.Interfaces[0].DHCP.MAC, i.Spec.ManagementInterfaceMacAddress, "expected to find correct hardware address")
 	assert.Equal(t, hw.Spec.Interfaces[0].DHCP.IP.Gateway, i.Status.Gateway, "expected to find correct gateway")
 	assert.Equal(t, hw.Spec.Interfaces[0].DHCP.IP.Address, i.Status.Address, "expected to find correct address")
 	assert.Equal(t, hw.Spec.Interfaces[0].DHCP.IP.Netmask, i.Status.Netmask, "expected to find correct netmask")
+}
+
+func Test_GenerateHWRequestWithJoin(t *testing.T) {
+	i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.HarvesterCreateNode)
+	hw, err := GenerateHWRequest(i, c)
+	assert.NoError(t, err, "no error should occur during hardware generation")
+	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "harvester.server_url=https://192.168.1.100:8443", "expected to find join url")
 }

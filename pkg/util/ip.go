@@ -22,7 +22,12 @@ func GenerateAddressPoolStatus(pool *bmaasv1alpha1.AddressPool) (poolStatus *bma
 	poolStatus.StartAddress = ipRange.From().String()
 	poolStatus.LastAddress = ipRange.To().String()
 	poolStatus.AvailableAddresses = len
-	poolStatus.Netmask = ipPrefix.IPNet().Mask.String()
+	if pool.Spec.Netmask != "" {
+		poolStatus.Netmask = pool.Spec.Netmask
+	} else {
+		poolStatus.Netmask = ipPrefix.IPNet().Mask.String()
+	}
+
 	poolStatus.Status = bmaasv1alpha1.PoolReady
 	poolStatus.AddressAllocation = make(map[string]bmaasv1alpha1.ObjectReferenceWithKind)
 	return poolStatus, nil

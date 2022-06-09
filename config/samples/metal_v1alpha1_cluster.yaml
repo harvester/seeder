@@ -1,20 +1,42 @@
 apiVersion: metal.harvesterhci.io/v1alpha1
 kind: AddressPool
 metadata:
-  name: sample-address-pool
+  name: node-pool
   namespace: default
 spec:
-  cidr: "192.168.1.1/29"
-  gateway: "192.168.1.7"
+  cidr: "172.16.128.11/32"
+  gateway: "172.16.128.1"
+  netmask: "255.255.248.0"
 ---
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: AddressPool
+metadata:
+  name: node2-pool
+  namespace: default
+spec:
+  cidr: "172.16.128.12/32"
+  gateway: "172.16.128.1"
+  netmask: "255.255.248.0"
+---
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: AddressPool
+metadata:
+  name: vip-pool
+  namespace: default
+spec:
+  cidr: "172.16.128.7/32"
+  gateway: "172.16.128.1"
+  netmask: "255.255.248.0"
+---
+
 apiVersion: v1
 kind: Secret
 metadata:
   name: node
   namespace: default
 stringData:
-  username: admin
-  password: admin
+  username: "ADMIN"
+  password: "ADMIN"
 ---
 apiVersion: metal.harvesterhci.io/v1alpha1
 kind: Inventory
@@ -23,30 +45,67 @@ metadata:
   namespace: default
 spec:
   primaryDisk: "/dev/sda"
-  managementInterfaceMacAddress: "xx:xx:xx:xx:xx"
+  managementInterfaceMacAddress: "0c:c4:7a:6b:84:20"
   baseboardSpec:
     connection:
-      host: "localhost"
+      host: "172.16.1.53"
       port: 623
       insecureTLS: true
       authSecretRef:
         name: node
         namespace: default
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: node2
+  namespace: default
+stringData:
+  username: "ADMIN"
+  password: "ADMIN"
+---
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: Inventory
+metadata:
+  name: node2
+  namespace: default
+spec:
+  primaryDisk: "/dev/sda"
+  managementInterfaceMacAddress: "0c:c4:7a:6b:80:d0"
+  baseboardSpec:
+    connection:
+      host: "172.16.1.52"
+      port: 623
+      insecureTLS: true
+      authSecretRef:
+        name: node2
+        namespace: default
+---
 apiVersion: metal.harvesterhci.io/v1alpha1
 kind: Cluster
 metadata:
-  name: cluster-sample
+  name: first
+  namespace: default
 spec:
-  version: "harvester_1_0_2"
+  version: "v1.0.2"
+  imageURL: "http://172.16.135.50:8080"
+  clusterConfig:
+    nameservers:
+      - 172.16.128.1
   nodes:
     - inventoryReference:
         name: node
         namespace: default
       addressPoolReference:
-        name: sample-address-pool
+        name: node-pool
+        namespace: default
+    - inventoryReference:
+        name: node2
+        namespace: default
+      addressPoolReference:
+        name: node2-pool
         namespace: default
   vipConfig:
     addressPoolReference:
-      name: sample-address-pool
+      name: vip-pool
       namespace: default

@@ -317,9 +317,9 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, i *bmaasv1alp
 				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobError, message)
 			}
 
-			if err := r.Delete(ctx, j); err != nil {
+			/*if err := r.Delete(ctx, j); err != nil {
 				return err
-			}
+			}*/
 		}
 
 		util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted)

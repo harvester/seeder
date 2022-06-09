@@ -18,7 +18,6 @@ package main
 
 import (
 	"flag"
-	"github.com/harvester/bmaas/pkg/mock"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 	"os"
@@ -112,25 +111,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if err = (&mock.FakeBaseboardReconciller{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-		Logger: log.FromContext(ctx).WithName("baseboard-controller"),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "baseboard")
-		os.Exit(1)
-	}
-
-	if err = (&mock.FakeBaseboardJobReconciller{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-		Logger: log.FromContext(ctx).WithName("bmcjob-controller"),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "bmcjo")
-		os.Exit(1)
-	}
 	//+kubebuilder:scaffold:builder
-
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")
 		os.Exit(1)

@@ -19,8 +19,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"reflect"
-
 	"github.com/go-logr/logr"
 	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
 	"github.com/harvester/bmaas/pkg/tink"
@@ -160,9 +158,6 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *bmaasv1al
 				return fmt.Errorf("error during address pool lookup while configuring nodes: %v", err)
 			}
 
-			if pool.Status.Status != bmaasv1alpha1.PoolReady {
-				return fmt.Errorf("waiting for address pool %s to be ready", pool.Name)
-			}
 			i := &bmaasv1alpha1.Inventory{}
 			err = r.Get(ctx, types.NamespacedName{Namespace: nc.InventoryReference.Namespace,
 				Name: nc.InventoryReference.Name}, i)
@@ -189,6 +184,9 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *bmaasv1al
 			}
 
 			if !found {
+				if pool.Status.Status != bmaasv1alpha1.PoolReady {
+					return fmt.Errorf("waiting for address pool %s to be ready", pool.Name)
+				}
 				nodeAddress, err = util.AllocateAddress(pool.Status.DeepCopy(), nc.StaticAddress)
 			}
 
@@ -282,7 +280,7 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *bma
 				} else {
 					return err
 				}
-			} else {
+			} /*else {
 				if !reflect.DeepEqual(lookupHw.Spec, hw.Spec) {
 					lookupHw.Spec = hw.Spec
 					if err := r.Update(ctx, lookupHw); err != nil {
@@ -290,7 +288,7 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *bma
 					}
 					hardwareUpdated = true
 				}
-			}
+			}*/
 
 			if hardwareUpdated {
 				inventory.Status.Conditions = util.CreateOrUpdateCondition(inventory.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated, "tink workflow created")
