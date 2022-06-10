@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"github.com/go-logr/logr"
 	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
@@ -78,4 +79,33 @@ func IsBaseboardReady(b *rufio.BaseboardManagement) bool {
 	}
 
 	return ready
+}
+
+// ListInventory generates a list of inventory across all namespaces
+func ListInventory(ctx context.Context, c client.Client) ([]bmaasv1alpha1.Inventory, error) {
+	list := &bmaasv1alpha1.InventoryList{}
+	err := c.List(ctx, list, &client.ListOptions{})
+	if err != nil {
+		return []bmaasv1alpha1.Inventory{}, err
+	}
+
+	return list.Items, nil
+}
+
+// ListInventoryAllocatedToCluster lists all inventory across namespaces that is allocated to a particular
+// cluster
+func ListInventoryAllocatedtoCluster(ctx context.Context, c client.Client, cluster *bmaasv1alpha1.Cluster) ([]bmaasv1alpha1.Inventory, error) {
+	items, err := ListInventory(ctx, c)
+	if err != nil {
+		return []bmaasv1alpha1.Inventory{}, fmt.Errorf("error fetching inventory list: %v", err)
+	}
+
+	var retItems []bmaasv1alpha1.Inventory
+	for _, v := range items {
+		if v.Status.Cluster.Name == cluster.Name && v.Status.Cluster.Namespace == cluster.Namespace {
+			retItems = append(retItems, v)
+		}
+	}
+
+	return retItems, nil
 }

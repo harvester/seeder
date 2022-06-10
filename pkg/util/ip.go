@@ -1,9 +1,11 @@
 package util
 
 import (
+	"context"
 	"fmt"
 	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
 	"inet.af/netaddr"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // GenerateAddressPoolStatus will generate a IP address for the node
@@ -86,4 +88,24 @@ func DeallocateAddress(poolStatus *bmaasv1alpha1.AddressStatus, address string) 
 
 	delete(poolStatus.AddressAllocation, address)
 	return nil
+}
+
+// FindIPInAddressPools finds the address pool and address is allocated from.
+func FindIPInAddressPools(ctx context.Context, c client.Client, name, namespace, address string) (*bmaasv1alpha1.AddressPool, error) {
+	poolList := &bmaasv1alpha1.AddressPoolList{}
+	err := c.List(ctx, poolList, &client.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, i := range poolList.Items {
+		obj, ok := i.Status.AddressAllocation[address]
+		if ok && obj.Name == name && obj.Namespace == namespace && obj.Kind == "inventory" {
+			return &i, nil
+		}
+	}
+
+	// address not found in any pool. nothing to be done
+	return nil, nil
+
 }

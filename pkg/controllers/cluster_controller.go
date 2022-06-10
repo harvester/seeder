@@ -75,6 +75,7 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		r.generateClusterConfig,
 		r.patchNodesAndPools,
 		r.createTinkerbellHardware,
+		r.reconcileNodes,
 	}
 	deletionReconcileList := []clusterReconciler{
 		r.cleanupClusterDeps,
@@ -257,6 +258,15 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *bma
 			if err != nil {
 				return err
 			}
+
+			// if node is missing inventory allocation to cluster
+			// then skip the HW generation, as this node doesnt yet have any addresses
+			// allocated
+			if !util.ConditionExists(inventory.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) {
+				r.Info("skipping node from hardware generation as it has not yet been processed for allocation to cluster", inventory.Name, inventory.Namespace)
+				continue
+			}
+
 			hw, err := tink.GenerateHWRequest(inventory, c)
 			if err != nil {
 				return err
@@ -308,6 +318,104 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *bma
 	return nil
 }
 
+// reconcileNodes will perform housekeeping needed when nodes are added or
+// removed from the cluster
+func (r *ClusterReconciler) reconcileNodes(ctx context.Context, c *bmaasv1alpha1.Cluster) error {
+
+	if c.Status.Status == bmaasv1alpha1.ClusterTinkHardwareSubmitted {
+		items, err := util.ListInventoryAllocatedtoCluster(ctx, r.Client, c)
+		if err != nil {
+			return err
+		}
+
+		// reconcile removed nodes first
+		var removedNodes []bmaasv1alpha1.Inventory
+		for _, i := range items {
+			var found bool
+			var v bmaasv1alpha1.NodeConfig
+			for _, v = range c.Spec.Nodes {
+				if i.Namespace == v.InventoryReference.Namespace && i.Name == v.InventoryReference.Name {
+					found = true
+				}
+			}
+			if !found {
+				removedNodes = append(removedNodes, i)
+			}
+		}
+
+		for _, i := range removedNodes {
+			iObj := &bmaasv1alpha1.Inventory{}
+			err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj)
+			if err != nil {
+				if apierrors.IsNotFound(err) {
+					// inventory removed. Nothing to do
+					continue
+				} else {
+					return err
+				}
+			}
+
+			// free up address
+			a, err := util.FindIPInAddressPools(ctx, r.Client, i.Name, i.Namespace, i.Status.PXEBootInterface.Address)
+			if err != nil {
+				return err
+			}
+
+			if a != nil {
+				delete(a.Status.AddressAllocation, i.Status.PXEBootInterface.Address)
+				if err := r.Status().Update(ctx, a); err != nil {
+					return err
+				}
+			}
+			// need to clean up inventory
+			iObj.Status.PXEBootInterface = bmaasv1alpha1.PXEBootInterface{}
+			iObj.Status.Cluster = bmaasv1alpha1.ObjectReference{}
+			iObj.Status.GeneratedPassword = ""
+			iObj.Status.Conditions = util.RemoveCondition(iObj.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster)
+			iObj.Status.Conditions = util.RemoveCondition(iObj.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated)
+			iObj.Status.Conditions = util.RemoveCondition(iObj.Status.Conditions, bmaasv1alpha1.HarvesterJoinNode)
+			iObj.Status.Conditions = util.CreateOrUpdateCondition(iObj.Status.Conditions, bmaasv1alpha1.InventoryFreed, "")
+			if err := r.Status().Update(ctx, iObj); err != nil {
+				return err
+			}
+
+			// find and clean up hardware object
+			hw := &tinkv1alpha1.Hardware{}
+			if err := r.Get(ctx, types.NamespacedName{Namespace: iObj.Namespace, Name: iObj.Name}, hw); err != nil {
+				if apierrors.IsNotFound(err) {
+					continue
+				} else {
+					return err
+				}
+			}
+			if err := r.Delete(ctx, hw); err != nil {
+				return err
+			}
+		}
+
+		// add nodes to cluster if needed
+		var nodesAdded bool
+		for _, i := range c.Spec.Nodes {
+			iObj := &bmaasv1alpha1.Inventory{}
+			if err := r.Get(ctx, types.NamespacedName{Namespace: i.InventoryReference.Namespace,
+				Name: i.InventoryReference.Name}, iObj); err != nil {
+				return err
+			}
+			if !util.ConditionExists(iObj.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) || iObj.Status.Cluster.Namespace != c.Namespace || iObj.Status.Cluster.Name != c.Name {
+				nodesAdded = true
+			}
+		}
+
+		if nodesAdded {
+			// update status to allow reconcile to happen again from patch nodes and pools phase
+			c.Status.Status = bmaasv1alpha1.ClusterConfigReady
+			return r.Status().Update(ctx, c)
+		}
+	}
+
+	return nil
+}
+
 // cleanupClusterDeps will trigger cleanup of nodes and associated infra
 func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *bmaasv1alpha1.Cluster) error {
 	// clean up nodes
@@ -346,7 +454,8 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *bmaasv1al
 			i.Status.PXEBootInterface = bmaasv1alpha1.PXEBootInterface{}
 			i.Status.Cluster = bmaasv1alpha1.ObjectReference{}
 			i.Status.GeneratedPassword = ""
-			i.Status.Conditions = []bmaasv1alpha1.Conditions{}
+			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster)
+			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.InventoryFreed, "")
 			err = r.Status().Update(ctx, i)
 			if err != nil {
 				return err

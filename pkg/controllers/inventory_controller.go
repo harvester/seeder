@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/labels"
 
 	"github.com/go-logr/logr"
 	"github.com/google/uuid"
@@ -79,6 +80,8 @@ func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		r.handleBaseboardDeletion,
 		r.triggerReboot,
 		r.reconcileBMCJob,
+		r.housekeepingBMCJob,
+		r.inventoryFreed,
 	}
 
 	deletionReconcileList := []inventoryReconciler{
@@ -246,7 +249,11 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *bmaasv1alpha
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      fmt.Sprintf("%s-reboot", i.Name),
 				Namespace: i.Namespace,
+				Labels: map[string]string{
+					"inventory": i.Name,
+				},
 			},
+
 			Spec: rufio.BMCJobSpec{
 				BaseboardManagementRef: rufio.BaseboardManagementRef{
 					Name:      i.Name,
@@ -325,5 +332,90 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, i *bmaasv1alp
 		util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted)
 		return r.Status().Update(ctx, i)
 	}
+	return nil
+}
+
+func (r *InventoryReconciler) inventoryFreed(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
+	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryFreed) {
+		// check and submit a power off job
+		var notFound bool
+		j := &rufio.BMCJob{}
+		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: fmt.Sprintf("%s-poweroff", i.Name)}, j)
+		if err != nil {
+			if apierrors.IsNotFound(err) {
+				notFound = true
+			} else {
+				return err
+			}
+		}
+
+		if notFound {
+			off := rufio.HardPowerOff
+			job := &rufio.BMCJob{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("%s-poweroff", i.Name),
+					Namespace: i.Namespace,
+					Labels: map[string]string{
+						"inventory": i.Name,
+					},
+				},
+				Spec: rufio.BMCJobSpec{
+					BaseboardManagementRef: rufio.BaseboardManagementRef{
+						Name:      i.Name,
+						Namespace: i.Namespace,
+					},
+					Tasks: []rufio.Task{
+						{
+							PowerAction: &off,
+						},
+					},
+				},
+			}
+			if err := controllerutil.SetOwnerReference(i, job, r.Scheme); err != nil {
+				return err
+			}
+			if err := r.Create(ctx, job); err != nil {
+				return err
+			}
+		}
+
+		// trigger status update
+		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.InventoryFreed)
+		return r.Status().Update(ctx, i)
+	}
+	return nil
+}
+
+func (r *InventoryReconciler) housekeepingBMCJob(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
+	if !util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryFreed) {
+		bmcjoblist := &rufio.BMCJobList{}
+		l, err := labels.Parse(fmt.Sprintf("inventory=%s", i.Name))
+		if err != nil {
+			return err
+		}
+		if err := r.List(ctx, bmcjoblist, &client.ListOptions{LabelSelector: l}); err != nil {
+			return err
+		}
+
+		for _, v := range bmcjoblist.Items {
+			var completed bool
+			for _, c := range v.Status.Conditions {
+				if c.Type == rufio.JobCompleted {
+					completed = true
+				}
+			}
+			if completed {
+				if err := r.Delete(ctx, &v); err != nil {
+					return err
+				}
+			}
+
+		}
+
+		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted)
+		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobComplete)
+		return r.Status().Update(ctx, i)
+	}
+
 	return nil
 }

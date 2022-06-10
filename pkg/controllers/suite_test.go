@@ -146,12 +146,11 @@ var _ = BeforeSuite(func() {
 		Expect(err).ToNot(HaveOccurred())
 	}()
 
-	time.Sleep(60 * time.Second)
+	time.Sleep(30 * time.Second)
 })
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
-	time.Sleep(60 * time.Second)
 	cancel()
 	err := testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
