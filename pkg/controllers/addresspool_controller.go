@@ -6,8 +6,8 @@ import (
 	"reflect"
 
 	"github.com/go-logr/logr"
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
-	"github.com/harvester/bmaas/pkg/util"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/util"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -23,11 +23,12 @@ type AddressPoolReconciler struct {
 	logr.Logger
 }
 
-type addressPoolReconciler func(context.Context, *bmaasv1alpha1.AddressPool) error
+type addressPoolReconciler func(context.Context, *seederv1alpha1.AddressPool) error
 
 //+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=inventories,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=inventories/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=inventories/finalizers,verbs=update
+//+kubebuilder:rbac:groups=tinkerbell.org,resources=hardware,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -40,7 +41,7 @@ type addressPoolReconciler func(context.Context, *bmaasv1alpha1.AddressPool) err
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *AddressPoolReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	r.Info("Reconcilling addresspool objects", req.Name, req.Namespace)
-	pool := &bmaasv1alpha1.AddressPool{}
+	pool := &seederv1alpha1.AddressPool{}
 
 	err := r.Get(ctx, req.NamespacedName, pool)
 	if err != nil {
@@ -77,7 +78,7 @@ func (r *AddressPoolReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 }
 
 // reconcilePoolCapacity will mark the pool as exhausted if all addresses are used up, and make it ready once addresses are freed up again
-func (r *AddressPoolReconciler) reconcilePoolCapacity(ctx context.Context, pool *bmaasv1alpha1.AddressPool) error {
+func (r *AddressPoolReconciler) reconcilePoolCapacity(ctx context.Context, pool *seederv1alpha1.AddressPool) error {
 
 	// initial reconcile
 	if pool.Status.Status == "" {
@@ -91,21 +92,21 @@ func (r *AddressPoolReconciler) reconcilePoolCapacity(ctx context.Context, pool 
 			return err
 		}
 
-		if !controllerutil.ContainsFinalizer(pool, bmaasv1alpha1.AddressPoolFinalizer) {
-			controllerutil.AddFinalizer(pool, bmaasv1alpha1.AddressPoolFinalizer)
+		if !controllerutil.ContainsFinalizer(pool, seederv1alpha1.AddressPoolFinalizer) {
+			controllerutil.AddFinalizer(pool, seederv1alpha1.AddressPoolFinalizer)
 			return r.Client.Update(ctx, pool)
 		}
 	}
 
 	// reconcile capacity and update status for pool
 
-	if pool.Status.Status == bmaasv1alpha1.PoolReady && len(pool.Status.AddressAllocation) == pool.Status.AvailableAddresses {
-		pool.Status.Status = bmaasv1alpha1.PoolExhausted
+	if pool.Status.Status == seederv1alpha1.PoolReady && len(pool.Status.AddressAllocation) == pool.Status.AvailableAddresses {
+		pool.Status.Status = seederv1alpha1.PoolExhausted
 		return r.Client.Status().Update(ctx, pool)
 	}
 
-	if pool.Status.Status == bmaasv1alpha1.PoolExhausted && len(pool.Status.AddressAllocation) < pool.Status.AvailableAddresses {
-		pool.Status.Status = bmaasv1alpha1.PoolReady
+	if pool.Status.Status == seederv1alpha1.PoolExhausted && len(pool.Status.AddressAllocation) < pool.Status.AvailableAddresses {
+		pool.Status.Status = seederv1alpha1.PoolReady
 		return r.Client.Status().Update(ctx, pool)
 	}
 
@@ -113,16 +114,16 @@ func (r *AddressPoolReconciler) reconcilePoolCapacity(ctx context.Context, pool 
 }
 
 // deleteAddressPool will ensure that none of the IP's is in use before removing finalizer
-func (r *AddressPoolReconciler) deleteAddressPool(ctx context.Context, pool *bmaasv1alpha1.AddressPool) error {
-	if !pool.DeletionTimestamp.IsZero() && controllerutil.ContainsFinalizer(pool, bmaasv1alpha1.AddressPoolFinalizer) {
+func (r *AddressPoolReconciler) deleteAddressPool(ctx context.Context, pool *seederv1alpha1.AddressPool) error {
+	if !pool.DeletionTimestamp.IsZero() && controllerutil.ContainsFinalizer(pool, seederv1alpha1.AddressPoolFinalizer) {
 		var addressInUse bool
 		var err error
 		for address, ref := range pool.Status.AddressAllocation {
-			if reflect.DeepEqual(ref, bmaasv1alpha1.ObjectReferenceWithKind{}) {
+			if reflect.DeepEqual(ref, seederv1alpha1.ObjectReferenceWithKind{}) {
 				delete(pool.Status.AddressAllocation, address)
 				continue
 			}
-			if ref.Kind == bmaasv1alpha1.KindCluster {
+			if ref.Kind == seederv1alpha1.KindCluster {
 				addressInUse, err = r.lookupClusterVIP(ctx, ref.ObjectReference, address)
 			} else {
 				addressInUse, err = r.lookupInventoryAddress(ctx, ref.ObjectReference, address)
@@ -136,7 +137,7 @@ func (r *AddressPoolReconciler) deleteAddressPool(ctx context.Context, pool *bma
 		if addressInUse {
 			return fmt.Errorf("one of the address in addresspool %s is still in use, requeuing", pool.Name)
 		}
-		controllerutil.RemoveFinalizer(pool, bmaasv1alpha1.AddressPoolFinalizer)
+		controllerutil.RemoveFinalizer(pool, seederv1alpha1.AddressPoolFinalizer)
 		return r.Client.Update(ctx, pool)
 	}
 
@@ -146,12 +147,12 @@ func (r *AddressPoolReconciler) deleteAddressPool(ctx context.Context, pool *bma
 // SetupWithManager sets up the controller with the Manager.
 func (r *AddressPoolReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&bmaasv1alpha1.AddressPool{}).
+		For(&seederv1alpha1.AddressPool{}).
 		Complete(r)
 }
 
-func (r *AddressPoolReconciler) lookupClusterVIP(ctx context.Context, obj bmaasv1alpha1.ObjectReference, address string) (bool, error) {
-	c := &bmaasv1alpha1.Cluster{}
+func (r *AddressPoolReconciler) lookupClusterVIP(ctx context.Context, obj seederv1alpha1.ObjectReference, address string) (bool, error) {
+	c := &seederv1alpha1.Cluster{}
 	err := r.Get(ctx, types.NamespacedName{Namespace: obj.Namespace, Name: obj.Name}, c)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
@@ -167,8 +168,8 @@ func (r *AddressPoolReconciler) lookupClusterVIP(ctx context.Context, obj bmaasv
 	return false, nil
 }
 
-func (r *AddressPoolReconciler) lookupInventoryAddress(ctx context.Context, obj bmaasv1alpha1.ObjectReference, address string) (bool, error) {
-	c := &bmaasv1alpha1.Inventory{}
+func (r *AddressPoolReconciler) lookupInventoryAddress(ctx context.Context, obj seederv1alpha1.ObjectReference, address string) (bool, error) {
+	c := &seederv1alpha1.Inventory{}
 	err := r.Get(ctx, types.NamespacedName{Namespace: obj.Namespace, Name: obj.Name}, c)
 	if err != nil {
 		if apierrors.IsNotFound(err) {

@@ -18,9 +18,10 @@ package main
 
 import (
 	"flag"
+	"os"
+
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
-	"os"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
@@ -34,8 +35,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
-	"github.com/harvester/bmaas/pkg/controllers"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/controllers"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -44,11 +45,15 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 )
 
+const (
+	defaultNamespace = "default"
+)
+
 func init() {
 	utilruntime.Must(rufio.AddToScheme(scheme))
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
-	utilruntime.Must(bmaasv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(seederv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(tinkv1alpha1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
@@ -57,13 +62,21 @@ func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
+	var leaderElectionNamespace string
+
+	ns, ok := os.LookupEnv("LEADER_ELECTION_NAMESPACE")
+	if !ok {
+		ns = defaultNamespace
+	}
+
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
-	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
+	flag.StringVar(&leaderElectionNamespace, "leader-election-namespace", ns, "The namespace to use for leader election")
+	flag.BoolVar(&enableLeaderElection, "leader-elect", true,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
 	opts := zap.Options{
-		Development: true,
+		Development: false,
 	}
 	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
@@ -71,12 +84,13 @@ func main() {
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                 scheme,
-		MetricsBindAddress:     metricsAddr,
-		Port:                   9443,
-		HealthProbeBindAddress: probeAddr,
-		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "28b21117.harvesterhci.io",
+		Scheme:                  scheme,
+		MetricsBindAddress:      metricsAddr,
+		Port:                    9443,
+		HealthProbeBindAddress:  probeAddr,
+		LeaderElection:          enableLeaderElection,
+		LeaderElectionID:        "28b21117.harvesterhci.io",
+		LeaderElectionNamespace: leaderElectionNamespace,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

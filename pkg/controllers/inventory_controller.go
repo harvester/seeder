@@ -19,11 +19,12 @@ package controllers
 import (
 	"context"
 	"fmt"
+
 	"k8s.io/apimachinery/pkg/labels"
 
 	"github.com/go-logr/logr"
 	"github.com/google/uuid"
-	"github.com/harvester/bmaas/pkg/util"
+	"github.com/harvester/seeder/pkg/util"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -32,7 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -46,11 +47,15 @@ type InventoryReconciler struct {
 	logr.Logger
 }
 
-type inventoryReconciler func(context.Context, *bmaasv1alpha1.Inventory) error
+type inventoryReconciler func(context.Context, *seederv1alpha1.Inventory) error
 
 //+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=inventories,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=inventories/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=inventories/finalizers,verbs=update
+//+kubebuilder:rbac:groups=bmc.tinkerbell.org,resources=bmcjobs,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=bmc.tinkerbell.org,resources=bmcjobs/status,verbs=get
+//+kubebuilder:rbac:groups=bmc.tinkerbell.org,resources=baseboardmanagements,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=bmc.tinkerbell.org,resources=baseboardmanagements/status,verbs=get
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -63,7 +68,7 @@ type inventoryReconciler func(context.Context, *bmaasv1alpha1.Inventory) error
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	r.Info("Reconcilling inventory objects", req.Name, req.Namespace)
-	inventoryObj := &bmaasv1alpha1.Inventory{}
+	inventoryObj := &seederv1alpha1.Inventory{}
 
 	err := r.Get(ctx, req.NamespacedName, inventoryObj)
 	if err != nil {
@@ -106,9 +111,9 @@ func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 
 // manageBMCObject checks if an associated BaseboardManagement Object exists else creates one
 // and sets the appropriate ownership
-func (r *InventoryReconciler) manageBaseboardObject(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
+func (r *InventoryReconciler) manageBaseboardObject(ctx context.Context, i *seederv1alpha1.Inventory) error {
 	// already in desired state. No further action needed
-	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.BMCObjectCreated) {
+	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCObjectCreated) {
 		return nil
 	}
 
@@ -127,14 +132,14 @@ func (r *InventoryReconciler) manageBaseboardObject(ctx context.Context, i *bmaa
 		return err
 	}
 	i.Status.HardwareID = id.String()
-	i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCObjectCreated, "bmc object created")
+	i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCObjectCreated, "bmc object created")
 	return r.Client.Status().Update(ctx, i)
 }
 
 // checkAndMarkNodeReady will check the power status of the BaseboardManagement Object and Mark the node ready
-func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
-	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.BMCObjectCreated) {
-		if i.Status.Status == bmaasv1alpha1.InventoryReady {
+func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, i *seederv1alpha1.Inventory) error {
+	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCObjectCreated) {
+		if i.Status.Status == seederv1alpha1.InventoryReady {
 			return nil
 		}
 
@@ -148,14 +153,14 @@ func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, i *bmaa
 
 		// check if condition bmcv1alpha1.Contactable exists and is bmcv1alpha1.ConditionTrue
 		if util.IsBaseboardReady(b) {
-			i.Status.Status = bmaasv1alpha1.InventoryReady
+			i.Status.Status = seederv1alpha1.InventoryReady
 			err = r.Status().Update(ctx, i)
 			if err != nil {
 				return err
 			}
 			// apply finalizer on inventory
-			if !controllerutil.ContainsFinalizer(i, bmaasv1alpha1.InventoryFinalizer) {
-				controllerutil.AddFinalizer(i, bmaasv1alpha1.InventoryFinalizer)
+			if !controllerutil.ContainsFinalizer(i, seederv1alpha1.InventoryFinalizer) {
+				controllerutil.AddFinalizer(i, seederv1alpha1.InventoryFinalizer)
 				return r.Update(ctx, i)
 			}
 		}
@@ -164,17 +169,17 @@ func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, i *bmaa
 }
 
 // handleBMCDeletion will reconcile deletion of BaseboardManagement objects {
-func (r *InventoryReconciler) handleBaseboardDeletion(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
+func (r *InventoryReconciler) handleBaseboardDeletion(ctx context.Context, i *seederv1alpha1.Inventory) error {
 	// if no status is present then nothing is needed yet as BMC has not yet been created
-	if i.Status.Status == bmaasv1alpha1.InventoryReady {
+	if i.Status.Status == seederv1alpha1.InventoryReady {
 		b := &rufio.BaseboardManagement{}
 		err := r.Get(ctx, types.NamespacedName{Name: i.Name, Namespace: i.Namespace}, b)
 		if err != nil {
 			r.Error(err, "error looking up baseboard object")
 			return err
 		}
-		if !b.DeletionTimestamp.IsZero() && controllerutil.ContainsFinalizer(b, bmaasv1alpha1.InventoryFinalizer) {
-			controllerutil.RemoveFinalizer(b, bmaasv1alpha1.InventoryFinalizer)
+		if !b.DeletionTimestamp.IsZero() && controllerutil.ContainsFinalizer(b, seederv1alpha1.InventoryFinalizer) {
+			controllerutil.RemoveFinalizer(b, seederv1alpha1.InventoryFinalizer)
 			err = r.Update(ctx, b)
 			if err != nil {
 				r.Error(err, "error removing finalizer from baseboard object")
@@ -182,7 +187,7 @@ func (r *InventoryReconciler) handleBaseboardDeletion(ctx context.Context, i *bm
 			}
 			// reset status to re-trigger recreation of baseboard objects
 			i.Status.Status = ""
-			util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.BMCObjectCreated)
+			util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCObjectCreated)
 			return r.Status().Update(ctx, i)
 		}
 	}
@@ -191,8 +196,8 @@ func (r *InventoryReconciler) handleBaseboardDeletion(ctx context.Context, i *bm
 }
 
 // handleInventoryDeletion cleans up the finalizer on boseboard object allowing it to be cleaned up
-func (r *InventoryReconciler) handleInventoryDeletion(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
-	if controllerutil.ContainsFinalizer(i, bmaasv1alpha1.InventoryFinalizer) {
+func (r *InventoryReconciler) handleInventoryDeletion(ctx context.Context, i *seederv1alpha1.Inventory) error {
+	if controllerutil.ContainsFinalizer(i, seederv1alpha1.InventoryFinalizer) {
 		b := &rufio.BaseboardManagement{}
 		var skipcleanup bool
 		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
@@ -204,16 +209,16 @@ func (r *InventoryReconciler) handleInventoryDeletion(ctx context.Context, i *bm
 			}
 		}
 		if !skipcleanup {
-			if controllerutil.ContainsFinalizer(b, bmaasv1alpha1.InventoryFinalizer) {
-				controllerutil.RemoveFinalizer(b, bmaasv1alpha1.InventoryFinalizer)
+			if controllerutil.ContainsFinalizer(b, seederv1alpha1.InventoryFinalizer) {
+				controllerutil.RemoveFinalizer(b, seederv1alpha1.InventoryFinalizer)
 			}
 			if err := r.Update(ctx, b); err != nil {
 				return err
 			}
 		}
 
-		if controllerutil.ContainsFinalizer(i, bmaasv1alpha1.InventoryFinalizer) {
-			controllerutil.RemoveFinalizer(i, bmaasv1alpha1.InventoryFinalizer)
+		if controllerutil.ContainsFinalizer(i, seederv1alpha1.InventoryFinalizer) {
+			controllerutil.RemoveFinalizer(i, seederv1alpha1.InventoryFinalizer)
 			return r.Update(ctx, i)
 		}
 	}
@@ -224,7 +229,7 @@ func (r *InventoryReconciler) handleInventoryDeletion(ctx context.Context, i *bm
 // SetupWithManager sets up the controller with the Manager.
 func (r *InventoryReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&bmaasv1alpha1.Inventory{}).
+		For(&seederv1alpha1.Inventory{}).
 		Watches(&source.Kind{Type: &rufio.BaseboardManagement{}}, handler.EnqueueRequestsFromMapFunc(func(a client.Object) []reconcile.Request {
 			return []reconcile.Request{{
 				NamespacedName: types.NamespacedName{
@@ -238,10 +243,10 @@ func (r *InventoryReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 // triggerReboot will reboot the machine using the BMCJob object
-func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
+func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *seederv1alpha1.Inventory) error {
 	// if tink hardware has been created and inventory is allocated to a cluster
 	// then reboot the hardware using BMC tasks
-	if i.Status.Status == bmaasv1alpha1.InventoryReady && util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted) {
+	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i.Status.Conditions, seederv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) {
 		// submit BMC task
 		off := rufio.HardPowerOff
 		on := rufio.PowerOn
@@ -286,7 +291,7 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *bmaasv1alpha
 			return err
 		}
 
-		i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted, "BMCJob submitted")
+		i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted, "BMCJob submitted")
 
 		return r.Status().Update(ctx, i)
 	}
@@ -295,9 +300,9 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *bmaasv1alpha
 }
 
 // reconcileBMCJob will update the BMCJob conditions to reflect current state of the job for specific inventory
-func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
+func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, i *seederv1alpha1.Inventory) error {
 
-	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted) {
+	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) {
 		j := &rufio.BMCJob{}
 		var jobFound bool
 		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: fmt.Sprintf("%s-reboot", i.Name)}, j)
@@ -311,7 +316,7 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, i *bmaasv1alp
 
 		if jobFound {
 			if j.HasCondition(rufio.JobCompleted, rufio.ConditionTrue) {
-				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobComplete, "")
+				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobComplete, "")
 			}
 
 			if j.HasCondition(rufio.JobFailed, rufio.ConditionTrue) {
@@ -321,7 +326,7 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, i *bmaasv1alp
 						message = c.Message
 					}
 				}
-				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobError, message)
+				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobError, message)
 			}
 
 			/*if err := r.Delete(ctx, j); err != nil {
@@ -329,14 +334,14 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, i *bmaasv1alp
 			}*/
 		}
 
-		util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted)
+		util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted)
 		return r.Status().Update(ctx, i)
 	}
 	return nil
 }
 
-func (r *InventoryReconciler) inventoryFreed(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
-	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryFreed) {
+func (r *InventoryReconciler) inventoryFreed(ctx context.Context, i *seederv1alpha1.Inventory) error {
+	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryFreed) {
 		// check and submit a power off job
 		var notFound bool
 		j := &rufio.BMCJob{}
@@ -380,14 +385,14 @@ func (r *InventoryReconciler) inventoryFreed(ctx context.Context, i *bmaasv1alph
 		}
 
 		// trigger status update
-		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.InventoryFreed)
+		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.InventoryFreed)
 		return r.Status().Update(ctx, i)
 	}
 	return nil
 }
 
-func (r *InventoryReconciler) housekeepingBMCJob(ctx context.Context, i *bmaasv1alpha1.Inventory) error {
-	if !util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryFreed) {
+func (r *InventoryReconciler) housekeepingBMCJob(ctx context.Context, i *seederv1alpha1.Inventory) error {
+	if !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryFreed) {
 		bmcjoblist := &rufio.BMCJobList{}
 		l, err := labels.Parse(fmt.Sprintf("inventory=%s", i.Name))
 		if err != nil {
@@ -412,8 +417,8 @@ func (r *InventoryReconciler) housekeepingBMCJob(ctx context.Context, i *bmaasv1
 
 		}
 
-		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobSubmitted)
-		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.BMCJobComplete)
+		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted)
+		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobComplete)
 		return r.Status().Update(ctx, i)
 	}
 

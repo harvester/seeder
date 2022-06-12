@@ -23,8 +23,8 @@ import (
 	"testing"
 	"time"
 
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
-	"github.com/harvester/bmaas/pkg/mock"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/mock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
@@ -80,7 +80,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
-	err = bmaasv1alpha1.AddToScheme(scheme)
+	err = seederv1alpha1.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = rufio.AddToScheme(scheme)

@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
-	"github.com/harvester/bmaas/pkg/mock"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/mock"
 	"github.com/stretchr/testify/assert"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
@@ -43,12 +43,12 @@ func Test_CheckAndCreateBaseBoardObject(t *testing.T) {
 	c, err := mock.GenerateFakeClient()
 	assert.Equal(t, nil, err, "error creating mock client")
 
-	i := &bmaasv1alpha1.Inventory{
+	i := &seederv1alpha1.Inventory{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "fiftyone",
 			Namespace: "default",
 		},
-		Spec: bmaasv1alpha1.InventorySpec{
+		Spec: seederv1alpha1.InventorySpec{
 			PrimaryDisk:                   "/dev/sda1",
 			ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 			BaseboardManagementSpec: rufio.BaseboardManagementSpec{
@@ -73,12 +73,12 @@ func Test_CheckAndCreateBaseBoardObjectFailure(t *testing.T) {
 	c, err := mock.GenerateFakeClient()
 	assert.Equal(t, nil, err, "error creating mock client")
 
-	i := &bmaasv1alpha1.Inventory{
+	i := &seederv1alpha1.Inventory{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "fiftythree",
 			Namespace: "default",
 		},
-		Spec: bmaasv1alpha1.InventorySpec{
+		Spec: seederv1alpha1.InventorySpec{
 			PrimaryDisk:                   "/dev/sda1",
 			ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 			BaseboardManagementSpec: rufio.BaseboardManagementSpec{

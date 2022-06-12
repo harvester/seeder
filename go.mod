@@ -1,4 +1,4 @@
-module github.com/harvester/bmaas
+module github.com/harvester/seeder
 
 go 1.18
 

@@ -1,7 +1,7 @@
 package mock
 
 import (
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/rancher/wrangler/pkg/yaml"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -75,7 +75,7 @@ func GenerateFakeClient() (client.WithWatch, error) {
 	}
 	scheme := runtime.NewScheme()
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-	utilruntime.Must(bmaasv1alpha1.AddToScheme(scheme))
+	utilruntime.Must(seederv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(rufio.AddToScheme(scheme))
 	c := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(objs...).Build()
 	return c, nil

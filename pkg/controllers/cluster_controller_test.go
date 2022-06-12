@@ -3,8 +3,8 @@ package controllers
 import (
 	"fmt"
 
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
-	"github.com/harvester/bmaas/pkg/util"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/util"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
@@ -16,28 +16,28 @@ import (
 )
 
 var _ = Describe("Create cluster tests", func() {
-	var i *bmaasv1alpha1.Inventory
-	var c *bmaasv1alpha1.Cluster
-	var a *bmaasv1alpha1.AddressPool
+	var i *seederv1alpha1.Inventory
+	var c *seederv1alpha1.Cluster
+	var a *seederv1alpha1.AddressPool
 	var creds *v1.Secret
 	BeforeEach(func() {
-		a = &bmaasv1alpha1.AddressPool{
+		a = &seederv1alpha1.AddressPool{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "cluster-test",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.AddressSpec{
+			Spec: seederv1alpha1.AddressSpec{
 				CIDR:    "192.168.1.1/29",
 				Gateway: "192.168.1.7",
 			},
 		}
 
-		i = &bmaasv1alpha1.Inventory{
+		i = &seederv1alpha1.Inventory{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "cluster-test",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.InventorySpec{
+			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
@@ -65,32 +65,32 @@ var _ = Describe("Create cluster tests", func() {
 			},
 		}
 
-		c = &bmaasv1alpha1.Cluster{
+		c = &seederv1alpha1.Cluster{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "cluster-test",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.ClusterSpec{
+			Spec: seederv1alpha1.ClusterSpec{
 				HarvesterVersion: "harvester_1_0_2",
-				Nodes: []bmaasv1alpha1.NodeConfig{
+				Nodes: []seederv1alpha1.NodeConfig{
 					{
-						InventoryReference: bmaasv1alpha1.ObjectReference{
+						InventoryReference: seederv1alpha1.ObjectReference{
 							Name:      "cluster-test",
 							Namespace: "default",
 						},
-						AddressPoolReference: bmaasv1alpha1.ObjectReference{
+						AddressPoolReference: seederv1alpha1.ObjectReference{
 							Name:      "cluster-test",
 							Namespace: "default",
 						},
 					},
 				},
-				VIPConfig: bmaasv1alpha1.VIPConfig{
-					AddressPoolReference: bmaasv1alpha1.ObjectReference{
+				VIPConfig: seederv1alpha1.VIPConfig{
+					AddressPoolReference: seederv1alpha1.ObjectReference{
 						Name:      "cluster-test",
 						Namespace: "default",
 					},
 				},
-				ClusterConfig: bmaasv1alpha1.ClusterConfig{
+				ClusterConfig: seederv1alpha1.ClusterConfig{
 					SSHKeys: []string{
 						"abc",
 						"def",
@@ -119,13 +119,13 @@ var _ = Describe("Create cluster tests", func() {
 	It("check address pool reconcile in cluster controller workflow", func() {
 
 		Eventually(func() error {
-			obj := &bmaasv1alpha1.AddressPool{}
+			obj := &seederv1alpha1.AddressPool{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: a.Namespace, Name: a.Name}, obj)
 			if err != nil {
 				return err
 			}
 
-			if obj.Status.Status != bmaasv1alpha1.PoolReady {
+			if obj.Status.Status != seederv1alpha1.PoolReady {
 				return fmt.Errorf("waiting for pool to be ready. current status is %s", obj.Status.Status)
 			}
 			return nil
@@ -134,27 +134,27 @@ var _ = Describe("Create cluster tests", func() {
 
 	It("check inventory reconcile in cluster controller workflow", func() {
 		Eventually(func() error {
-			tmpInventory := &bmaasv1alpha1.Inventory{}
+			tmpInventory := &seederv1alpha1.Inventory{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, tmpInventory)
 			if err != nil {
 				return err
 			}
 
 			// is inventory ready
-			if tmpInventory.Status.Status != bmaasv1alpha1.InventoryReady {
+			if tmpInventory.Status.Status != seederv1alpha1.InventoryReady {
 				return fmt.Errorf("expected inventory to be ready, but current state is %v", tmpInventory)
 			}
 
-			if !util.ConditionExists(tmpInventory.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) {
+			if !util.ConditionExists(tmpInventory.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
 				return fmt.Errorf("expected inventory to be allocated to cluster %v", tmpInventory.Status)
 			}
 			// is tinkerbell workflow condition present
-			if !util.ConditionExists(tmpInventory.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated) {
+			if !util.ConditionExists(tmpInventory.Status.Conditions, seederv1alpha1.TinkWorkflowCreated) {
 				return fmt.Errorf("expected tinkerbell hardware condition to exist %v", tmpInventory.Status.Conditions)
 			}
 
 			// is bmcjob completed
-			if !util.ConditionExists(tmpInventory.Status.Conditions, bmaasv1alpha1.BMCJobComplete) {
+			if !util.ConditionExists(tmpInventory.Status.Conditions, seederv1alpha1.BMCJobComplete) {
 				return fmt.Errorf("expected associated bmcjob completion condition to exist %v", tmpInventory.Status.Conditions)
 			}
 			return nil
@@ -163,12 +163,12 @@ var _ = Describe("Create cluster tests", func() {
 
 	It("reconcile hardware workflow in cluster controller reconcile", func() {
 		Eventually(func() error {
-			tmpCluster := &bmaasv1alpha1.Cluster{}
+			tmpCluster := &seederv1alpha1.Cluster{}
 			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, tmpCluster); err != nil {
 				return err
 			}
 
-			if tmpCluster.Status.Status != bmaasv1alpha1.ClusterTinkHardwareSubmitted {
+			if tmpCluster.Status.Status != seederv1alpha1.ClusterTinkHardwareSubmitted {
 				return fmt.Errorf("expected status to be tink hardware submitted")
 			}
 
@@ -193,7 +193,7 @@ var _ = Describe("Create cluster tests", func() {
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 
 		Eventually(func() error {
-			iObj := &bmaasv1alpha1.Inventory{}
+			iObj := &seederv1alpha1.Inventory{}
 			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj); err != nil {
 				return err
 			}
@@ -211,7 +211,7 @@ var _ = Describe("Create cluster tests", func() {
 		Eventually(func() error {
 			// check and delete cluster if needed. Need this since one of the tests simulates removing cluster
 			// and checking gc of hardware objects
-			cObj := &bmaasv1alpha1.Cluster{}
+			cObj := &seederv1alpha1.Cluster{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
 			if err != nil {
 				if apierrors.IsNotFound(err) {
@@ -235,7 +235,7 @@ var _ = Describe("Create cluster tests", func() {
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 
 		Eventually(func() error {
-			cObj := &bmaasv1alpha1.Cluster{}
+			cObj := &seederv1alpha1.Cluster{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
 			if err != nil {
 				if apierrors.IsNotFound(err) {
@@ -250,28 +250,28 @@ var _ = Describe("Create cluster tests", func() {
 })
 
 var _ = Describe("add inventory to cluster tests", func() {
-	var i, i2 *bmaasv1alpha1.Inventory
-	var c *bmaasv1alpha1.Cluster
-	var a *bmaasv1alpha1.AddressPool
+	var i, i2 *seederv1alpha1.Inventory
+	var c *seederv1alpha1.Cluster
+	var a *seederv1alpha1.AddressPool
 	var creds, creds2 *v1.Secret
 	BeforeEach(func() {
-		a = &bmaasv1alpha1.AddressPool{
+		a = &seederv1alpha1.AddressPool{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "add-cluster-test",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.AddressSpec{
+			Spec: seederv1alpha1.AddressSpec{
 				CIDR:    "192.168.1.1/29",
 				Gateway: "192.168.1.7",
 			},
 		}
 
-		i = &bmaasv1alpha1.Inventory{
+		i = &seederv1alpha1.Inventory{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "node1",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.InventorySpec{
+			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
@@ -288,12 +288,12 @@ var _ = Describe("add inventory to cluster tests", func() {
 			},
 		}
 
-		i2 = &bmaasv1alpha1.Inventory{
+		i2 = &seederv1alpha1.Inventory{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "node2",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.InventorySpec{
+			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
@@ -332,32 +332,32 @@ var _ = Describe("add inventory to cluster tests", func() {
 			},
 		}
 
-		c = &bmaasv1alpha1.Cluster{
+		c = &seederv1alpha1.Cluster{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "add-cluster",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.ClusterSpec{
+			Spec: seederv1alpha1.ClusterSpec{
 				HarvesterVersion: "harvester_1_0_2",
-				Nodes: []bmaasv1alpha1.NodeConfig{
+				Nodes: []seederv1alpha1.NodeConfig{
 					{
-						InventoryReference: bmaasv1alpha1.ObjectReference{
+						InventoryReference: seederv1alpha1.ObjectReference{
 							Name:      "node1",
 							Namespace: "default",
 						},
-						AddressPoolReference: bmaasv1alpha1.ObjectReference{
+						AddressPoolReference: seederv1alpha1.ObjectReference{
 							Name:      "add-cluster-test",
 							Namespace: "default",
 						},
 					},
 				},
-				VIPConfig: bmaasv1alpha1.VIPConfig{
-					AddressPoolReference: bmaasv1alpha1.ObjectReference{
+				VIPConfig: seederv1alpha1.VIPConfig{
+					AddressPoolReference: seederv1alpha1.ObjectReference{
 						Name:      "add-cluster-test",
 						Namespace: "default",
 					},
 				},
-				ClusterConfig: bmaasv1alpha1.ClusterConfig{
+				ClusterConfig: seederv1alpha1.ClusterConfig{
 					SSHKeys: []string{
 						"abc",
 						"def",
@@ -395,22 +395,22 @@ var _ = Describe("add inventory to cluster tests", func() {
 	It("add inventory reconcile in cluster controller workflow", func() {
 		// add a noed to a cluster
 		Eventually(func() error {
-			cObj := &bmaasv1alpha1.Cluster{}
+			cObj := &seederv1alpha1.Cluster{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
 			if err != nil {
 				return err
 			}
 
-			if cObj.Status.Status != bmaasv1alpha1.ClusterTinkHardwareSubmitted {
+			if cObj.Status.Status != seederv1alpha1.ClusterTinkHardwareSubmitted {
 				return fmt.Errorf("waiting for cluster to complete initial reconcilliation")
 			}
 
-			cObj.Spec.Nodes = append(cObj.Spec.Nodes, bmaasv1alpha1.NodeConfig{
-				InventoryReference: bmaasv1alpha1.ObjectReference{
+			cObj.Spec.Nodes = append(cObj.Spec.Nodes, seederv1alpha1.NodeConfig{
+				InventoryReference: seederv1alpha1.ObjectReference{
 					Name:      i2.Name,
 					Namespace: i2.Namespace,
 				},
-				AddressPoolReference: bmaasv1alpha1.ObjectReference{
+				AddressPoolReference: seederv1alpha1.ObjectReference{
 					Name:      a.Name,
 					Namespace: a.Namespace,
 				},
@@ -421,13 +421,13 @@ var _ = Describe("add inventory to cluster tests", func() {
 
 		// reconcile status of additional node
 		Eventually(func() error {
-			iObj := &bmaasv1alpha1.Inventory{}
+			iObj := &seederv1alpha1.Inventory{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i2.Namespace, Name: i2.Name}, iObj)
 			if err != nil {
 				return err
 			}
 
-			if util.ConditionExists(iObj.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) {
+			if util.ConditionExists(iObj.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
 				return nil
 			}
 			fmt.Println(iObj.Status.Conditions)
@@ -440,7 +440,7 @@ var _ = Describe("add inventory to cluster tests", func() {
 		Eventually(func() error {
 			// check and delete cluster if needed. Need this since one of the tests simulates removing cluster
 			// and checking gc of hardware objects
-			cObj := &bmaasv1alpha1.Cluster{}
+			cObj := &seederv1alpha1.Cluster{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
 			if err != nil {
 				if apierrors.IsNotFound(err) {
@@ -471,7 +471,7 @@ var _ = Describe("add inventory to cluster tests", func() {
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 
 		Eventually(func() error {
-			cObj := &bmaasv1alpha1.Cluster{}
+			cObj := &seederv1alpha1.Cluster{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
 			if err != nil {
 				if apierrors.IsNotFound(err) {
@@ -486,28 +486,28 @@ var _ = Describe("add inventory to cluster tests", func() {
 })
 
 var _ = Describe("delete inventory from cluster tests", func() {
-	var i, i2 *bmaasv1alpha1.Inventory
-	var c *bmaasv1alpha1.Cluster
-	var a *bmaasv1alpha1.AddressPool
+	var i, i2 *seederv1alpha1.Inventory
+	var c *seederv1alpha1.Cluster
+	var a *seederv1alpha1.AddressPool
 	var creds, creds2 *v1.Secret
 	BeforeEach(func() {
-		a = &bmaasv1alpha1.AddressPool{
+		a = &seederv1alpha1.AddressPool{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "del-cluster-test",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.AddressSpec{
+			Spec: seederv1alpha1.AddressSpec{
 				CIDR:    "192.168.1.1/29",
 				Gateway: "192.168.1.7",
 			},
 		}
 
-		i = &bmaasv1alpha1.Inventory{
+		i = &seederv1alpha1.Inventory{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "del-node1",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.InventorySpec{
+			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
@@ -524,12 +524,12 @@ var _ = Describe("delete inventory from cluster tests", func() {
 			},
 		}
 
-		i2 = &bmaasv1alpha1.Inventory{
+		i2 = &seederv1alpha1.Inventory{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "del-node2",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.InventorySpec{
+			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
@@ -568,42 +568,42 @@ var _ = Describe("delete inventory from cluster tests", func() {
 			},
 		}
 
-		c = &bmaasv1alpha1.Cluster{
+		c = &seederv1alpha1.Cluster{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "del-cluster",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.ClusterSpec{
+			Spec: seederv1alpha1.ClusterSpec{
 				HarvesterVersion: "harvester_1_0_2",
-				Nodes: []bmaasv1alpha1.NodeConfig{
+				Nodes: []seederv1alpha1.NodeConfig{
 					{
-						InventoryReference: bmaasv1alpha1.ObjectReference{
+						InventoryReference: seederv1alpha1.ObjectReference{
 							Name:      "del-node1",
 							Namespace: "default",
 						},
-						AddressPoolReference: bmaasv1alpha1.ObjectReference{
+						AddressPoolReference: seederv1alpha1.ObjectReference{
 							Name:      "del-cluster-test",
 							Namespace: "default",
 						},
 					},
 					{
-						InventoryReference: bmaasv1alpha1.ObjectReference{
+						InventoryReference: seederv1alpha1.ObjectReference{
 							Name:      "del-node2",
 							Namespace: "default",
 						},
-						AddressPoolReference: bmaasv1alpha1.ObjectReference{
+						AddressPoolReference: seederv1alpha1.ObjectReference{
 							Name:      "del-cluster-test",
 							Namespace: "default",
 						},
 					},
 				},
-				VIPConfig: bmaasv1alpha1.VIPConfig{
-					AddressPoolReference: bmaasv1alpha1.ObjectReference{
+				VIPConfig: seederv1alpha1.VIPConfig{
+					AddressPoolReference: seederv1alpha1.ObjectReference{
 						Name:      "del-cluster-test",
 						Namespace: "default",
 					},
 				},
-				ClusterConfig: bmaasv1alpha1.ClusterConfig{
+				ClusterConfig: seederv1alpha1.ClusterConfig{
 					SSHKeys: []string{
 						"abc",
 						"def",
@@ -641,24 +641,24 @@ var _ = Describe("delete inventory from cluster tests", func() {
 	It("remove inventory reconcile in cluster controller workflow", func() {
 		// add a noed to a cluster
 		Eventually(func() error {
-			cObj := &bmaasv1alpha1.Cluster{}
+			cObj := &seederv1alpha1.Cluster{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
 			if err != nil {
 				return err
 			}
 
-			if cObj.Status.Status != bmaasv1alpha1.ClusterTinkHardwareSubmitted {
+			if cObj.Status.Status != seederv1alpha1.ClusterTinkHardwareSubmitted {
 				return fmt.Errorf("waiting for cluster to complete initial reconcilliation")
 			}
 
 			// remove the second node
-			cObj.Spec.Nodes = []bmaasv1alpha1.NodeConfig{
+			cObj.Spec.Nodes = []seederv1alpha1.NodeConfig{
 				{
-					InventoryReference: bmaasv1alpha1.ObjectReference{
+					InventoryReference: seederv1alpha1.ObjectReference{
 						Name:      "del-node1",
 						Namespace: "default",
 					},
-					AddressPoolReference: bmaasv1alpha1.ObjectReference{
+					AddressPoolReference: seederv1alpha1.ObjectReference{
 						Name:      "del-cluster-test",
 						Namespace: "default",
 					},
@@ -670,13 +670,13 @@ var _ = Describe("delete inventory from cluster tests", func() {
 
 		// reconcile status of additional node
 		Eventually(func() error {
-			iObj := &bmaasv1alpha1.Inventory{}
+			iObj := &seederv1alpha1.Inventory{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i2.Namespace, Name: i2.Name}, iObj)
 			if err != nil {
 				return err
 			}
 
-			if !util.ConditionExists(iObj.Status.Conditions, bmaasv1alpha1.InventoryFreed) || util.ConditionExists(iObj.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) {
+			if !util.ConditionExists(iObj.Status.Conditions, seederv1alpha1.InventoryFreed) || util.ConditionExists(iObj.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
 				return nil
 			}
 			return fmt.Errorf("waiting for inventory to be freed")
@@ -704,7 +704,7 @@ var _ = Describe("delete inventory from cluster tests", func() {
 		Eventually(func() error {
 			// check and delete cluster if needed. Need this since one of the tests simulates removing cluster
 			// and checking gc of hardware objects
-			cObj := &bmaasv1alpha1.Cluster{}
+			cObj := &seederv1alpha1.Cluster{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
 			if err != nil {
 				if apierrors.IsNotFound(err) {
@@ -735,7 +735,7 @@ var _ = Describe("delete inventory from cluster tests", func() {
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 
 		Eventually(func() error {
-			cObj := &bmaasv1alpha1.Cluster{}
+			cObj := &seederv1alpha1.Cluster{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
 			if err != nil {
 				if apierrors.IsNotFound(err) {

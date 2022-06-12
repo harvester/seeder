@@ -1,12 +1,12 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{ include "seeder.fullname" . }}-manager-rolebinding
+  name: {{ include "boots.fullname" . }}-role
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: manager-role
+  name: {{ include "boots.fullname" . }}-role
 subjects:
 - kind: ServiceAccount
-  name: controller-manager
-  namespace: system
+  name: {{ include "boots.fullname" . }}
+  namespace: {{ .Release.Namespace }}

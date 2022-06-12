@@ -3,15 +3,15 @@ package util
 import (
 	"testing"
 
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var (
-	testConditionData = []bmaasv1alpha1.Conditions{
+	testConditionData = []seederv1alpha1.Conditions{
 		{
-			Type:      bmaasv1alpha1.BMCObjectCreated,
+			Type:      seederv1alpha1.BMCObjectCreated,
 			StartTime: metav1.Now(),
 			Message:   "BMC Request submitted",
 		},
@@ -19,33 +19,33 @@ var (
 )
 
 func Test_ConditionsExist(t *testing.T) {
-	ok := ConditionExists(testConditionData, bmaasv1alpha1.BMCObjectCreated)
+	ok := ConditionExists(testConditionData, seederv1alpha1.BMCObjectCreated)
 	assert.True(t, ok, "expected condition to be found")
 }
 
 func Test_ConditionsExist_False(t *testing.T) {
-	ok := ConditionExists(testConditionData, bmaasv1alpha1.BMCJobSubmitted)
+	ok := ConditionExists(testConditionData, seederv1alpha1.BMCJobSubmitted)
 	assert.False(t, ok, "expected condition to be not found")
 }
 
 func Test_RemoveCondition(t *testing.T) {
-	newConditions := RemoveCondition(testConditionData, bmaasv1alpha1.BMCObjectCreated)
-	ok := ConditionExists(newConditions, bmaasv1alpha1.BMCObjectCreated)
+	newConditions := RemoveCondition(testConditionData, seederv1alpha1.BMCObjectCreated)
+	ok := ConditionExists(newConditions, seederv1alpha1.BMCObjectCreated)
 	assert.False(t, ok, "expected condition to be not found")
 }
 
 func Test_AddCondition(t *testing.T) {
-	newConditions := CreateOrUpdateCondition(testConditionData, bmaasv1alpha1.BMCJobComplete, "task completed")
-	ok := ConditionExists(newConditions, bmaasv1alpha1.BMCJobComplete)
+	newConditions := CreateOrUpdateCondition(testConditionData, seederv1alpha1.BMCJobComplete, "task completed")
+	ok := ConditionExists(newConditions, seederv1alpha1.BMCJobComplete)
 	assert.True(t, ok, "expected new condition to be present")
-	ok = ConditionExists(newConditions, bmaasv1alpha1.BMCObjectCreated)
+	ok = ConditionExists(newConditions, seederv1alpha1.BMCObjectCreated)
 	assert.True(t, ok, "expected original condition to be present", newConditions)
 }
 
 func Test_UpdateCondition(t *testing.T) {
 	orgTime := testConditionData[0].StartTime
-	newConditions := CreateOrUpdateCondition(testConditionData, bmaasv1alpha1.BMCObjectCreated, "new task request")
-	ok := ConditionExists(newConditions, bmaasv1alpha1.BMCObjectCreated)
+	newConditions := CreateOrUpdateCondition(testConditionData, seederv1alpha1.BMCObjectCreated, "new task request")
+	ok := ConditionExists(newConditions, seederv1alpha1.BMCObjectCreated)
 	assert.True(t, ok, "expected condition to be present")
 	assert.Equal(t, orgTime, newConditions[0].StartTime, "original time should be unchanged")
 	assert.NotEmpty(t, newConditions[0].LastUpdateTime, "lastUpdateTime should not be empty")

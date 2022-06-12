@@ -3,7 +3,7 @@ package util
 import (
 	"fmt"
 	"github.com/go-logr/logr"
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	"golang.org/x/net/context"
 	v1 "k8s.io/api/core/v1"
@@ -29,7 +29,7 @@ func CheckSecretExists(ctx context.Context, client client.Client, log logr.Logge
 
 // CheckAndCreateBaseBoardObject will take the BMCSpec and generate a baseboardobject of the same name
 // and set owner references.
-func CheckAndCreateBaseBoardObject(ctx context.Context, client client.Client, log logr.Logger, instanceObj *bmaasv1alpha1.Inventory, schema *runtime.Scheme) error {
+func CheckAndCreateBaseBoardObject(ctx context.Context, client client.Client, log logr.Logger, instanceObj *seederv1alpha1.Inventory, schema *runtime.Scheme) error {
 	b := &rufio.BaseboardManagement{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      instanceObj.Name,
@@ -38,7 +38,7 @@ func CheckAndCreateBaseBoardObject(ctx context.Context, client client.Client, lo
 		Spec: *instanceObj.Spec.BaseboardManagementSpec.DeepCopy(),
 	}
 
-	controllerutil.AddFinalizer(b, bmaasv1alpha1.InventoryFinalizer)
+	controllerutil.AddFinalizer(b, seederv1alpha1.InventoryFinalizer)
 	existingObj := &rufio.BaseboardManagement{}
 	err := client.Get(ctx, types.NamespacedName{Name: b.Name, Namespace: b.Namespace}, existingObj)
 	if err != nil {
@@ -82,11 +82,11 @@ func IsBaseboardReady(b *rufio.BaseboardManagement) bool {
 }
 
 // ListInventory generates a list of inventory across all namespaces
-func ListInventory(ctx context.Context, c client.Client) ([]bmaasv1alpha1.Inventory, error) {
-	list := &bmaasv1alpha1.InventoryList{}
+func ListInventory(ctx context.Context, c client.Client) ([]seederv1alpha1.Inventory, error) {
+	list := &seederv1alpha1.InventoryList{}
 	err := c.List(ctx, list, &client.ListOptions{})
 	if err != nil {
-		return []bmaasv1alpha1.Inventory{}, err
+		return []seederv1alpha1.Inventory{}, err
 	}
 
 	return list.Items, nil
@@ -94,13 +94,13 @@ func ListInventory(ctx context.Context, c client.Client) ([]bmaasv1alpha1.Invent
 
 // ListInventoryAllocatedToCluster lists all inventory across namespaces that is allocated to a particular
 // cluster
-func ListInventoryAllocatedtoCluster(ctx context.Context, c client.Client, cluster *bmaasv1alpha1.Cluster) ([]bmaasv1alpha1.Inventory, error) {
+func ListInventoryAllocatedtoCluster(ctx context.Context, c client.Client, cluster *seederv1alpha1.Cluster) ([]seederv1alpha1.Inventory, error) {
 	items, err := ListInventory(ctx, c)
 	if err != nil {
-		return []bmaasv1alpha1.Inventory{}, fmt.Errorf("error fetching inventory list: %v", err)
+		return []seederv1alpha1.Inventory{}, fmt.Errorf("error fetching inventory list: %v", err)
 	}
 
-	var retItems []bmaasv1alpha1.Inventory
+	var retItems []seederv1alpha1.Inventory
 	for _, v := range items {
 		if v.Status.Cluster.Name == cluster.Name && v.Status.Cluster.Namespace == cluster.Namespace {
 			retItems = append(retItems, v)

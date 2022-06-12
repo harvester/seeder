@@ -20,9 +20,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-logr/logr"
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
-	"github.com/harvester/bmaas/pkg/tink"
-	"github.com/harvester/bmaas/pkg/util"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/tink"
+	"github.com/harvester/seeder/pkg/util"
 	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -42,7 +42,7 @@ type ClusterReconciler struct {
 	logr.Logger
 }
 
-type clusterReconciler func(context.Context, *bmaasv1alpha1.Cluster) error
+type clusterReconciler func(context.Context, *seederv1alpha1.Cluster) error
 
 //+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=clusters,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=clusters/status,verbs=get;update;patch
@@ -60,7 +60,7 @@ type clusterReconciler func(context.Context, *bmaasv1alpha1.Cluster) error
 func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	r.Info("Reconcilling inventory objects", req.Name, req.Namespace)
 	// TODO(user): your logic here
-	c := &bmaasv1alpha1.Cluster{}
+	c := &seederv1alpha1.Cluster{}
 
 	err := r.Get(ctx, req.NamespacedName, c)
 	if err != nil {
@@ -99,23 +99,23 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 }
 
 // generateClusterConfig will generate the clusterConfig
-func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, c *bmaasv1alpha1.Cluster) error {
+func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, c *seederv1alpha1.Cluster) error {
 	if c.Status.Status == "" {
-		vipPool := &bmaasv1alpha1.AddressPool{}
+		vipPool := &seederv1alpha1.AddressPool{}
 		err := r.Get(ctx, types.NamespacedName{Namespace: c.Spec.VIPConfig.AddressPoolReference.Namespace,
 			Name: c.Spec.VIPConfig.AddressPoolReference.Name}, vipPool)
 		if err != nil {
 			return err
 		}
 
-		if vipPool.Status.Status != bmaasv1alpha1.PoolReady {
+		if vipPool.Status.Status != seederv1alpha1.PoolReady {
 			return fmt.Errorf("waiting for address pool %s to be ready", vipPool.Name)
 		}
 
 		if c.Status.ClusterAddress == "" {
 			var addressFound bool
 			for address, v := range vipPool.Status.AddressAllocation {
-				if v.Kind == bmaasv1alpha1.KindCluster && v.Name == c.Name && v.Namespace == c.Namespace {
+				if v.Kind == seederv1alpha1.KindCluster && v.Name == c.Name && v.Namespace == c.Namespace {
 					addressFound = true
 					c.Status.ClusterAddress = address
 				}
@@ -127,9 +127,9 @@ func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, c *bmaasv
 				}
 				c.Status.ClusterAddress = vip
 				// update address allocation
-				vipPool.Status.AddressAllocation[vip] = bmaasv1alpha1.ObjectReferenceWithKind{
-					Kind: bmaasv1alpha1.KindCluster,
-					ObjectReference: bmaasv1alpha1.ObjectReference{
+				vipPool.Status.AddressAllocation[vip] = seederv1alpha1.ObjectReferenceWithKind{
+					Kind: seederv1alpha1.KindCluster,
+					ObjectReference: seederv1alpha1.ObjectReference{
 						Name:      c.Name,
 						Namespace: c.Namespace,
 					},
@@ -141,7 +141,7 @@ func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, c *bmaasv
 		}
 
 		c.Status.ClusterToken = util.GenerateRand()
-		c.Status.Status = bmaasv1alpha1.ClusterConfigReady
+		c.Status.Status = seederv1alpha1.ClusterConfigReady
 		return r.Status().Update(ctx, c)
 	}
 	return nil
@@ -149,17 +149,17 @@ func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, c *bmaasv
 
 // patchNodes will patch the node information and associate appropriate events to trigger
 // tinkerbell workflows to be generated and reboot initiated
-func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *bmaasv1alpha1.Cluster) error {
-	if c.Status.Status == bmaasv1alpha1.ClusterConfigReady {
+func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *seederv1alpha1.Cluster) error {
+	if c.Status.Status == seederv1alpha1.ClusterConfigReady {
 		for n, nc := range c.Spec.Nodes {
-			pool := &bmaasv1alpha1.AddressPool{}
+			pool := &seederv1alpha1.AddressPool{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: nc.AddressPoolReference.Namespace,
 				Name: nc.AddressPoolReference.Name}, pool)
 			if err != nil {
 				return fmt.Errorf("error during address pool lookup while configuring nodes: %v", err)
 			}
 
-			i := &bmaasv1alpha1.Inventory{}
+			i := &seederv1alpha1.Inventory{}
 			err = r.Get(ctx, types.NamespacedName{Namespace: nc.InventoryReference.Namespace,
 				Name: nc.InventoryReference.Name}, i)
 			if err != nil {
@@ -167,11 +167,11 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *bmaasv1al
 			}
 
 			// check that inventory is ready before using it
-			if i.Status.Status != bmaasv1alpha1.InventoryReady {
+			if i.Status.Status != seederv1alpha1.InventoryReady {
 				return fmt.Errorf("waiting for inventory %s in namespace %s to be ready", i.Name, i.Namespace)
 			}
 
-			if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) {
+			if util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
 				continue
 			}
 
@@ -185,7 +185,7 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *bmaasv1al
 			}
 
 			if !found {
-				if pool.Status.Status != bmaasv1alpha1.PoolReady {
+				if pool.Status.Status != seederv1alpha1.PoolReady {
 					return fmt.Errorf("waiting for address pool %s to be ready", pool.Name)
 				}
 				nodeAddress, err = util.AllocateAddress(pool.Status.DeepCopy(), nc.StaticAddress)
@@ -203,14 +203,14 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *bmaasv1al
 			i.Status.GeneratedPassword = util.GenerateRand()
 			i.Status.Cluster.Namespace = c.Namespace
 			i.Status.Cluster.Name = c.Name
-			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster,
+			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster,
 				fmt.Sprintf("node assigned to cluster %s", c.Name))
-			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.InventoryFreed)
+			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.InventoryFreed)
 
 			if n == 0 {
-				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.HarvesterCreateNode, "Create Mode")
+				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.HarvesterCreateNode, "Create Mode")
 			} else {
-				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.HarvesterJoinNode, "Join Mode")
+				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.HarvesterJoinNode, "Join Mode")
 			}
 
 			err = r.Status().Update(ctx, i)
@@ -219,12 +219,12 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *bmaasv1al
 			}
 			// update pool with node allocation if not already done
 			if !found {
-				pool.Status.AddressAllocation[nodeAddress] = bmaasv1alpha1.ObjectReferenceWithKind{
-					ObjectReference: bmaasv1alpha1.ObjectReference{
+				pool.Status.AddressAllocation[nodeAddress] = seederv1alpha1.ObjectReferenceWithKind{
+					ObjectReference: seederv1alpha1.ObjectReference{
 						Namespace: i.Namespace,
 						Name:      i.Name,
 					},
-					Kind: bmaasv1alpha1.KindInventory,
+					Kind: seederv1alpha1.KindInventory,
 				}
 				err = r.Status().Update(ctx, pool)
 				if err != nil {
@@ -233,14 +233,14 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *bmaasv1al
 			}
 		}
 
-		c.Status.Status = bmaasv1alpha1.ClusterNodesPatched
+		c.Status.Status = seederv1alpha1.ClusterNodesPatched
 		err := r.Status().Update(ctx, c)
 		if err != nil {
 			return err
 		}
 
-		if !controllerutil.ContainsFinalizer(c, bmaasv1alpha1.ClusterFinalizer) {
-			controllerutil.AddFinalizer(c, bmaasv1alpha1.ClusterFinalizer)
+		if !controllerutil.ContainsFinalizer(c, seederv1alpha1.ClusterFinalizer) {
+			controllerutil.AddFinalizer(c, seederv1alpha1.ClusterFinalizer)
 			return r.Update(ctx, c)
 		}
 
@@ -249,11 +249,11 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *bmaasv1al
 }
 
 // createTinkerbellHardware will create hardware objects for all nodes in the cluster
-func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *bmaasv1alpha1.Cluster) error {
-	if c.Status.Status == bmaasv1alpha1.ClusterNodesPatched || c.Status.Status == bmaasv1alpha1.ClusterTinkHardwareSubmitted {
+func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *seederv1alpha1.Cluster) error {
+	if c.Status.Status == seederv1alpha1.ClusterNodesPatched || c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted {
 		for _, i := range c.Spec.Nodes {
 			var hardwareUpdated bool
-			inventory := &bmaasv1alpha1.Inventory{}
+			inventory := &seederv1alpha1.Inventory{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: i.InventoryReference.Namespace, Name: i.InventoryReference.Name}, inventory)
 			if err != nil {
 				return err
@@ -262,7 +262,7 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *bma
 			// if node is missing inventory allocation to cluster
 			// then skip the HW generation, as this node doesnt yet have any addresses
 			// allocated
-			if !util.ConditionExists(inventory.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) {
+			if !util.ConditionExists(inventory.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
 				r.Info("skipping node from hardware generation as it has not yet been processed for allocation to cluster", inventory.Name, inventory.Namespace)
 				continue
 			}
@@ -301,7 +301,7 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *bma
 			}*/
 
 			if hardwareUpdated {
-				inventory.Status.Conditions = util.CreateOrUpdateCondition(inventory.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated, "tink workflow created")
+				inventory.Status.Conditions = util.CreateOrUpdateCondition(inventory.Status.Conditions, seederv1alpha1.TinkWorkflowCreated, "tink workflow created")
 				if err := r.Status().Update(ctx, inventory); err != nil {
 					return err
 				}
@@ -310,8 +310,8 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *bma
 
 	}
 
-	if c.Status.Status == bmaasv1alpha1.ClusterNodesPatched {
-		c.Status.Status = bmaasv1alpha1.ClusterTinkHardwareSubmitted
+	if c.Status.Status == seederv1alpha1.ClusterNodesPatched {
+		c.Status.Status = seederv1alpha1.ClusterTinkHardwareSubmitted
 		return r.Status().Update(ctx, c)
 	}
 
@@ -320,19 +320,19 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *bma
 
 // reconcileNodes will perform housekeeping needed when nodes are added or
 // removed from the cluster
-func (r *ClusterReconciler) reconcileNodes(ctx context.Context, c *bmaasv1alpha1.Cluster) error {
+func (r *ClusterReconciler) reconcileNodes(ctx context.Context, c *seederv1alpha1.Cluster) error {
 
-	if c.Status.Status == bmaasv1alpha1.ClusterTinkHardwareSubmitted {
+	if c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted {
 		items, err := util.ListInventoryAllocatedtoCluster(ctx, r.Client, c)
 		if err != nil {
 			return err
 		}
 
 		// reconcile removed nodes first
-		var removedNodes []bmaasv1alpha1.Inventory
+		var removedNodes []seederv1alpha1.Inventory
 		for _, i := range items {
 			var found bool
-			var v bmaasv1alpha1.NodeConfig
+			var v seederv1alpha1.NodeConfig
 			for _, v = range c.Spec.Nodes {
 				if i.Namespace == v.InventoryReference.Namespace && i.Name == v.InventoryReference.Name {
 					found = true
@@ -344,7 +344,7 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, c *bmaasv1alpha1
 		}
 
 		for _, i := range removedNodes {
-			iObj := &bmaasv1alpha1.Inventory{}
+			iObj := &seederv1alpha1.Inventory{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj)
 			if err != nil {
 				if apierrors.IsNotFound(err) {
@@ -368,13 +368,13 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, c *bmaasv1alpha1
 				}
 			}
 			// need to clean up inventory
-			iObj.Status.PXEBootInterface = bmaasv1alpha1.PXEBootInterface{}
-			iObj.Status.Cluster = bmaasv1alpha1.ObjectReference{}
+			iObj.Status.PXEBootInterface = seederv1alpha1.PXEBootInterface{}
+			iObj.Status.Cluster = seederv1alpha1.ObjectReference{}
 			iObj.Status.GeneratedPassword = ""
-			iObj.Status.Conditions = util.RemoveCondition(iObj.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster)
-			iObj.Status.Conditions = util.RemoveCondition(iObj.Status.Conditions, bmaasv1alpha1.TinkWorkflowCreated)
-			iObj.Status.Conditions = util.RemoveCondition(iObj.Status.Conditions, bmaasv1alpha1.HarvesterJoinNode)
-			iObj.Status.Conditions = util.CreateOrUpdateCondition(iObj.Status.Conditions, bmaasv1alpha1.InventoryFreed, "")
+			iObj.Status.Conditions = util.RemoveCondition(iObj.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster)
+			iObj.Status.Conditions = util.RemoveCondition(iObj.Status.Conditions, seederv1alpha1.TinkWorkflowCreated)
+			iObj.Status.Conditions = util.RemoveCondition(iObj.Status.Conditions, seederv1alpha1.HarvesterJoinNode)
+			iObj.Status.Conditions = util.CreateOrUpdateCondition(iObj.Status.Conditions, seederv1alpha1.InventoryFreed, "")
 			if err := r.Status().Update(ctx, iObj); err != nil {
 				return err
 			}
@@ -396,19 +396,19 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, c *bmaasv1alpha1
 		// add nodes to cluster if needed
 		var nodesAdded bool
 		for _, i := range c.Spec.Nodes {
-			iObj := &bmaasv1alpha1.Inventory{}
+			iObj := &seederv1alpha1.Inventory{}
 			if err := r.Get(ctx, types.NamespacedName{Namespace: i.InventoryReference.Namespace,
 				Name: i.InventoryReference.Name}, iObj); err != nil {
 				return err
 			}
-			if !util.ConditionExists(iObj.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster) || iObj.Status.Cluster.Namespace != c.Namespace || iObj.Status.Cluster.Name != c.Name {
+			if !util.ConditionExists(iObj.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) || iObj.Status.Cluster.Namespace != c.Namespace || iObj.Status.Cluster.Name != c.Name {
 				nodesAdded = true
 			}
 		}
 
 		if nodesAdded {
 			// update status to allow reconcile to happen again from patch nodes and pools phase
-			c.Status.Status = bmaasv1alpha1.ClusterConfigReady
+			c.Status.Status = seederv1alpha1.ClusterConfigReady
 			return r.Status().Update(ctx, c)
 		}
 	}
@@ -417,11 +417,11 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, c *bmaasv1alpha1
 }
 
 // cleanupClusterDeps will trigger cleanup of nodes and associated infra
-func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *bmaasv1alpha1.Cluster) error {
+func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *seederv1alpha1.Cluster) error {
 	// clean up nodes
 	for _, nc := range c.Spec.Nodes {
 		var poolmissing, inventorymissing bool
-		pool := &bmaasv1alpha1.AddressPool{}
+		pool := &seederv1alpha1.AddressPool{}
 		err := r.Get(ctx, types.NamespacedName{Namespace: nc.AddressPoolReference.Namespace,
 			Name: nc.AddressPoolReference.Name}, pool)
 		if err != nil {
@@ -432,7 +432,7 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *bmaasv1al
 			}
 		}
 
-		i := &bmaasv1alpha1.Inventory{}
+		i := &seederv1alpha1.Inventory{}
 		err = r.Get(ctx, types.NamespacedName{Namespace: nc.InventoryReference.Namespace,
 			Name: nc.InventoryReference.Name}, i)
 		if err != nil {
@@ -451,11 +451,11 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *bmaasv1al
 		}
 
 		if !inventorymissing {
-			i.Status.PXEBootInterface = bmaasv1alpha1.PXEBootInterface{}
-			i.Status.Cluster = bmaasv1alpha1.ObjectReference{}
+			i.Status.PXEBootInterface = seederv1alpha1.PXEBootInterface{}
+			i.Status.Cluster = seederv1alpha1.ObjectReference{}
 			i.Status.GeneratedPassword = ""
-			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.InventoryAllocatedToCluster)
-			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, bmaasv1alpha1.InventoryFreed, "")
+			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster)
+			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.InventoryFreed, "")
 			err = r.Status().Update(ctx, i)
 			if err != nil {
 				return err
@@ -467,7 +467,7 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *bmaasv1al
 	//cleanup VIP address pool
 	if c.Status.ClusterAddress != "" {
 		var poolNotFound bool
-		pool := &bmaasv1alpha1.AddressPool{}
+		pool := &seederv1alpha1.AddressPool{}
 		if err := r.Get(ctx, types.NamespacedName{Namespace: c.Spec.VIPConfig.AddressPoolReference.Namespace,
 			Name: c.Spec.VIPConfig.AddressPoolReference.Name}, pool); err != nil {
 			if apierrors.IsNotFound(err) {
@@ -485,8 +485,8 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *bmaasv1al
 		}
 	}
 
-	if controllerutil.ContainsFinalizer(c, bmaasv1alpha1.ClusterFinalizer) {
-		controllerutil.RemoveFinalizer(c, bmaasv1alpha1.ClusterFinalizer)
+	if controllerutil.ContainsFinalizer(c, seederv1alpha1.ClusterFinalizer) {
+		controllerutil.RemoveFinalizer(c, seederv1alpha1.ClusterFinalizer)
 		return r.Update(ctx, c)
 	}
 
@@ -496,7 +496,7 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *bmaasv1al
 // SetupWithManager sets up the controller with the Manager.
 func (r *ClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&bmaasv1alpha1.Cluster{}).
+		For(&seederv1alpha1.Cluster{}).
 		Watches(&source.Kind{Type: &tinkv1alpha1.Hardware{}}, handler.EnqueueRequestsFromMapFunc(func(a client.Object) []reconcile.Request {
 			var reconRequest []reconcile.Request
 			owners := a.GetOwnerReferences()

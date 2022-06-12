@@ -3,8 +3,8 @@ package tink
 import (
 	"bytes"
 	"fmt"
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
-	"github.com/harvester/bmaas/pkg/util"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/util"
 	"github.com/pkg/errors"
 	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 	"html/template"
@@ -20,11 +20,11 @@ const (
 )
 
 //GenerateHWRequest will generate the tinkerbell Hardware type object
-func GenerateHWRequest(i *bmaasv1alpha1.Inventory, c *bmaasv1alpha1.Cluster) (hw *tinkv1alpha1.Hardware, err error) {
+func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (hw *tinkv1alpha1.Hardware, err error) {
 
 	// generate metadata
 	mode := "join"
-	if util.ConditionExists(i.Status.Conditions, bmaasv1alpha1.HarvesterCreateNode) {
+	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.HarvesterCreateNode) {
 		mode = "create"
 	}
 

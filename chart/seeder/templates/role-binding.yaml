@@ -5,8 +5,8 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: manager-role
+  name: {{ include "seeder.fullname" . }}-manager-role
 subjects:
 - kind: ServiceAccount
-  name: controller-manager
-  namespace: system
+  name: {{ include "seeder.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}

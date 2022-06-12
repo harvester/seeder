@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/harvester/bmaas/pkg/util"
+	"github.com/harvester/seeder/pkg/util"
 
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
@@ -15,16 +15,16 @@ import (
 )
 
 var _ = Describe("Inventory controller and baseboard tests", func() {
-	var i *bmaasv1alpha1.Inventory
+	var i *seederv1alpha1.Inventory
 	var creds *v1.Secret
 
 	BeforeEach(func() {
-		i = &bmaasv1alpha1.Inventory{
+		i = &seederv1alpha1.Inventory{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "sample",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.InventorySpec{
+			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
@@ -64,13 +64,13 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 
 	It("check inventory reconcile", func() {
 		Eventually(func() error {
-			iObj := &bmaasv1alpha1.Inventory{}
+			iObj := &seederv1alpha1.Inventory{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj)
 			if err != nil {
 				return err
 			}
 
-			if iObj.Status.Status != bmaasv1alpha1.InventoryReady {
+			if iObj.Status.Status != seederv1alpha1.InventoryReady {
 				return fmt.Errorf("waiting for baseboard object to be created. Current status %v", iObj)
 			}
 			return nil
@@ -123,16 +123,16 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 })
 
 var _ = Describe("inventory object deletion tests", func() {
-	var i *bmaasv1alpha1.Inventory
+	var i *seederv1alpha1.Inventory
 	var creds *v1.Secret
 
 	BeforeEach(func() {
-		i = &bmaasv1alpha1.Inventory{
+		i = &seederv1alpha1.Inventory{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "sample-deletion",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.InventorySpec{
+			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
@@ -197,15 +197,15 @@ var _ = Describe("inventory object deletion tests", func() {
 })
 
 var _ = Describe("list inventory objects test", func() {
-	var one, two *bmaasv1alpha1.Inventory
+	var one, two *seederv1alpha1.Inventory
 
 	BeforeEach(func() {
-		one = &bmaasv1alpha1.Inventory{
+		one = &seederv1alpha1.Inventory{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "one",
 				Namespace: "default",
 			},
-			Spec: bmaasv1alpha1.InventorySpec{
+			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
@@ -222,12 +222,12 @@ var _ = Describe("list inventory objects test", func() {
 			},
 		}
 
-		two = &bmaasv1alpha1.Inventory{
+		two = &seederv1alpha1.Inventory{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "two",
 				Namespace: "kube-system",
 			},
-			Spec: bmaasv1alpha1.InventorySpec{
+			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 				BaseboardManagementSpec: rufio.BaseboardManagementSpec{

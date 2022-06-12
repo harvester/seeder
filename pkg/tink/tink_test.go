@@ -1,8 +1,8 @@
 package tink
 
 import (
-	bmaasv1alpha1 "github.com/harvester/bmaas/pkg/api/v1alpha1"
-	"github.com/harvester/bmaas/pkg/util"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/util"
 	"github.com/stretchr/testify/assert"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
@@ -19,12 +19,12 @@ func Test_generateMetaData(t *testing.T) {
 }
 
 var (
-	i = &bmaasv1alpha1.Inventory{
+	i = &seederv1alpha1.Inventory{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "firstnode",
 			Namespace: "default",
 		},
-		Spec: bmaasv1alpha1.InventorySpec{
+		Spec: seederv1alpha1.InventorySpec{
 			PrimaryDisk:                   "/dev/sda",
 			ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
 			BaseboardManagementSpec: rufio.BaseboardManagementSpec{
@@ -39,21 +39,21 @@ var (
 				},
 			},
 		},
-		Status: bmaasv1alpha1.InventoryStatus{
-			Status:            bmaasv1alpha1.InventoryReady,
+		Status: seederv1alpha1.InventoryStatus{
+			Status:            seederv1alpha1.InventoryReady,
 			GeneratedPassword: "password",
 			HardwareID:        "uuid",
-			Conditions: []bmaasv1alpha1.Conditions{
+			Conditions: []seederv1alpha1.Conditions{
 				{
-					Type:      bmaasv1alpha1.HarvesterCreateNode,
+					Type:      seederv1alpha1.HarvesterCreateNode,
 					StartTime: metav1.Now(),
 				},
 			},
-			Cluster: bmaasv1alpha1.ObjectReference{
+			Cluster: seederv1alpha1.ObjectReference{
 				Name:      "harvester-one",
 				Namespace: "default",
 			},
-			PXEBootInterface: bmaasv1alpha1.PXEBootInterface{
+			PXEBootInterface: seederv1alpha1.PXEBootInterface{
 				Address:     "192.168.1.129",
 				Netmask:     "255.255.255.0",
 				Gateway:     "192.168.1.1",
@@ -62,33 +62,33 @@ var (
 		},
 	}
 
-	c = &bmaasv1alpha1.Cluster{
+	c = &seederv1alpha1.Cluster{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "harvester-one",
 			Namespace: "default",
 		},
-		Spec: bmaasv1alpha1.ClusterSpec{
+		Spec: seederv1alpha1.ClusterSpec{
 			HarvesterVersion: "v1.0.1",
-			VIPConfig: bmaasv1alpha1.VIPConfig{
-				AddressPoolReference: bmaasv1alpha1.ObjectReference{
+			VIPConfig: seederv1alpha1.VIPConfig{
+				AddressPoolReference: seederv1alpha1.ObjectReference{
 					Name:      "management-pool",
 					Namespace: "default",
 				},
 				StaticAddress: "192.168.1.100",
 			},
-			Nodes: []bmaasv1alpha1.NodeConfig{
+			Nodes: []seederv1alpha1.NodeConfig{
 				{
-					InventoryReference: bmaasv1alpha1.ObjectReference{
+					InventoryReference: seederv1alpha1.ObjectReference{
 						Name:      "firstnode",
 						Namespace: "default",
 					},
-					AddressPoolReference: bmaasv1alpha1.ObjectReference{
+					AddressPoolReference: seederv1alpha1.ObjectReference{
 						Name:      "management-pool",
 						Namespace: "default",
 					},
 				},
 			},
-			ClusterConfig: bmaasv1alpha1.ClusterConfig{
+			ClusterConfig: seederv1alpha1.ClusterConfig{
 				SSHKeys: []string{
 					"abc",
 					"def",
@@ -100,7 +100,7 @@ var (
 				ConfigURL: "http://endpoint",
 			},
 		},
-		Status: bmaasv1alpha1.ClusterStatus{
+		Status: seederv1alpha1.ClusterStatus{
 			ClusterToken:   "token",
 			ClusterAddress: "192.168.1.100",
 		},
@@ -126,7 +126,7 @@ func Test_GenerateHWRequest(t *testing.T) {
 }
 
 func Test_GenerateHWRequestWithJoin(t *testing.T) {
-	i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, bmaasv1alpha1.HarvesterCreateNode)
+	i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.HarvesterCreateNode)
 	hw, err := GenerateHWRequest(i, c)
 	assert.NoError(t, err, "no error should occur during hardware generation")
 	assert.Contains(t, hw.Spec.Metadata.Instance.Userdata, "harvester.server_url=https://192.168.1.100:8443", "expected to find join url")
