@@ -44,6 +44,32 @@ rules:
 - apiGroups:
   - metal.harvesterhci.io
   resources:
+  - addresspools
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - metal.harvesterhci.io
+  resources:
+  - addresspools/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - metal.harvesterhci.io
+  resources:
+  - addresspools/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - metal.harvesterhci.io
+  resources:
   - clusters
   verbs:
   - create

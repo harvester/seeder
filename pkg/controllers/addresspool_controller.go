@@ -28,6 +28,9 @@ type addressPoolReconciler func(context.Context, *seederv1alpha1.AddressPool) er
 //+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=inventories,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=inventories/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=inventories/finalizers,verbs=update
+//+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=addresspools,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=addresspools/status,verbs=get;update;patch
+//+kubebuilder:rbac:groups=metal.harvesterhci.io,resources=addresspools/finalizers,verbs=update
 //+kubebuilder:rbac:groups=tinkerbell.org,resources=hardware,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
