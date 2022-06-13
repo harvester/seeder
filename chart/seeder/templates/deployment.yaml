@@ -46,14 +46,6 @@ spec:
             - name: leader
               containerPort: 9443
               protocol: TCP                            
-          livenessProbe:
-            httpGet:
-              path: /
-              port: probe
-          readinessProbe:
-            httpGet:
-              path: /
-              port: probe
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

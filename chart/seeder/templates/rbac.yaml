@@ -44,6 +44,32 @@ rules:
 - apiGroups:
   - metal.harvesterhci.io
   resources:
+  - addresspools
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - metal.harvesterhci.io
+  resources:
+  - addresspools/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - metal.harvesterhci.io
+  resources:
+  - addresspools/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - metal.harvesterhci.io
+  resources:
   - clusters
   verbs:
   - create
@@ -105,3 +131,40 @@ rules:
   - patch
   - update
   - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "seeder.fullname" . }}-leader-election-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
