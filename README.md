@@ -8,7 +8,7 @@ The project is currently under active development and things may break.
 ## Quickstart
 To get started you need a k8s cluster, running on the same L2 segment as your baremetal devices.
 
-The helm [chart](./charts) will install seeder and associated components to your k8s cluster.
+The helm [chart](./chart) will install seeder and associated components to your k8s cluster.
 
 Once installed, a simple yaml manifest as follows will get the cluster provisioning kick started
 
