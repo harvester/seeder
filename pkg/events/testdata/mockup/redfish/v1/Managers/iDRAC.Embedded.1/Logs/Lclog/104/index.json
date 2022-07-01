@@ -1,0 +1,25 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/104",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-04T19:22:57-05:00",
+    "Description": " Log Entry 104",
+    "EntryType": "Oem",
+    "Id": "104",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/RAID.Integrated.1-1"
+        }
+    },
+    "Message": "Version change detected for PERC H730 Mini firmware. Previous version:25.5.6.0009, Current version:25.5.8.0001",
+    "MessageArgs": [
+        "PERC H730 Mini",
+        "25.5.6.0009",
+        "25.5.8.0001"
+    ],
+    "MessageArgs@odata.count": 3,
+    "MessageId": "PR36",
+    "Name": " Log Entry 104",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

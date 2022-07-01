@@ -1,0 +1,15 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#SoftwareInventory.SoftwareInventory",
+    "@odata.id": "/redfish/v1/UpdateService/FirmwareInventory/Installed-27483-19.5.12",
+    "@odata.type": "#SoftwareInventory.v1_1_1.SoftwareInventory",
+    "Description": "Represents Firmware Inventory",
+    "Id": "Installed-27483-19.5.12",
+    "Name": "Intel(R) Gigabit 4P I350-t rNDC - EC:F4:BB:F0:46:55",
+    "SoftwareId": "27483",
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    },
+    "Updateable": true,
+    "Version": "19.5.12"
+}

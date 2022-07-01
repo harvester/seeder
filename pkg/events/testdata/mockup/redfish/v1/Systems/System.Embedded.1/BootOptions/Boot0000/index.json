@@ -1,0 +1,12 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#BootOption.BootOption",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/BootOptions/Boot0000",
+    "@odata.type": "#BootOption.v1_0_0.BootOption",
+    "BootOptionEnabled": true,
+    "BootOptionReference": "Boot0000",
+    "Description": "Current settings of the UEFI Boot option",
+    "DisplayName": "PCIe SSD in Slot 9 in Bay 1: ubuntu",
+    "Id": "Boot0000",
+    "Name": "Uefi Boot Option",
+    "UefiDevicePath": "HD(1,GPT,D16C0F7E-3E84-4890-89B4-B8130395DE02,0x22,0x10089E)/\\EFI\\ubuntu\\shimx64.efi"
+}

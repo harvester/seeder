@@ -1,0 +1,9 @@
+Redfish service captured by the Redfish Mockup Creator, Version 1.1.8
+Created: 2022-07-01 01:17:35
+Service: https://172.19.0.10:443
+User: root
+Description: 
+Total response time: 1037.092625617981
+Average response time: 0.5836199356319532
+Minimum response time: 0.2874927520751953, /redfish/v1/Schemas/Schedule.json
+Maximum response time: 8.481079578399658, /redfish/v1/Registries/Messages/EEMIRegistry

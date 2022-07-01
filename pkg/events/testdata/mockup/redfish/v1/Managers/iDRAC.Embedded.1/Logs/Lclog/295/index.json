@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/295",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-05-03T19:49:28-05:00",
+    "Description": " Log Entry 295",
+    "EntryType": "Oem",
+    "Id": "295",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+        }
+    },
+    "Message": "Requested system powerdown.",
+    "MessageId": "RAC0704",
+    "Name": " Log Entry 295",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

@@ -1,0 +1,22 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#RoleCollection.RoleCollection",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Roles",
+    "@odata.type": "#RoleCollection.RoleCollection",
+    "Description": "Roles Collection",
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Roles/Administrator"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Roles/Operator"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Roles/ReadOnly"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Roles/None"
+        }
+    ],
+    "Members@odata.count": 4,
+    "Name": "Roles Collection"
+}

@@ -1,0 +1,26 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Power.Power",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Sensors/Voltages/iDRAC.Embedded.1%23PS2Voltage",
+    "@odata.type": "#Power.v1_3_0.Voltage",
+    "LowerThresholdCritical": null,
+    "LowerThresholdFatal": null,
+    "LowerThresholdNonCritical": null,
+    "MemberId": "iDRAC.Embedded.1#PS2Voltage",
+    "Name": "PS2 Voltage 2",
+    "PhysicalContext": "PowerSupply",
+    "ReadingVolts": 206,
+    "RelatedItem": [
+        {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Power/PowerSupplies/PSU.Slot.2"
+        }
+    ],
+    "RelatedItem@odata.count": 1,
+    "SensorNumber": 109,
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    },
+    "UpperThresholdCritical": null,
+    "UpperThresholdFatal": null,
+    "UpperThresholdNonCritical": null
+}

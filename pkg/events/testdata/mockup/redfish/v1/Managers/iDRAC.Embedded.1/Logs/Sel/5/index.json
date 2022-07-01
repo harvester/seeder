@@ -1,0 +1,27 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Sel/5",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-05-03T17:05:06-05:00",
+    "Description": " Log Entry 5",
+    "EntryCode": [
+        {
+            "Member": "Deassert"
+        }
+    ],
+    "EntryType": "SEL",
+    "Id": "5",
+    "Links": {},
+    "Message": "The input power for power supply 2 has been restored.",
+    "MessageArgs": [],
+    "MessageArgs@odata.count": 0,
+    "MessageId": "3ffff",
+    "Name": " Log Entry 5",
+    "SensorNumber": 99,
+    "SensorType": [
+        {
+            "Member": "Power Supply / Converter"
+        }
+    ],
+    "Severity": "OK"
+}

@@ -1,0 +1,54 @@
+{
+    "@Redfish.Settings": {
+        "@odata.context": "/redfish/v1/$metadata#Settings.Settings",
+        "@odata.type": "#Settings.v1_1_0.Settings",
+        "SettingsObject": {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/Volumes/Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1/Settings"
+        },
+        "SupportedApplyTimes": [
+            "Immediate",
+            "OnReset",
+            "AtMaintenanceWindowStart",
+            "InMaintenanceWindowOnReset"
+        ]
+    },
+    "@odata.context": "/redfish/v1/$metadata#Volume.Volume",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/Volumes/Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1",
+    "@odata.type": "#Volume.v1_0_3.Volume",
+    "Actions": {
+        "#Volume.CheckConsistency": {
+            "target": "/redfish/v1/Systems/System.Embedded.1/Storage/Volumes/Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1/Actions/Volume.CheckConsistency"
+        },
+        "#Volume.Initialize": {
+            "InitializeType@Redfish.AllowableValues": [
+                "Fast",
+                "Slow"
+            ],
+            "target": "/redfish/v1/Systems/System.Embedded.1/Storage/Volumes/Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1/Actions/Volume.Initialize"
+        }
+    },
+    "BlockSizeBytes": 0,
+    "CapacityBytes": 0,
+    "Description": "PCIe SSD in Slot 9 in Bay 1",
+    "Encrypted": null,
+    "EncryptionTypes": [],
+    "Id": "Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1",
+    "Identifiers": [],
+    "Links": {
+        "Drives": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/Drives/Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1"
+            }
+        ],
+        "Drives@odata.count": 1
+    },
+    "Name": "PCIe SSD in Slot 9 in Bay 1",
+    "Operations": [],
+    "OptimumIOSizeBytes": null,
+    "Status": {
+        "Health": null,
+        "HealthRollup": null,
+        "State": "Enabled"
+    },
+    "VolumeType": "RawDevice"
+}

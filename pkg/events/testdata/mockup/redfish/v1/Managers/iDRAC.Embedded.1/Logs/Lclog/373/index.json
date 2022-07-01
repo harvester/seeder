@@ -1,0 +1,25 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/373",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-06-14T04:26:33-05:00",
+    "Description": " Log Entry 373",
+    "EntryType": "Oem",
+    "Id": "373",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+        }
+    },
+    "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+    "MessageArgs": [
+        "root",
+        "172.16.132.45",
+        "REDFISH"
+    ],
+    "MessageArgs@odata.count": 3,
+    "MessageId": "USR0030",
+    "Name": " Log Entry 373",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

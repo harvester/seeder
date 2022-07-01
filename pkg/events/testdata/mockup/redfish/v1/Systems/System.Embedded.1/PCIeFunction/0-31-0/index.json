@@ -1,0 +1,34 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#PCIeFunction.PCIeFunction",
+    "@odata.etag": "1655847841",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/0-31-0",
+    "@odata.type": "#PCIeFunction.v1_1_1.PCIeFunction",
+    "ClassCode": "0x000006",
+    "Description": "C610/X99 series chipset LPC Controller",
+    "DeviceClass": "Bridge",
+    "DeviceId": "0x8d44",
+    "FunctionId": 0,
+    "FunctionType": "Physical",
+    "Id": "0-31-0",
+    "Links": {
+        "Drives": [],
+        "Drives@odata.count": 0,
+        "EthernetInterfaces": [],
+        "EthernetInterfaces@odata.count": 0,
+        "PCIeDevice": {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeDevice/0-3"
+        },
+        "StorageControllers": [],
+        "StorageControllers@odata.count": 0
+    },
+    "Name": "C610/X99 series chipset LPC Controller",
+    "RevisionId": "0x05",
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    },
+    "SubsystemId": "0x0601",
+    "SubsystemVendorId": "0x1028",
+    "VendorId": "0x8086"
+}

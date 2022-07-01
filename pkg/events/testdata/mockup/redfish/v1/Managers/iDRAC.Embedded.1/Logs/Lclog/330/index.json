@@ -1,0 +1,25 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/330",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-05-10T01:01:41-05:00",
+    "Description": " Log Entry 330",
+    "EntryType": "Oem",
+    "Id": "330",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+        }
+    },
+    "Message": "The session for root from 172.16.31.2 using Virtual Console is logged off.",
+    "MessageArgs": [
+        "root",
+        "172.16.31.2",
+        "Virtual Console"
+    ],
+    "MessageArgs@odata.count": 3,
+    "MessageId": "USR0032",
+    "Name": " Log Entry 330",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

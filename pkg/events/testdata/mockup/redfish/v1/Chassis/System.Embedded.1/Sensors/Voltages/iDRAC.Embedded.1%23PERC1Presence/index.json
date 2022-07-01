@@ -1,0 +1,26 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Power.Power",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Sensors/Voltages/iDRAC.Embedded.1%23PERC1Presence",
+    "@odata.type": "#Power.v1_3_0.Voltage",
+    "LowerThresholdCritical": null,
+    "LowerThresholdFatal": null,
+    "LowerThresholdNonCritical": null,
+    "MemberId": "iDRAC.Embedded.1#PERC1Presence",
+    "Name": "PERC1 Presence",
+    "PhysicalContext": "Chassis",
+    "ReadingVolts": null,
+    "RelatedItem": [
+        {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+        }
+    ],
+    "RelatedItem@odata.count": 1,
+    "SensorNumber": 73,
+    "Status": {
+        "Health": null,
+        "State": null
+    },
+    "UpperThresholdCritical": null,
+    "UpperThresholdFatal": null,
+    "UpperThresholdNonCritical": null
+}

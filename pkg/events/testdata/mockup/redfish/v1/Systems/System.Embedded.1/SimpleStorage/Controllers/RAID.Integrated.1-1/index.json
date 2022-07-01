@@ -1,0 +1,33 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#SimpleStorage.SimpleStorage",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/RAID.Integrated.1-1",
+    "@odata.type": "#SimpleStorage.v1_2_0.SimpleStorage",
+    "Description": "Simple Storage Controller",
+    "Devices": [
+        {
+            "CapacityBytes": null,
+            "Manufacturer": "DELL",
+            "Model": "BP13G+EXP 0:1",
+            "Name": "Backplane 1 on Connector 0 of Integrated RAID Controller 1",
+            "Status": {
+                "Health": "OK",
+                "HealthRollup": "OK",
+                "State": "Enabled"
+            }
+        }
+    ],
+    "Devices@odata.count": 1,
+    "Id": "RAID.Integrated.1-1",
+    "Links": {
+        "Chassis": {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+        }
+    },
+    "Name": "PERC H730 Mini",
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    },
+    "UefiDevicePath": "PciRoot(0x0)/Pci(0x1,0x0)/Pci(0x0,0x0)/Ctrl(0x1)"
+}

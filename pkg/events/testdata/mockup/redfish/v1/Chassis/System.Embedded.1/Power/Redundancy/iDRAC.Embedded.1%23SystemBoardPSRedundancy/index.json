@@ -1,0 +1,23 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Redundancy.Redundancy",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Power/Redundancy/iDRAC.Embedded.1%23SystemBoardPSRedundancy",
+    "@odata.type": "#Redundancy.v1_3_0.Redundancy",
+    "MaxNumSupported": 4,
+    "MemberId": "iDRAC.Embedded.1#SystemBoardPSRedundancy",
+    "MinNumNeeded": 2,
+    "Mode": "N+m",
+    "Name": "System Board PS Redundancy",
+    "RedundancySet": [
+        {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Power/PowerSupplies/PSU.Slot.1"
+        },
+        {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Power/PowerSupplies/PSU.Slot.2"
+        }
+    ],
+    "RedundancySet@odata.count": 2,
+    "Status": {
+        "Health": "OK",
+        "State": "Disabled"
+    }
+}

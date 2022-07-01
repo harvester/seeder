@@ -1,0 +1,16 @@
+{
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Thermal/Redundancy/iDRAC.Embedded.1%23SystemBoardFanRedundancy",
+    "@odata.type": "#Redundancy.v1_3_0.Redundancy",
+    "MaxNumSupported": null,
+    "MemberId": "iDRAC.Embedded.1#SystemBoardFanRedundancy",
+    "MinNumNeeded": null,
+    "Mode": "N+m",
+    "Name": "System Board Fan Redundancy",
+    "RedundancyEnabled": false,
+    "RedundancySet": [],
+    "RedundancySet@odata.count": 0,
+    "Status": {
+        "Health": "OK",
+        "State": "Disabled"
+    }
+}

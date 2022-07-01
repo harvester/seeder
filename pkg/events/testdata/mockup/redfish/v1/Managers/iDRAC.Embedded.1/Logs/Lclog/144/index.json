@@ -1,0 +1,17 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/144",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-04T20:35:19-05:00",
+    "Description": " Log Entry 144",
+    "EntryType": "Oem",
+    "Id": "144",
+    "Links": {},
+    "Message": "One or more keys in the keyboard is stuck and not functional.",
+    "MessageArgs": [],
+    "MessageArgs@odata.count": 0,
+    "MessageId": "UEFI0047",
+    "Name": " Log Entry 144",
+    "OemRecordFormat": "Dell",
+    "Severity": "Warning"
+}

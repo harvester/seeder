@@ -1,0 +1,20 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/96",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-04T19:16:25-05:00",
+    "Description": " Log Entry 96",
+    "EntryType": "Oem",
+    "Id": "96",
+    "Links": {},
+    "Message": "Updating firmware for PowerEdge BIOS to version 2.12.1.",
+    "MessageArgs": [
+        "PowerEdge BIOS",
+        "2.12.1"
+    ],
+    "MessageArgs@odata.count": 2,
+    "MessageId": "SUP0516",
+    "Name": " Log Entry 96",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

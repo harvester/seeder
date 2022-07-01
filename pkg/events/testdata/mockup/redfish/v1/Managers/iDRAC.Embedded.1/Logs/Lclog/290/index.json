@@ -1,0 +1,22 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/290",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-05-03T19:48:42-05:00",
+    "Description": " Log Entry 290",
+    "EntryType": "Oem",
+    "Id": "290",
+    "Links": {},
+    "Message": "User root via IP 172.19.1.130 requested state / configuration change to Users using GUI.",
+    "MessageArgs": [
+        "root",
+        "172.19.1.130",
+        "Users",
+        "GUI"
+    ],
+    "MessageArgs@odata.count": 4,
+    "MessageId": "RAC1195",
+    "Name": " Log Entry 290",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

@@ -1,0 +1,32 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Power.Power",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Power/PowerControl",
+    "@odata.type": "#Power.v1_4_0.PowerControl",
+    "MemberId": "PowerControl",
+    "Name": "System Power Control",
+    "PowerAllocatedWatts": 1792,
+    "PowerAvailableWatts": 0,
+    "PowerCapacityWatts": 1792,
+    "PowerConsumedWatts": 247,
+    "PowerLimit": {
+        "CorrectionInMs": 0,
+        "LimitException": "HardPowerOff",
+        "LimitInWatts": 477
+    },
+    "PowerMetrics": {
+        "AverageConsumedWatts": 246,
+        "IntervalInMin": 1,
+        "MaxConsumedWatts": 249,
+        "MinConsumedWatts": 244
+    },
+    "PowerRequestedWatts": 569,
+    "RelatedItem": [
+        {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+        },
+        {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+        }
+    ],
+    "RelatedItem@odata.count": 2
+}

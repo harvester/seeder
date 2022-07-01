@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/789",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-06-30T06:45:58-05:00",
+    "Description": " Log Entry 789",
+    "EntryType": "Oem",
+    "Id": "789",
+    "Links": {},
+    "Message": "The previous log entry was repeated 2 times.",
+    "MessageArgs": [
+        "2"
+    ],
+    "MessageArgs@odata.count": 1,
+    "MessageId": "LOG007",
+    "Name": " Log Entry 789",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

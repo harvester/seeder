@@ -1,0 +1,35 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#UpdateService.UpdateService",
+    "@odata.id": "/redfish/v1/UpdateService",
+    "@odata.type": "#UpdateService.v1_2_0.UpdateService",
+    "Actions": {
+        "#UpdateService.SimpleUpdate": {
+            "TransferProtocol@Redfish.AllowableValues": [
+                "HTTP"
+            ],
+            "target": "/redfish/v1/UpdateService/Actions/UpdateService.SimpleUpdate"
+        },
+        "Oem": {
+            "DellUpdateService.v1_0_0#DellUpdateService.Install": {
+                "InstallUpon@Redfish.AllowableValues": [
+                    "Now",
+                    "NowAndReboot",
+                    "NextReboot"
+                ],
+                "target": "/redfish/v1/UpdateService/Actions/Oem/DellUpdateService.Install"
+            }
+        }
+    },
+    "Description": "Represents the properties for the Update Service",
+    "FirmwareInventory": {
+        "@odata.id": "/redfish/v1/UpdateService/FirmwareInventory"
+    },
+    "HttpPushUri": "/redfish/v1/UpdateService/FirmwareInventory",
+    "Id": "UpdateService",
+    "Name": "Update Service",
+    "ServiceEnabled": true,
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    }
+}

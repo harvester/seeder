@@ -1,0 +1,565 @@
+{
+    "$ref": "#/definitions/OemManager",
+    "$schema": "/redfish/v1/Schemas/redfish-schema.v1_1_1.json",
+    "copyright": "Copyright 2014-2018 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright",
+    "definitions": {
+        "Actions": {
+            "additionalProperties": false,
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "description": "This property shall specify a valid odata or Redfish property.",
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ]
+                }
+            },
+            "properties": {
+                "#OemManager.ClearPending": {
+                    "$ref": "#/definitions/ClearPending"
+                },
+                "#OemManager.ExportSystemConfiguration": {
+                    "$ref": "#/definitions/ExportSystemConfiguration"
+                },
+                "#OemManager.ImportSystemConfiguration": {
+                    "$ref": "#/definitions/ImportSystemConfiguration"
+                },
+                "#OemManager.ImportSystemConfigurationPreview": {
+                    "$ref": "#/definitions/ImportSystemConfigurationPreview"
+                },
+                "#OemManager.ResetToDefaults": {
+                    "$ref": "#/definitions/ResetToDefaults"
+                }
+            },
+            "type": "object"
+        },
+        "Attributes": {
+            "additionalProperties": false,
+            "patternProperties": {
+                "[A-Za-z0-9]+": {
+                    "type": [
+                        "string",
+                        "boolean",
+                        "number",
+                        "null"
+                    ]
+                },
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "description": "This property shall specify a valid odata or Redfish property.",
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ]
+                }
+            },
+            "properties": {},
+            "type": "object"
+        },
+        "ClearPending": {
+            "additionalProperties": false,
+            "description": "This action is used to clear the pending values.",
+            "longDescription": "This action is used to clear the pending values of Manager.",
+            "parameters": {},
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "description": "This property shall specify a valid odata or Redfish property.",
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ]
+                }
+            },
+            "properties": {
+                "target": {
+                    "description": "Link to invoke action",
+                    "format": "uri",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Friendly action name",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ExportFormat": {
+            "enum": [
+                "XML",
+                "JSON"
+            ],
+            "type": "string"
+        },
+        "ExportSystemConfiguration": {
+            "additionalProperties": false,
+            "description": "This action is used to export System Configuration attributes.",
+            "longDescription": "This action shall perform an export System Configuration attributes.",
+            "parameters": {
+                "ExportFormat": {
+                    "$ref": "#/definitions/ExportFormat",
+                    "description": "XML format",
+                    "longDescription": "XML format",
+                    "requiredParameter": true
+                },
+                "ExportUse": {
+                    "$ref": "#/definitions/ExportUse",
+                    "description": "Type of Export intended for use :Default =0, Clone=1 , Replace=2.",
+                    "requiredParameter": true
+                },
+                "IncludeInExport": {
+                    "$ref": "#/definitions/IncludeInExport",
+                    "description": "Extra information to include in the export like      Default, Include read only, Include password hash values, Include read only and password hash values.",
+                    "requiredParameter": true
+                },
+                "ShareParameters": {
+                    "$ref": "#/definitions/ShareParameters",
+                    "description": "Share parameters are listed.",
+                    "requiredParameter": true
+                }
+            },
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "description": "This property shall specify a valid odata or Redfish property.",
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ]
+                }
+            },
+            "properties": {
+                "target": {
+                    "description": "Link to invoke action",
+                    "format": "uri",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Friendly action name",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ExportUse": {
+            "enum": [
+                "Default",
+                "Clone",
+                "Replace"
+            ],
+            "type": "string"
+        },
+        "HostPowerState": {
+            "enum": [
+                "On",
+                "Off"
+            ],
+            "type": "string"
+        },
+        "IgnoreCertificateWarning": {
+            "enum": [
+                "Enabled",
+                "Disabled"
+            ],
+            "enumDescriptions": {
+                "Disabled": "Ignoring of certificate warning is Disabled.",
+                "Enabled": "Ignoring of certificate warning is Enabled."
+            },
+            "type": "string"
+        },
+        "ImportSystemConfiguration": {
+            "additionalProperties": false,
+            "description": "This action is used to import System Configuration attributes.",
+            "longDescription": "This action shall perform an import System Configuration attributes.",
+            "parameters": {
+                "HostPowerState": {
+                    "$ref": "#/definitions/HostPowerState",
+                    "description": "Type of host power state after performing import operation.",
+                    "requiredParameter": true
+                },
+                "ImportBuffer": {
+                    "description": "Buffer content to perform Import. This is required for localstore only and not required for CIFS/NFS style Import.",
+                    "requiredParameter": true,
+                    "type": "string"
+                },
+                "ShareParameters": {
+                    "$ref": "#/definitions/ShareParameters",
+                    "description": "Share parameters are listed.",
+                    "requiredParameter": true
+                },
+                "ShutdownType": {
+                    "$ref": "#/definitions/ShutdownType",
+                    "description": "Type of shut down before performing import operation.",
+                    "requiredParameter": true
+                },
+                "TimeToWait": {
+                    "description": "The time to wait for the host to shut down. Default and minimum value is 300 seconds. Maximum value is 3600 seconds.",
+                    "maximum": 3600,
+                    "minimum": 300,
+                    "requiredParameter": true,
+                    "type": "number",
+                    "units": "s"
+                }
+            },
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "description": "This property shall specify a valid odata or Redfish property.",
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ]
+                }
+            },
+            "properties": {
+                "target": {
+                    "description": "Link to invoke action",
+                    "format": "uri",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Friendly action name",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ImportSystemConfigurationPreview": {
+            "additionalProperties": false,
+            "description": "This action is used to import System Configuration Preview.",
+            "longDescription": "This action shall perform an import System Configuration Preview.",
+            "parameters": {
+                "ImportBuffer": {
+                    "description": "Buffer content to perform Import. This is required for localstore only and not required for CIFS/NFS style Import.",
+                    "requiredParameter": true,
+                    "type": "string"
+                },
+                "ShareParameters": {
+                    "$ref": "#/definitions/ShareParameters",
+                    "description": "Share parameters are listed.",
+                    "requiredParameter": true
+                }
+            },
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "description": "This property shall specify a valid odata or Redfish property.",
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ]
+                }
+            },
+            "properties": {
+                "target": {
+                    "description": "Link to invoke action",
+                    "format": "uri",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Friendly action name",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "IncludeInExport": {
+            "enum": [
+                "Default",
+                "IncludeReadOnly",
+                "IncludePasswordHashValues"
+            ],
+            "type": "string"
+        },
+        "OemActions": {
+            "additionalProperties": true,
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "description": "This property shall specify a valid odata or Redfish property.",
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ]
+                }
+            },
+            "properties": {},
+            "type": "object"
+        },
+        "OemManager": {
+            "additionalProperties": true,
+            "description": "OemManager contains properties of additional actions to complement the Manager DMTF schema.",
+            "longDescription": "This resource shall be used to represent Oem Manager actions for a Redfish implementation.",
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "description": "This property shall specify a valid odata or Redfish property.",
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ]
+                }
+            },
+            "properties": {
+                "@odata.context": {
+                    "$ref": "/redfish/v1/Schemas/odata.v4_0_2.json#/definitions/context"
+                },
+                "@odata.etag": {
+                    "$ref": "/redfish/v1/Schemas/odata.v4_0_2.json#/definitions/etag"
+                },
+                "@odata.id": {
+                    "$ref": "/redfish/v1/Schemas/odata.v4_0_2.json#/definitions/id"
+                },
+                "@odata.type": {
+                    "$ref": "/redfish/v1/Schemas/odata.v4_0_2.json#/definitions/type"
+                },
+                "AttributeRegistry": {
+                    "description": "The Resource ID of the Attribute Registry for the OEM Manager Attributes resource.",
+                    "longDescription": "The reference to the Attribute Registry that lists the metadata describing the Oem Manager attribute settings in this resource.",
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "Description": {
+                    "anyOf": [
+                        {
+                            "$ref": "/redfish/v1/Schemas/Resource.json#/definitions/Description"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ],
+                    "readonly": true
+                },
+                "Id": {
+                    "$ref": "/redfish/v1/Schemas/Resource.json#/definitions/Id",
+                    "readonly": true
+                },
+                "Name": {
+                    "$ref": "/redfish/v1/Schemas/Resource.json#/definitions/Name",
+                    "readonly": true
+                },
+                "Oem": {
+                    "$ref": "/redfish/v1/Schemas/Resource.json#/definitions/Oem",
+                    "description": "This is the manufacturer/provider specific extension moniker used to divide the Oem object into sections.",
+                    "longDescription": "The value of this string shall be of the format for the reserved word *Oem*."
+                },
+                "OemActions": {
+                    "$ref": "#/definitions/OemActions",
+                    "description": "The available actions for this resource.",
+                    "longDescription": "The Actions property shall contain the available actions for this resource.",
+                    "readonly": true
+                }
+            },
+            "required": [
+                "Id",
+                "Name"
+            ],
+            "type": "object"
+        },
+        "ProxySupport": {
+            "enum": [
+                "Disabled",
+                "EnabledProxyDefault",
+                "Enabled"
+            ],
+            "enumDescriptions": {
+                "Disabled": "Proxy Support is Disabled.",
+                "Enabled": "Proxy Support is Enabled.",
+                "EnabledProxyDefault": "Proxy Support to be Enabled and set to default."
+            },
+            "type": "string"
+        },
+        "ProxyType": {
+            "enum": [
+                "HTTP",
+                "SOCKS4"
+            ],
+            "enumDescriptions": {
+                "HTTP": "Proxy type is of HTTP type.",
+                "SOCKS4": "Proxy type is of SOCKS4 type."
+            },
+            "type": "string"
+        },
+        "ResetToDefaults": {
+            "additionalProperties": false,
+            "description": "This action is used to reset the Manager attributes to default.",
+            "longDescription": "This action shall perform a reset of the Manager attributes to their default values.",
+            "parameters": {},
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "description": "This property shall specify a valid odata or Redfish property.",
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ]
+                }
+            },
+            "properties": {
+                "target": {
+                    "description": "Link to invoke action",
+                    "format": "uri",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Friendly action name",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ShareParameters": {
+            "additionalProperties": false,
+            "patternProperties": {
+                "^([a-zA-Z_][a-zA-Z0-9_]*)?@(odata|Redfish|Message)\\.[a-zA-Z_][a-zA-Z0-9_.]+$": {
+                    "description": "This property shall specify a valid odata or Redfish property.",
+                    "type": [
+                        "array",
+                        "boolean",
+                        "number",
+                        "null",
+                        "object",
+                        "string"
+                    ]
+                }
+            },
+            "properties": {
+                "FileName": {
+                    "description": "The target output file name.",
+                    "readonly": true,
+                    "type": "string"
+                },
+                "IPAddress": {
+                    "description": "The IP address of the target export server.",
+                    "readonly": true,
+                    "type": "string"
+                },
+                "IgnoreCertificateWarning": {
+                    "$ref": "#/definitions/IgnoreCertificateWarning",
+                    "description": "Ignore Certificate Warning.",
+                    "readonly": true
+                },
+                "Password": {
+                    "description": "Password for the target export server.",
+                    "readonly": true,
+                    "type": "string"
+                },
+                "ProxyPassword": {
+                    "description": "Proxy Server Password.",
+                    "readonly": true,
+                    "type": "string"
+                },
+                "ProxyPort": {
+                    "description": "Proxy Port address.",
+                    "readonly": true,
+                    "type": "number"
+                },
+                "ProxyServer": {
+                    "description": "Proxy Server address.",
+                    "readonly": true,
+                    "type": "string"
+                },
+                "ProxySupport": {
+                    "$ref": "#/definitions/ProxySupport",
+                    "description": "Proxy Support to be Enabled or Disabled.",
+                    "readonly": true
+                },
+                "ProxyType": {
+                    "$ref": "#/definitions/ProxyType",
+                    "description": "Type of Proxy HTTP or SOCKS4.",
+                    "readonly": true
+                },
+                "ProxyUserName": {
+                    "description": "Proxy Server User Name.",
+                    "readonly": true,
+                    "type": "string"
+                },
+                "ShareName": {
+                    "description": "The directory path to the mount point.",
+                    "readonly": true,
+                    "type": "string"
+                },
+                "ShareType": {
+                    "$ref": "#/definitions/ShareType",
+                    "description": "Type of share like  NFS, CIFS, HTTP, HTTPS, LOCAL",
+                    "readonly": true
+                },
+                "Target": {
+                    "description": "To identify the component for Export. It identifies the one or more FQDDs .Selective list of FQDDs should be given in comma separated format . Default = ALL.",
+                    "readonly": true,
+                    "type": "string"
+                },
+                "Username": {
+                    "description": "User name for the target export server.",
+                    "readonly": true,
+                    "type": "string"
+                },
+                "Workgroup": {
+                    "description": "WorkGroup name if it is needed.",
+                    "readonly": true,
+                    "type": "string"
+                }
+            },
+            "required": [
+                "FileName"
+            ],
+            "type": "object"
+        },
+        "ShareType": {
+            "enum": [
+                "NFS",
+                "CIFS",
+                "HTTP",
+                "HTTPS",
+                "LOCAL"
+            ],
+            "enumDescriptions": {
+                "CIFS": "Share type is of CIFS type.",
+                "HTTP": "Share type is of HTTP type.",
+                "HTTPS": "Share type is of HTTPS type.",
+                "LOCAL": "Share type is of LOCAL type.",
+                "NFS": "Share type is of NFS type."
+            },
+            "type": "string"
+        },
+        "ShutdownType": {
+            "enum": [
+                "Graceful",
+                "Forced",
+                "NoReboot"
+            ],
+            "type": "string"
+        }
+    },
+    "title": "#OemManager.v1_1_1.OemManager"
+}

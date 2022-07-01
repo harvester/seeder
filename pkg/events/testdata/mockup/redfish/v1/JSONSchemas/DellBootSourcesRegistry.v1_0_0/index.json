@@ -1,0 +1,21 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#JsonSchemaFile.JsonSchemaFile",
+    "@odata.id": "/redfish/v1/JSONSchemas/DellBootSourcesRegistry.v1_0_0",
+    "@odata.type": "#JsonSchemaFile.v1_0_2.JsonSchemaFile",
+    "Description": "DellBootSourcesRegistry Schema File Location",
+    "Id": "DellBootSourcesRegistry.v1_0_0",
+    "Languages": [
+        "en"
+    ],
+    "Languages@odata.count": 1,
+    "Location": [
+        {
+            "Language": "en",
+            "PublicationUri": "http://downloads.dell.com/redfish/bmc/schemas/DellBootSourcesRegistry.v1_0_0.json",
+            "Uri": "/redfish/v1/Schemas/DellBootSourcesRegistry.v1_0_0.json"
+        }
+    ],
+    "Location@odata.count": 1,
+    "Name": "DellBootSourcesRegistry Schema File",
+    "Schema": "#DellBootSourcesRegistry.v1_0_0.DellBootSourcesRegistry"
+}

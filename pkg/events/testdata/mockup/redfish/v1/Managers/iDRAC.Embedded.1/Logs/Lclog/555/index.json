@@ -1,0 +1,25 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/555",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-06-14T04:40:54-05:00",
+    "Description": " Log Entry 555",
+    "EntryType": "Oem",
+    "Id": "555",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+        }
+    },
+    "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+    "MessageArgs": [
+        "root",
+        "172.16.132.45",
+        "IPMI over LAN"
+    ],
+    "MessageArgs@odata.count": 3,
+    "MessageId": "USR0032",
+    "Name": " Log Entry 555",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

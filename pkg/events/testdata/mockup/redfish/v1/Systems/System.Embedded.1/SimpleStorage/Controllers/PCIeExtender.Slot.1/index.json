@@ -1,0 +1,54 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#SimpleStorage.SimpleStorage",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/PCIeExtender.Slot.1",
+    "@odata.type": "#SimpleStorage.v1_2_0.SimpleStorage",
+    "Description": "Simple Storage Controller",
+    "Devices": [
+        {
+            "CapacityBytes": 0,
+            "Manufacturer": "SAMSUNG",
+            "Model": "SAMSUNG MZQLB1T9HAJR-00007",
+            "Name": "PCIe SSD in Slot 8 in Bay 1",
+            "Status": {
+                "Health": null,
+                "HealthRollup": null,
+                "State": null
+            }
+        },
+        {
+            "CapacityBytes": 0,
+            "Manufacturer": "SAMSUNG",
+            "Model": "SAMSUNG MZQLB1T9HAJR-00007",
+            "Name": "PCIe SSD in Slot 9 in Bay 1",
+            "Status": {
+                "Health": null,
+                "HealthRollup": null,
+                "State": null
+            }
+        },
+        {
+            "CapacityBytes": null,
+            "Manufacturer": "DELL",
+            "Model": "PCIe SSD BP 1",
+            "Name": "Backplane 1 of PCIe Extender in PCIe Slot 1",
+            "Status": {
+                "Health": "OK",
+                "HealthRollup": "OK",
+                "State": "Enabled"
+            }
+        }
+    ],
+    "Devices@odata.count": 3,
+    "Id": "PCIeExtender.Slot.1",
+    "Links": {
+        "Chassis": {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+        }
+    },
+    "Name": "PCIe Extender 1",
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    }
+}

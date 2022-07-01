@@ -1,0 +1,38 @@
+{
+    "$ref": "#/definitions/ManagerNetworkProtocol",
+    "$schema": "/redfish/v1/Schemas/redfish-schema.v1_3_0.json",
+    "copyright": "Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright",
+    "definitions": {
+        "ManagerNetworkProtocol": {
+            "anyOf": [
+                {
+                    "$ref": "/redfish/v1/Schemas/odata.v4_0_1.json#/definitions/idRef"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ManagerNetworkProtocol.v1_0_0.json#/definitions/ManagerNetworkProtocol"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ManagerNetworkProtocol.v1_0_2.json#/definitions/ManagerNetworkProtocol"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ManagerNetworkProtocol.v1_0_3.json#/definitions/ManagerNetworkProtocol"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ManagerNetworkProtocol.v1_0_4.json#/definitions/ManagerNetworkProtocol"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ManagerNetworkProtocol.v1_1_0.json#/definitions/ManagerNetworkProtocol"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ManagerNetworkProtocol.v1_1_1.json#/definitions/ManagerNetworkProtocol"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ManagerNetworkProtocol.v1_2_0.json#/definitions/ManagerNetworkProtocol"
+                }
+            ],
+            "description": "This resource is used to obtain or modify the network services managed by a given manager.",
+            "longDescription": "This object shall be used to represent the network service settings for the manager."
+        }
+    },
+    "title": "#ManagerNetworkProtocol.ManagerNetworkProtocol"
+}

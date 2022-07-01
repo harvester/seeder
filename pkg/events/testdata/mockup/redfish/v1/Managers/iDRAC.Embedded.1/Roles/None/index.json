@@ -1,0 +1,12 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Role.Role",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Roles/None",
+    "@odata.type": "#Role.v1_2_1.Role",
+    "AssignedPrivileges": [],
+    "AssignedPrivileges@odata.count": 0,
+    "Description": "User Role None",
+    "Id": "None",
+    "IsPredefined": true,
+    "Name": "User Role",
+    "RoleId": "None"
+}

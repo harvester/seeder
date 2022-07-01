@@ -1,0 +1,38 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#PCIeDevice.PCIeDevice",
+    "@odata.etag": "1655847846",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeDevice/0-28",
+    "@odata.type": "#PCIeDevice.v1_2_0.PCIeDevice",
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+    },
+    "AssetTag": null,
+    "Description": "C610/X99 series chipset PCI Express Root Port #1",
+    "DeviceType": "MultiFunction",
+    "FirmwareVersion": "",
+    "Id": "0-28",
+    "Links": {
+        "Chassis": [],
+        "Chassis@odata.count": 0,
+        "PCIeFunctions": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/0-28-0"
+            },
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/0-28-7"
+            }
+        ],
+        "PCIeFunctions@odata.count": 2
+    },
+    "Manufacturer": "Intel Corporation",
+    "Model": null,
+    "Name": "C610/X99 series chipset PCI Express Root Port #1",
+    "PartNumber": null,
+    "SKU": null,
+    "SerialNumber": null,
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    }
+}

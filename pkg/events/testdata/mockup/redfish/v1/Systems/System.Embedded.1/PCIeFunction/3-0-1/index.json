@@ -1,0 +1,38 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#PCIeFunction.PCIeFunction",
+    "@odata.etag": "1655847847",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/3-0-1",
+    "@odata.type": "#PCIeFunction.v1_1_1.PCIeFunction",
+    "ClassCode": "0x000002",
+    "Description": "Ethernet Server Adapter X520-2",
+    "DeviceClass": "NetworkController",
+    "DeviceId": "0x10fb",
+    "FunctionId": 1,
+    "FunctionType": "Physical",
+    "Id": "3-0-1",
+    "Links": {
+        "Drives": [],
+        "Drives@odata.count": 0,
+        "EthernetInterfaces": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Slot.3-2"
+            }
+        ],
+        "EthernetInterfaces@odata.count": 1,
+        "PCIeDevice": {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeDevice/3-0"
+        },
+        "StorageControllers": [],
+        "StorageControllers@odata.count": 0
+    },
+    "Name": "Ethernet Server Adapter X520-2",
+    "RevisionId": "0x01",
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    },
+    "SubsystemId": "0x7b11",
+    "SubsystemVendorId": "0x108e",
+    "VendorId": "0x8086"
+}

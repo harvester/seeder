@@ -1,0 +1,29 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/3",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2021-02-17T09:58:23-06:00",
+    "Description": " Log Entry 3",
+    "EntryType": "Oem",
+    "Id": "3",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+        }
+    },
+    "Message": "Power Supply 2: Status = 0x2840, IOUT = 0x0, VOUT= 0x0, TEMP= 0x0, FAN = 0x0, INPUT= 0x8.",
+    "MessageArgs": [
+        "2",
+        "2840",
+        "0",
+        "0",
+        "0",
+        "0",
+        "8"
+    ],
+    "MessageArgs@odata.count": 7,
+    "MessageId": "PSU0800",
+    "Name": " Log Entry 3",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

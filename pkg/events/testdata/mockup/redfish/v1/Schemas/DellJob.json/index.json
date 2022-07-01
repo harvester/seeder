@@ -1,0 +1,23 @@
+{
+    "$ref": "#/definitions/DellJob",
+    "$schema": "http://redfish.dmtf.org/schemas/v1/redfish-schema-v1.json",
+    "copyright": "Copyright 2014-2018 DMTF. For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright",
+    "definitions": {
+        "DellJob": {
+            "anyOf": [
+                {
+                    "$ref": "http://redfish.dmtf.org/schemas/v1/odata.v4_0_3.json#/definitions/idRef"
+                },
+                {
+                    "$ref": "http://redfish.dmtf.org/schemas/v1/DellJob.v1_0_0.json#/definitions/DellJob"
+                },
+                {
+                    "$ref": "http://redfish.dmtf.org/schemas/v1/DellJob.v1_0_1.json#/definitions/DellJob"
+                }
+            ],
+            "description": "This resource contains information about a specific configuration Job scheduled by or being executed by a Redfish service's Job Service.",
+            "longDescription": "This resource shall be used to represent a Job for a Redfish implementation."
+        }
+    },
+    "title": "#DellJob.DellJob"
+}

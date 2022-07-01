@@ -1,0 +1,34 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#PCIeFunction.PCIeFunction",
+    "@odata.etag": "1655847839",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/1-0-0",
+    "@odata.type": "#PCIeFunction.v1_1_1.PCIeFunction",
+    "ClassCode": "0x000000",
+    "Description": "Gigabit 4P I350-t rNDC",
+    "DeviceClass": "UnclassifiedDevice",
+    "DeviceId": "0x1521",
+    "FunctionId": 0,
+    "FunctionType": "Physical",
+    "Id": "1-0-0",
+    "Links": {
+        "Drives": [],
+        "Drives@odata.count": 0,
+        "EthernetInterfaces": [],
+        "EthernetInterfaces@odata.count": 0,
+        "PCIeDevice": {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeDevice/1-0"
+        },
+        "StorageControllers": [],
+        "StorageControllers@odata.count": 0
+    },
+    "Name": "Gigabit 4P I350-t rNDC",
+    "RevisionId": "0x00",
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    },
+    "SubsystemId": "0x1f60",
+    "SubsystemVendorId": "0x1028",
+    "VendorId": "0x8086"
+}

@@ -1,0 +1,135 @@
+{
+    "$ref": "#/definitions/ComputerSystem",
+    "$schema": "/redfish/v1/Schemas/redfish-schema.v1_3_0.json",
+    "copyright": "Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright",
+    "definitions": {
+        "BootSource": {
+            "enum": [
+                "None",
+                "Pxe",
+                "Floppy",
+                "Cd",
+                "Usb",
+                "Hdd",
+                "BiosSetup",
+                "Utilities",
+                "Diags",
+                "UefiShell",
+                "UefiTarget",
+                "SDCard",
+                "UefiHttp",
+                "RemoteDrive",
+                "UefiBootNext"
+            ],
+            "enumDescriptions": {
+                "BiosSetup": "Boot to the BIOS Setup Utility.",
+                "Cd": "Boot from the CD/DVD disc.",
+                "Diags": "Boot the manufacturer's Diagnostics program.",
+                "Floppy": "Boot from the floppy disk drive.",
+                "Hdd": "Boot from a hard drive.",
+                "None": "Boot from the normal boot device.",
+                "Pxe": "Boot from the Pre-Boot EXecution (PXE) environment.",
+                "RemoteDrive": "Boot from a remote drive (e.g. iSCSI).",
+                "SDCard": "Boot from an SD Card.",
+                "UefiBootNext": "Boot to the UEFI Device specified in the BootNext property.",
+                "UefiHttp": "Boot from a UEFI HTTP network location.",
+                "UefiShell": "Boot to the UEFI Shell.",
+                "UefiTarget": "Boot to the UEFI Device specified in the UefiTargetBootSourceOverride property.",
+                "Usb": "Boot from a USB device as specified by the system BIOS.",
+                "Utilities": "Boot the manufacturer's Utilities program(s)."
+            },
+            "type": "string"
+        },
+        "ComputerSystem": {
+            "anyOf": [
+                {
+                    "$ref": "/redfish/v1/Schemas/odata.v4_0_1.json#/definitions/idRef"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_0_0.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_0_1.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_0_2.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_0_3.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_0_4.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_0_5.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_0_6.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_0_7.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_1_0.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_1_1.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_1_2.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_1_3.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_1_4.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_1_5.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_2_0.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_2_1.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_2_2.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_2_3.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_2_4.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_3_0.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_3_1.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_3_2.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_3_3.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_4_0.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_4_1.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_4_2.json#/definitions/ComputerSystem"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/ComputerSystem.v1_5_0.json#/definitions/ComputerSystem"
+                }
+            ],
+            "description": "The ComputerSystem schema represents a general purpose machine or system (as opposed to an appliance) instance and the software-visible resources (items within the data plane) such as memory, CPU and other devices that can be accessed from that machine.  Details of those resources or subsystems are also linked through this resource.",
+            "longDescription": "This resource shall be used to represent resources that represent a computing system (as opposed to an appliance) in the Redfish specification."
+        }
+    },
+    "title": "#ComputerSystem.ComputerSystem"
+}

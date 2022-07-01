@@ -1,0 +1,53 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Chassis.Chassis",
+    "@odata.id": "/redfish/v1/Chassis/Enclosure.Internal.0-1:PCIeExtender.Slot.1",
+    "@odata.type": "#Chassis.v1_6_0.Chassis",
+    "Actions": {},
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/Enclosure.Internal.0-1:PCIeExtender.Slot.1/Assembly"
+    },
+    "AssetTag": "",
+    "ChassisType": "Enclosure",
+    "Description": "PCIe SSD BP 1",
+    "Id": "Enclosure.Internal.0-1:PCIeExtender.Slot.1",
+    "Links": {
+        "ContainedBy": {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+        },
+        "Contains": [],
+        "Contains@odata.count": 0,
+        "Drives": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/Drives/Disk.Bay.8:Enclosure.Internal.0-1:PCIeExtender.Slot.1"
+            },
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/Drives/Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1"
+            }
+        ],
+        "Drives@odata.count": 2,
+        "ManagedBy": [
+            {
+                "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+            }
+        ],
+        "ManagedBy@odata.count": 1,
+        "Storage": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/PCIeExtender.Slot.1"
+            }
+        ],
+        "Storage@odata.count": 1
+    },
+    "Manufacturer": null,
+    "Model": "PCIe SSD BP 1",
+    "Name": "PCIe SSD BP 1",
+    "PartNumber": null,
+    "PowerState": "On",
+    "SKU": "",
+    "SerialNumber": null,
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    }
+}
