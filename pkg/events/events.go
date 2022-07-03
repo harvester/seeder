@@ -3,6 +3,7 @@ package events
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/stmcginnis/gofish"
 )
@@ -78,8 +79,8 @@ func (ef *EventFetcher) GetConfig() (map[string]string, string, error) {
 	retMap["totalCpuCores"] = fmt.Sprintf("%d", totalCoreCount)
 	retMap["totalMemoryMiB"] = fmt.Sprintf("%d", totalMemory)
 	retMap["totalCoreHz"] = fmt.Sprintf("%d", totalCoreHz)
-	retMap["manufacturer"] = manufacturer
-	retMap["model"] = model
-	retMap["serialNumber"] = serialNumber
+	retMap["manufacturer"] = strings.ReplaceAll(strings.ReplaceAll(manufacturer, " ", ""), ".", "")
+	retMap["model"] = strings.ReplaceAll(strings.ReplaceAll(model, " ", ""), ".", "")
+	retMap["serialNumber"] = strings.ReplaceAll(strings.ReplaceAll(serialNumber, " ", ""), ".", "")
 	return retMap, health, nil
 }

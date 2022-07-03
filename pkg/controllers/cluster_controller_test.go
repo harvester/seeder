@@ -13,6 +13,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 var _ = Describe("Create cluster tests", func() {
@@ -173,15 +174,17 @@ var _ = Describe("Create cluster tests", func() {
 			}
 
 			hwList := &tinkv1alpha1.HardwareList{}
-			if err := k8sClient.List(ctx, hwList); err != nil {
+			if err := k8sClient.List(ctx, hwList, &client.ListOptions{Namespace: "default"}); err != nil {
 				return err
 			}
 
-			if len(hwList.Items) != 1 {
-				return fmt.Errorf("exepcted to find 1 hardware object but found %d", len(hwList.Items))
+			for _, v := range hwList.Items {
+				if v.Name == i.Name && v.Namespace == i.Namespace {
+					return nil
+				}
 			}
 
-			return nil
+			return fmt.Errorf("did not find hardware matching the inventory %s", i.Name)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 

@@ -89,12 +89,23 @@ spec:
                 required:
                 - connection
                 type: object
+              events:
+                properties:
+                  enabled:
+                    type: boolean
+                  pollingInterval:
+                    default: 1h
+                    type: string
+                required:
+                - enabled
+                type: object
               managementInterfaceMacAddress:
                 type: string
               primaryDisk:
                 type: string
             required:
             - baseboardSpec
+            - events
             - managementInterfaceMacAddress
             - primaryDisk
             type: object

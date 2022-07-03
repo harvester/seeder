@@ -18,15 +18,18 @@ package controllers
 
 import (
 	"context"
-	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/ory/dockertest/v3"
+	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/mock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/ory/dockertest/v3/docker"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	"golang.org/x/sync/errgroup"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -44,15 +47,18 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 var (
-	cfg       *rest.Config
-	k8sClient client.Client
-	testEnv   *envtest.Environment
-	scheme    = runtime.NewScheme()
-	ctx       context.Context
-	cancel    context.CancelFunc
-	eg        *errgroup.Group
-	egctx     context.Context
-	setupLog  = ctrl.Log.WithName("setup")
+	cfg         *rest.Config
+	k8sClient   client.Client
+	testEnv     *envtest.Environment
+	scheme      = runtime.NewScheme()
+	ctx         context.Context
+	cancel      context.CancelFunc
+	eg          *errgroup.Group
+	egctx       context.Context
+	setupLog    = ctrl.Log.WithName("setup")
+	pool        *dockertest.Pool
+	redfishPort string
+	redfishMock *dockertest.Resource
 )
 
 const (
@@ -140,11 +146,44 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
+	err = (&InventoryEventReconciller{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		Logger:        log.Log.WithName("controller.cluster"),
+		EventRecorder: mgr.GetEventRecorderFor("seeder"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
 	go func() {
 		defer GinkgoRecover()
 		err := mgr.Start(ctx)
 		Expect(err).ToNot(HaveOccurred())
 	}()
+
+	pool, err = dockertest.NewPool("")
+	Expect(err).NotTo(HaveOccurred())
+
+	buildOpts := &dockertest.BuildOptions{
+		ContextDir: "../events/testdata",
+	}
+	runOpts := &dockertest.RunOptions{
+		Name: "redfishmock",
+		Cmd: []string{
+			"-D",
+			"/mockup",
+			"--ssl",
+			"--cert",
+			"/mockup/localhost.crt",
+			"--key",
+			"/mockup/localhost.key",
+		},
+		PortBindings: map[docker.Port][]docker.PortBinding{
+			"8000/tcp": {{HostPort: "443"}},
+		},
+	}
+
+	redfishMock, err = pool.BuildAndRunWithBuildOptions(buildOpts, runOpts)
+	Expect(err).NotTo(HaveOccurred())
 
 	time.Sleep(30 * time.Second)
 })
@@ -152,6 +191,8 @@ var _ = BeforeSuite(func() {
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
 	cancel()
-	err := testEnv.Stop()
+	err := pool.Purge(redfishMock)
+	Expect(err).NotTo(HaveOccurred())
+	err = testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())
 })

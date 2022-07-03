@@ -92,7 +92,7 @@ type Conditions struct {
 
 type Events struct {
 	Enabled bool `json:"enabled"`
-	// +kubebuilder:default:=1h
+	// +kubebuilder:default:="1h"
 	PollingInterval string `json:"pollingInterval,omitempty"`
 }
 
