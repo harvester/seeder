@@ -506,27 +506,7 @@ func (r *ClusterReconciler) markClusterReady(ctx context.Context, c *seederv1alp
 		return nil
 	}
 
-	port, ok := c.Labels[seederv1alpha1.OverrideAPIPortLabel]
-	if !ok {
-		port = seederv1alpha1.DefaultAPIPort
-	}
-
-	kcBytes, err := util.FetchKubeConfig(fmt.Sprintf("https://%s:%s", c.Status.ClusterAddress, port), seederv1alpha1.DefaultAPIPrefix, c.Status.ClusterToken)
-	if err != nil {
-		return err
-	}
-
-	hcClientConfig, err := clientcmd.NewClientConfigFromBytes(kcBytes)
-	if err != nil {
-		return err
-	}
-
-	restConfig, err := hcClientConfig.ClientConfig()
-	if err != nil {
-		return err
-	}
-
-	typedClient, err := typedCore.NewForConfig(restConfig)
+	typedClient, err := genCoreTypedClient(ctx, c)
 	if err != nil {
 		return err
 	}
@@ -564,4 +544,28 @@ func (r *ClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			return reconRequest
 		})).
 		Complete(r)
+}
+
+func genCoreTypedClient(ctx context.Context, c *seederv1alpha1.Cluster) (*typedCore.CoreV1Client, error) {
+	port, ok := c.Labels[seederv1alpha1.OverrideAPIPortLabel]
+	if !ok {
+		port = seederv1alpha1.DefaultAPIPort
+	}
+
+	kcBytes, err := util.FetchKubeConfig(fmt.Sprintf("https://%s:%s", c.Status.ClusterAddress, port), seederv1alpha1.DefaultAPIPrefix, c.Status.ClusterToken)
+	if err != nil {
+		return nil, err
+	}
+
+	hcClientConfig, err := clientcmd.NewClientConfigFromBytes(kcBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	restConfig, err := hcClientConfig.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	return typedCore.NewForConfig(restConfig)
 }

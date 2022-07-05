@@ -2,12 +2,18 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/go-logr/logr"
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/events"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
+	typedCore "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -47,8 +53,7 @@ func (r *ClusterEventReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	}
 
 	reconcileList := []clusterEventReconciler{
-		r.updateHardware,
-		r.hardwareEvents,
+		r.updateNodes,
 	}
 
 	for _, reconciler := range reconcileList {
@@ -57,13 +62,111 @@ func (r *ClusterEventReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		}
 	}
 
-	return ctrl.Result{RequeueAfter: 1 * time.Hour}, nil
+	return ctrl.Result{RequeueAfter: 15 * time.Minute}, nil
 }
 
-func (r *ClusterEventReconciler) updateHardware(ctx context.Context, c *seederv1alpha1.Cluster) error {
+func (r *ClusterEventReconciler) updateNodes(ctx context.Context, c *seederv1alpha1.Cluster) error {
+	typedClient, err := genCoreTypedClient(ctx, c)
+	if err != nil {
+		return err
+	}
+
+	inventoryList, err := r.identifyInventory(ctx, c)
+	if err != nil {
+		return err
+	}
+
+	if len(inventoryList) == 0 {
+		// no nodes have event collection enabled. nothing to do
+		return nil
+	}
+
+	nodeList, err := typedClient.Nodes().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	// associate k8s node with inventory using the address allocated to inventory by cluster
+	// this should make it easy to uniquely identify nodes in the cluster
+	for _, i := range inventoryList {
+		node := findNodeByIP(nodeList.Items, i.Status.Address)
+		if node != nil {
+			s := &corev1.Secret{}
+			err := r.Get(ctx, types.NamespacedName{Namespace: i.Spec.BaseboardManagementSpec.Connection.AuthSecretRef.Namespace,
+				Name: i.Spec.BaseboardManagementSpec.Connection.AuthSecretRef.Name}, s)
+			if err != nil {
+				return err
+			}
+			username := s.Data["username"]
+			password := s.Data["password"]
+			e, err := events.NewEventFetcher(ctx, string(username), string(password), fmt.Sprintf("https://%s", i.Spec.Connection.Host))
+			if err != nil {
+				return err
+			}
+			labels, status, err := e.GetConfig()
+			if err != nil {
+				return err
+			}
+
+			if node.Labels == nil {
+				node.Labels = make(map[string]string)
+			}
+			for k, v := range labels {
+				node.Labels[k] = v
+			}
+
+			updatedNode, err := typedClient.Nodes().Update(ctx, node, metav1.UpdateOptions{})
+			if err != nil {
+				return err
+			}
+
+			recorder := remoteEventRecorder(typedClient, r.Scheme)
+			var update string
+			if status == "OK" {
+				update = "Normal"
+			} else {
+				update = "Warning"
+			}
+			recorder.Event(updatedNode, update, "SeederUpdated", fmt.Sprintf("Underlying inventory %s status is %s", i.Name, status))
+		}
+	}
 	return nil
 }
 
-func (r *ClusterEventReconciler) hardwareEvents(ctx context.Context, c *seederv1alpha1.Cluster) error {
+func (r *ClusterEventReconciler) identifyInventory(ctx context.Context, c *seederv1alpha1.Cluster) ([]*seederv1alpha1.Inventory, error) {
+	var retNodes []*seederv1alpha1.Inventory
+	// identify nodes for which event collection is enabled
+	for _, v := range c.Spec.Nodes {
+		nodeObj := &seederv1alpha1.Inventory{}
+		err := r.Get(ctx, types.NamespacedName{Namespace: v.InventoryReference.Namespace, Name: v.InventoryReference.Name}, nodeObj)
+		if err != nil {
+			return nil, err
+		}
+		if nodeObj.Spec.Events.Enabled {
+			retNodes = append(retNodes, nodeObj)
+		}
+	}
+
+	return retNodes, nil
+
+}
+
+func findNodeByIP(nodeList []corev1.Node, address string) *corev1.Node {
+	for _, v := range nodeList {
+		for _, a := range v.Status.Addresses {
+			if a.Address == address {
+				return &v
+			}
+		}
+	}
+
 	return nil
+}
+
+func remoteEventRecorder(c *typedCore.CoreV1Client, scheme *runtime.Scheme) record.EventRecorder {
+	eventBroadcaster := record.NewBroadcaster()
+	eventBroadcaster.StartStructuredLogging(0)
+	eventBroadcaster.StartRecordingToSink(&typedCore.EventSinkImpl{Interface: c.Events("")})
+	recorder := eventBroadcaster.NewRecorder(scheme, corev1.EventSource{Component: "boots"})
+	return recorder
 }
