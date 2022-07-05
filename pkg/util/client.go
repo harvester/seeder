@@ -4,18 +4,20 @@ import (
 	"crypto/ecdsa"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/pem"
 	"fmt"
-	certutil "github.com/rancher/dynamiclistener/cert"
 	"io/ioutil"
-	"k8s.io/client-go/tools/clientcmd"
-	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 	"net/http"
 	"time"
+
+	certutil "github.com/rancher/dynamiclistener/cert"
+	"k8s.io/client-go/tools/clientcmd"
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
 
 // FetchKubeConfig is a helper method to fetch remote harvester clusters kubeconfig file
 func FetchKubeConfig(serverURL, prefix, token string) ([]byte, error) {
-	kubeletURL := fmt.Sprintf("%s/v1-%s/serving-kubelet.crt", serverURL, prefix)
+	kubeletURL := fmt.Sprintf("%s/v1-%s/client-kubelet.crt", serverURL, prefix)
 	resp, err := fetchCerts(kubeletURL, prefix, token)
 	if err != nil {
 		return nil, err
@@ -36,11 +38,9 @@ func FetchKubeConfig(serverURL, prefix, token string) ([]byte, error) {
 		return nil, fmt.Errorf("expected to find two certs, but found %d", len(certs))
 	}
 
-	var ca, kubeletcert *x509.Certificate
+	var kubeletcert *x509.Certificate
 	for _, c := range certs {
-		if c.IsCA {
-			ca = c
-		} else {
+		if !c.IsCA {
 			kubeletcert = c
 		}
 	}
@@ -50,19 +50,37 @@ func FetchKubeConfig(serverURL, prefix, token string) ([]byte, error) {
 		return nil, err
 	}
 
-	keyBytes, err := x509.MarshalECPrivateKey(kubeletkey.(*ecdsa.PrivateKey))
+	ecdsaPrivKey, err := x509.MarshalECPrivateKey(kubeletkey.(*ecdsa.PrivateKey))
+	if err != nil {
+		return nil, err
+	}
+	kubeletKeyBlock := &pem.Block{
+		Bytes: ecdsaPrivKey,
+		Type:  certutil.ECPrivateKeyBlockType,
+	}
+
+	keyBytes := pem.EncodeToMemory(kubeletKeyBlock)
+	certBytes := certutil.EncodeCertPEM(kubeletcert)
+
+	// fetch ca cert
+	caURL := fmt.Sprintf("%s/v1-%s/server-ca.crt", serverURL, prefix)
+	resp, err = fetchCerts(caURL, prefix, token)
 	if err != nil {
 		return nil, err
 	}
 
-	caBytes := certutil.EncodeCertPEM(ca)
-	certBytes := certutil.EncodeCertPEM(kubeletcert)
+	defer resp.Body.Close()
+	caCertByte, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
 
 	config := clientcmdapi.NewConfig()
 
 	cluster := clientcmdapi.NewCluster()
-	cluster.CertificateAuthorityData = caBytes
+	cluster.CertificateAuthorityData = caCertByte
 	cluster.Server = serverURL
+	//cluster.InsecureSkipTLSVerify = true
 
 	authInfo := clientcmdapi.NewAuthInfo()
 	authInfo.ClientCertificateData = certBytes
