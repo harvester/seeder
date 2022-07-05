@@ -51,7 +51,7 @@ func (r *InventoryEventReconciller) Reconcile(ctx context.Context, req ctrl.Requ
 		if apierrors.IsNotFound(err) {
 			return ctrl.Result{}, nil
 		}
-		r.Error(err, "unable to fetch cluster object")
+		r.Error(err, "unable to fetch inventory object")
 		return ctrl.Result{}, err
 	}
 

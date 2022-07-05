@@ -163,10 +163,10 @@ var _ = BeforeSuite(func() {
 	pool, err = dockertest.NewPool("")
 	Expect(err).NotTo(HaveOccurred())
 
-	buildOpts := &dockertest.BuildOptions{
+	redfishBuildOpts := &dockertest.BuildOptions{
 		ContextDir: "../events/testdata",
 	}
-	runOpts := &dockertest.RunOptions{
+	redfishRunOpts := &dockertest.RunOptions{
 		Name: "redfishmock",
 		Cmd: []string{
 			"-D",
@@ -182,9 +182,8 @@ var _ = BeforeSuite(func() {
 		},
 	}
 
-	redfishMock, err = pool.BuildAndRunWithBuildOptions(buildOpts, runOpts)
+	redfishMock, err = pool.BuildAndRunWithBuildOptions(redfishBuildOpts, redfishRunOpts)
 	Expect(err).NotTo(HaveOccurred())
-
 	time.Sleep(30 * time.Second)
 })
 
