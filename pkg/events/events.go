@@ -13,10 +13,6 @@ type EventFetcher struct {
 	client *gofish.APIClient
 }
 
-const (
-	defaultPort = "443"
-)
-
 func NewEventFetcher(ctx context.Context, username, password, endpoint string) (*EventFetcher, error) {
 	cfg := gofish.ClientConfig{
 		Username: username,

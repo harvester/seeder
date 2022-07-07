@@ -8,7 +8,6 @@ import (
 	. "github.com/onsi/gomega"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -17,10 +16,10 @@ import (
 
 var _ = Describe("Inventory event controller tests", func() {
 	var i *seederv1alpha1.Inventory
-	var creds *v1.Secret
-	var ns *v1.Namespace
+	var creds *corev1.Secret
+	var ns *corev1.Namespace
 	BeforeEach(func() {
-		ns = &v1.Namespace{
+		ns = &corev1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "event-test",
 			},
@@ -39,7 +38,7 @@ var _ = Describe("Inventory event controller tests", func() {
 						Host:        "localhost",
 						Port:        623,
 						InsecureTLS: true,
-						AuthSecretRef: v1.SecretReference{
+						AuthSecretRef: corev1.SecretReference{
 							Name:      "events",
 							Namespace: "event-test",
 						},
@@ -52,7 +51,7 @@ var _ = Describe("Inventory event controller tests", func() {
 			},
 		}
 
-		creds = &v1.Secret{
+		creds = &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "events",
 				Namespace: "event-test",

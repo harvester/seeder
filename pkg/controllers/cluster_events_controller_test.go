@@ -10,7 +10,6 @@ import (
 	"github.com/ory/dockertest/v3/docker"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -61,7 +60,7 @@ var _ = Describe("cluster events test", func() {
 						Host:        "localhost",
 						Port:        623,
 						InsecureTLS: true,
-						AuthSecretRef: v1.SecretReference{
+						AuthSecretRef: corev1.SecretReference{
 							Name:      "event-test",
 							Namespace: "default",
 						},
@@ -73,7 +72,7 @@ var _ = Describe("cluster events test", func() {
 			},
 		}
 
-		s = &v1.Secret{
+		s = &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "event-test",
 				Namespace: "default",

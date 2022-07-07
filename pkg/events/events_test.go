@@ -9,22 +9,8 @@ import (
 	"time"
 
 	"github.com/ory/dockertest/v3"
-	"github.com/stretchr/testify/assert"
-
-	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/stretchr/testify/require"
 )
-
-var secret = &corev1.Secret{
-	ObjectMeta: metav1.ObjectMeta{
-		Name:      "test",
-		Namespace: "default",
-	},
-	StringData: map[string]string{
-		"username": "root",
-		"password": "calvin",
-	},
-}
 
 var ef *EventFetcher
 
@@ -66,8 +52,9 @@ func TestMain(m *testing.M) {
 }
 
 func Test_GetInventory(t *testing.T) {
+	assert := require.New(t)
 	_, health, err := ef.GetConfig()
-	assert.NoErrorf(t, err, "expected no error during inventory call")
-	assert.Equal(t, health, "OK", "expected health to be ok")
+	assert.NoErrorf(err, "expected no error during inventory call")
+	assert.Equal(health, "OK", "expected health to be ok")
 	ef.client.HTTPClient.CloseIdleConnections()
 }

@@ -74,7 +74,8 @@ func (r *InventoryEventReconciller) Reconcile(ctx context.Context, req ctrl.Requ
 		}
 
 		if parsedTime.After(time.Now()) {
-			return ctrl.Result{RequeueAfter: parsedTime.Sub(time.Now())}, nil
+			time.Until(parsedTime)
+			return ctrl.Result{RequeueAfter: time.Until(parsedTime)}, nil
 		}
 
 	}
