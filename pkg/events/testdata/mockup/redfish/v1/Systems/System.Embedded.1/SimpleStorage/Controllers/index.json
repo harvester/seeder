@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#SimpleStorageCollection.SimpleStorageCollection",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage",
+    "@odata.type": "#SimpleStorageCollection.SimpleStorageCollection",
+    "Description": "Collection of Controllers for this system",
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/SimpleStorage/Controllers/RAID.Integrated.1-1"
+        },
+        {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/SimpleStorage/Controllers/RAID.Embedded.1-1"
+        },
+        {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/SimpleStorage/Controllers/PCIeExtender.Slot.1"
+        }
+    ],
+    "Members@odata.count": 3,
+    "Name": "Simple Storage Collection"
+}

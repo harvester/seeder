@@ -1,0 +1,35 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#PCIeDevice.PCIeDevice",
+    "@odata.etag": "1655847839",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeDevice/0-0",
+    "@odata.type": "#PCIeDevice.v1_2_0.PCIeDevice",
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+    },
+    "AssetTag": null,
+    "Description": "Xeon E7 v3/Xeon E5 v3/Core i7 DMI2",
+    "DeviceType": "SingleFunction",
+    "FirmwareVersion": "",
+    "Id": "0-0",
+    "Links": {
+        "Chassis": [],
+        "Chassis@odata.count": 0,
+        "PCIeFunctions": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/0-0-0"
+            }
+        ],
+        "PCIeFunctions@odata.count": 1
+    },
+    "Manufacturer": "Intel Corporation",
+    "Model": null,
+    "Name": "Xeon E7 v3/Xeon E5 v3/Core i7 DMI2",
+    "PartNumber": null,
+    "SKU": null,
+    "SerialNumber": null,
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    }
+}

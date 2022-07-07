@@ -1,0 +1,27 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Sel/2",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-05-03T16:35:42-05:00",
+    "Description": " Log Entry 2",
+    "EntryCode": [
+        {
+            "Member": "Assert"
+        }
+    ],
+    "EntryType": "SEL",
+    "Id": "2",
+    "Links": {},
+    "Message": "The chassis is open while the power is off.",
+    "MessageArgs": [],
+    "MessageArgs@odata.count": 0,
+    "MessageId": "802ff",
+    "Name": " Log Entry 2",
+    "SensorNumber": 115,
+    "SensorType": [
+        {
+            "Member": "Physical Chassis Security"
+        }
+    ],
+    "Severity": "Critical"
+}

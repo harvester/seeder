@@ -1,0 +1,15 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/105",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-04T19:31:37-05:00",
+    "Description": " Log Entry 105",
+    "EntryType": "Oem",
+    "Id": "105",
+    "Links": {},
+    "Message": "System is turning off.",
+    "MessageId": "SYS1001",
+    "Name": " Log Entry 105",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

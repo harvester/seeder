@@ -1,0 +1,17 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogService.LogService",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/LogServices/Lclog",
+    "@odata.type": "#LogService.v1_1_0.LogService",
+    "DateTime": "2022-07-01T01:19:07-05:00",
+    "DateTimeLocalOffset": "-05:00",
+    "Description": "LifeCycle Controller Log Service",
+    "Entries": {
+        "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog"
+    },
+    "Id": "LC",
+    "LogEntryType": "OEM",
+    "MaxNumberOfRecords": 500000,
+    "Name": "LifeCycle Controller Log Service",
+    "OverWritePolicy": "WrapsWhenFull",
+    "ServiceEnabled": true
+}

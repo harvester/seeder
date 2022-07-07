@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/228",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-07T14:16:21-05:00",
+    "Description": " Log Entry 228",
+    "EntryType": "Oem",
+    "Id": "228",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+        }
+    },
+    "Message": "Firmware update programming flash.",
+    "MessageId": "SUP1905",
+    "Name": " Log Entry 228",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

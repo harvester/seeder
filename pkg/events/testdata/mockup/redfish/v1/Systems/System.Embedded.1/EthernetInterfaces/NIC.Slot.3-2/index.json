@@ -1,0 +1,28 @@
+{
+    "error": {
+        "@Message.ExtendedInfo": [
+            {
+                "Message": "Unable to complete the operation because the resource ~~1~ entered is not found.",
+                "MessageArgs": [],
+                "MessageArgs@odata.count": 0,
+                "MessageId": "IDRAC.1.6.SYS403",
+                "RelatedProperties": [],
+                "RelatedProperties@odata.count": 0,
+                "Resolution": "Enter the correct resource and retry the operation. For information about valid resource, see the Redfish Users Guide available on the support site.",
+                "Severity": "Critical"
+            },
+            {
+                "Message": "The resource at the URI %1 was not found.",
+                "MessageArgs": [],
+                "MessageArgs@odata.count": 0,
+                "MessageId": "Base.1.2.ResourceMissingAtURI",
+                "RelatedProperties": [],
+                "RelatedProperties@odata.count": 0,
+                "Resolution": "Place a valid resource at the URI or correct the URI and resubmit the request.",
+                "Severity": "Critical"
+            }
+        ],
+        "code": "Base.1.2.GeneralError",
+        "message": "A general error has occurred. See ExtendedInfo for more information"
+    }
+}

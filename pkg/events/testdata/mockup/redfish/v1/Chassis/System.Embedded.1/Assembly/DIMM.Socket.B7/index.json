@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Assembly.Assembly",
+    "@odata.etag": "1651625577",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly/DIMM.Socket.B7",
+    "@odata.type": "#Assembly.v1_0_0.AssemblyData",
+    "BinaryDataURI": null,
+    "Description": "DDR4 DIMM",
+    "EngineeringChangeLevel": null,
+    "MemberId": "DIMM.Socket.B7",
+    "Model": "DDR4 DIMM",
+    "Name": "DIMM.Socket.B7#FRU",
+    "PartNumber": "HMA84GL7MMR4N-TF",
+    "Producer": "Hynix Semiconductor",
+    "ProductionDate": "2015-05-11T07:00:00Z",
+    "SKU": null,
+    "SparePartNumber": null,
+    "Vendor": "DELL",
+    "Version": null
+}

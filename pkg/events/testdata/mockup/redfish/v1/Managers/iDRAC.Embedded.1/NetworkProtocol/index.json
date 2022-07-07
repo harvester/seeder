@@ -1,0 +1,57 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#ManagerNetworkProtocol.ManagerNetworkProtocol",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/NetworkProtocol",
+    "@odata.type": "#ManagerNetworkProtocol.v1_2_0.ManagerNetworkProtocol",
+    "DHCP": {
+        "ProtocolEnabled": true
+    },
+    "Description": "Manager Network Service Status",
+    "FQDN": "",
+    "HTTP": {
+        "Port": 80,
+        "ProtocolEnabled": true
+    },
+    "HTTPS": {
+        "Port": 443,
+        "ProtocolEnabled": true
+    },
+    "HostName": "idrac-BYBG282",
+    "IPMI": {
+        "ProtocolEnabled": true
+    },
+    "Id": "NetworkProtocol",
+    "KVMIP": {
+        "Port": 5900,
+        "ProtocolEnabled": true
+    },
+    "NTP": {
+        "NTPServers": [
+            "",
+            "",
+            ""
+        ],
+        "NTPServers@odata.count": 3,
+        "ProtocolEnabled": false
+    },
+    "Name": "Manager Network Protocol",
+    "SNMP": {
+        "Port": 161,
+        "ProtocolEnabled": true
+    },
+    "SSH": {
+        "Port": 22,
+        "ProtocolEnabled": true
+    },
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    },
+    "Telnet": {
+        "Port": 23,
+        "ProtocolEnabled": false
+    },
+    "VirtualMedia": {
+        "ProtocolEnabled": true
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Assembly.Assembly",
+    "@odata.etag": "1651625577",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly/System.Embedded.1",
+    "@odata.type": "#Assembly.v1_0_0.AssemblyData",
+    "BinaryDataURI": null,
+    "Description": "SystemPlanar",
+    "EngineeringChangeLevel": "A08",
+    "MemberId": "System.Embedded.1",
+    "Model": "SystemPlanar",
+    "Name": "System.Embedded.1#FRU",
+    "PartNumber": "0CNCJW",
+    "Producer": "Dell Inc.",
+    "ProductionDate": null,
+    "SKU": null,
+    "SparePartNumber": null,
+    "Vendor": "DELL",
+    "Version": null
+}

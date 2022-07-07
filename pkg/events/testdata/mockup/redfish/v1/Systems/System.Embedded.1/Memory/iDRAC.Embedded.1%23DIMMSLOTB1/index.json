@@ -1,0 +1,48 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Memory.Memory",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Memory/iDRAC.Embedded.1%23DIMMSLOTB1",
+    "@odata.type": "#Memory.v1_4_0.Memory",
+    "AllowedSpeedsMHz": [
+        2133
+    ],
+    "AllowedSpeedsMHz@odata.count": 1,
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+    },
+    "BaseModuleType": null,
+    "BusWidthBits": 72,
+    "CapacityMiB": 32768,
+    "DataWidthBits": 64,
+    "Description": "DIMM B1",
+    "DeviceLocator": "DIMM B1",
+    "ErrorCorrection": "MultiBitECC",
+    "Id": "iDRAC.Embedded.1#DIMMSLOTB1",
+    "Links": {
+        "Chassis": {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+        }
+    },
+    "Manufacturer": "Hynix Semiconductor",
+    "MaxTDPMilliWatts": [],
+    "MaxTDPMilliWatts@odata.count": 0,
+    "MemoryDeviceType": "DDR4",
+    "MemoryMedia": [],
+    "MemoryMedia@odata.count": 0,
+    "MemoryType": null,
+    "Metrics": {
+        "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Memory/iDRAC.Embedded.1%23DIMMSLOTB1/Metrics"
+    },
+    "Name": "DIMM B1",
+    "OperatingMemoryModes": [],
+    "OperatingMemoryModes@odata.count": 0,
+    "OperatingSpeedMhz": 2133,
+    "PartNumber": "HMA84GL7MMR4N-TF",
+    "RankCount": 4,
+    "Regions": [],
+    "Regions@odata.count": 0,
+    "SerialNumber": "80D76972",
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    }
+}

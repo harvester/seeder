@@ -1,0 +1,25 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Role.Role",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Roles/Administrator",
+    "@odata.type": "#Role.v1_2_1.Role",
+    "AssignedPrivileges": [
+        "Login",
+        "ConfigureManager",
+        "ConfigureUsers",
+        "ConfigureComponents"
+    ],
+    "AssignedPrivileges@odata.count": 4,
+    "Description": "Administrator User Role",
+    "Id": "Administrator",
+    "IsPredefined": true,
+    "Name": "User Role",
+    "OemPrivileges": [
+        "ClearLogs",
+        "AccessVirtualConsole",
+        "AccessVirtualMedia",
+        "TestAlerts",
+        "ExecuteDebugCommands"
+    ],
+    "OemPrivileges@odata.count": 5,
+    "RoleId": "Administrator"
+}

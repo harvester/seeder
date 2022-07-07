@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/226",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-07T14:15:36-05:00",
+    "Description": " Log Entry 226",
+    "EntryType": "Oem",
+    "Id": "226",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+        }
+    },
+    "Message": "Firmware update checksumming image.",
+    "MessageId": "SUP1904",
+    "Name": " Log Entry 226",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

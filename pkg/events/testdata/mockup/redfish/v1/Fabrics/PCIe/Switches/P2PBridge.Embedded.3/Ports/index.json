@@ -1,0 +1,12 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#PortCollection.PortCollection",
+    "@odata.id": "/redfish/v1/Fabrics/PCIe/Switches/P2PBridge.Embedded.3/Ports",
+    "@odata.type": "#PortCollection.PortCollection",
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Fabrics/PCIe/Switches/P2PBridge.Embedded.3/Ports/P2PBridge.Embedded.3-1"
+        }
+    ],
+    "Members@odata.count": 1,
+    "Name": "P2PBridge.Embedded.3"
+}

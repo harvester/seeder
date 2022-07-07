@@ -1,0 +1,23 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/282",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-05-03T16:38:58-05:00",
+    "Description": " Log Entry 282",
+    "EntryType": "Oem",
+    "Id": "282",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Power/PowerSupplies/PSU.Slot.2"
+        }
+    },
+    "Message": "The power input for power supply 2 is lost.",
+    "MessageArgs": [
+        "2"
+    ],
+    "MessageArgs@odata.count": 1,
+    "MessageId": "PSU0003",
+    "Name": " Log Entry 282",
+    "OemRecordFormat": "Dell",
+    "Severity": "Critical"
+}

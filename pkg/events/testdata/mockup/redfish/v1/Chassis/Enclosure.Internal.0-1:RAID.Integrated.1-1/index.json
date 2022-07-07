@@ -1,0 +1,46 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Chassis.Chassis",
+    "@odata.id": "/redfish/v1/Chassis/Enclosure.Internal.0-1:RAID.Integrated.1-1",
+    "@odata.type": "#Chassis.v1_6_0.Chassis",
+    "Actions": {},
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/Enclosure.Internal.0-1:RAID.Integrated.1-1/Assembly"
+    },
+    "AssetTag": "",
+    "ChassisType": "Enclosure",
+    "Description": "BP13G+EXP 0:1",
+    "Id": "Enclosure.Internal.0-1:RAID.Integrated.1-1",
+    "Links": {
+        "ContainedBy": {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+        },
+        "Contains": [],
+        "Contains@odata.count": 0,
+        "Drives": [],
+        "Drives@odata.count": 0,
+        "ManagedBy": [
+            {
+                "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+            }
+        ],
+        "ManagedBy@odata.count": 1,
+        "Storage": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/RAID.Integrated.1-1"
+            }
+        ],
+        "Storage@odata.count": 1
+    },
+    "Manufacturer": null,
+    "Model": "BP13G+EXP 0:1",
+    "Name": "BP13G+EXP 0:1",
+    "PartNumber": null,
+    "PowerState": "On",
+    "SKU": "",
+    "SerialNumber": null,
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    }
+}

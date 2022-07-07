@@ -125,6 +125,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = (&controllers.InventoryEventReconciller{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		Logger:        log.FromContext(ctx).WithName("inventoryevent-controller"),
+		EventRecorder: mgr.GetEventRecorderFor("seeder"),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "InventoryEvent")
+		os.Exit(1)
+	}
+
 	//+kubebuilder:scaffold:builder
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")

@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/192",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-06T20:19:06-05:00",
+    "Description": " Log Entry 192",
+    "EntryType": "Oem",
+    "Id": "192",
+    "Links": {},
+    "Message": "Device not detected: Generic NVMe PCIe SSD Configuration Data(Bay 7:Enclosure Internal 0-1:PCIeExtender Slot 1)",
+    "MessageArgs": [
+        "Generic NVMe PCIe SSD Configuration Data(Bay 7:Enclosure Internal 0-1:PCIeExtender Slot 1)"
+    ],
+    "MessageArgs@odata.count": 1,
+    "MessageId": "PR8",
+    "Name": " Log Entry 192",
+    "OemRecordFormat": "Dell",
+    "Severity": "Warning"
+}

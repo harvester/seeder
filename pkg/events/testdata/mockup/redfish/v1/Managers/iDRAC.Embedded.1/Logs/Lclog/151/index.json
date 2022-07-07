@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/151",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-05T18:52:06-05:00",
+    "Description": " Log Entry 151",
+    "EntryType": "Oem",
+    "Id": "151",
+    "Links": {},
+    "Message": "New device detected: Disk(Bay 9:Enclosure Internal 0-1:PCIeExtender Slot 1)",
+    "MessageArgs": [
+        "Disk(Bay 9:Enclosure Internal 0-1:PCIeExtender Slot 1)"
+    ],
+    "MessageArgs@odata.count": 1,
+    "MessageId": "PR7",
+    "Name": " Log Entry 151",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

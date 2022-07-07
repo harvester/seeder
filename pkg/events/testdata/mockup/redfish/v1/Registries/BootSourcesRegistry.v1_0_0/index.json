@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#MessageRegistryFile.MessageRegistryFile",
+    "@odata.id": "/redfish/v1/Registries/BootSourcesRegistry.v1_0_0",
+    "@odata.type": "#MessageRegistryFile.v1_1_0.MessageRegistryFile",
+    "Description": "BootSources Attribute Registry File locations",
+    "Id": "BootSourcesRegistry.v1_0_0",
+    "Languages": [
+        "en"
+    ],
+    "Location": [
+        {
+            "Language": "en",
+            "Uri": "/redfish/v1/Systems/System.Embedded.1/BootSources/BootSourcesRegistry"
+        }
+    ],
+    "Name": "BootSources Attribute Registry File",
+    "Oem": {},
+    "Registry": "BootSourcesRegistry1.0"
+}

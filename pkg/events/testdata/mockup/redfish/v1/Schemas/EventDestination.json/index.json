@@ -1,0 +1,55 @@
+{
+    "$ref": "#/definitions/EventDestination",
+    "$schema": "/redfish/v1/Schemas/redfish-schema.v1_3_0.json",
+    "copyright": "Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright",
+    "definitions": {
+        "EventDestination": {
+            "anyOf": [
+                {
+                    "$ref": "/redfish/v1/Schemas/odata.v4_0_1.json#/definitions/idRef"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_0_0.json#/definitions/EventDestination"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_0_2.json#/definitions/EventDestination"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_0_3.json#/definitions/EventDestination"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_0_4.json#/definitions/EventDestination"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_0_5.json#/definitions/EventDestination"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_1_0.json#/definitions/EventDestination"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_1_1.json#/definitions/EventDestination"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_1_2.json#/definitions/EventDestination"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_1_3.json#/definitions/EventDestination"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_1_4.json#/definitions/EventDestination"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_2_0.json#/definitions/EventDestination"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_2_1.json#/definitions/EventDestination"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/EventDestination.v1_2_2.json#/definitions/EventDestination"
+                }
+            ],
+            "description": "An Event Destination desribes the target of an event subscription, including the types of events subscribed and context to provide to the target in the Event payload."
+        }
+    },
+    "title": "#EventDestination.EventDestination"
+}

@@ -1,0 +1,35 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#NetworkPort.NetworkPort",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkPorts/NIC.Integrated.1-2",
+    "@odata.type": "#NetworkPort.v1_1_0.NetworkPort",
+    "ActiveLinkTechnology": "Ethernet",
+    "AssociatedNetworkAddresses": [
+        "EC:F4:BB:F0:46:55"
+    ],
+    "Description": "Network Port View",
+    "EEEEnabled": null,
+    "FlowControlConfiguration": "None",
+    "FlowControlStatus": "None",
+    "Id": "NIC.Integrated.1-2",
+    "LinkStatus": "Down",
+    "Name": "Network Port View",
+    "NetDevFuncMaxBWAlloc": [],
+    "NetDevFuncMinBWAlloc": [],
+    "PhysicalPortNumber": "2",
+    "Status": {
+        "Health": null,
+        "HealthRollup": null,
+        "State": "Enabled"
+    },
+    "SupportedEthernetCapabilities": [
+        "WakeOnLAN",
+        "EEE"
+    ],
+    "SupportedLinkCapabilities": [
+        {
+            "LinkNetworkTechnology": "Ethernet",
+            "LinkSpeedMbps": 0
+        }
+    ],
+    "WakeOnLANEnabled": false
+}

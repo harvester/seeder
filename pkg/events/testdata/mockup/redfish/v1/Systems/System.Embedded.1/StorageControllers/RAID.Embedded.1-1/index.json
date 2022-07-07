@@ -1,0 +1,32 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Storage.Storage",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/StorageControllers/RAID.Embedded.1-1",
+    "@odata.type": "#Storage.v1_4_0.StorageController",
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+    },
+    "FirmwareVersion": "4.3.0-0002",
+    "Identifiers": [
+        {
+            "DurableName": null,
+            "DurableNameFormat": null
+        }
+    ],
+    "Links": {},
+    "Manufacturer": "DELL",
+    "MemberId": "RAID.Embedded.1-1",
+    "Model": "PERC S130 Controller",
+    "Name": "PERC S130 Controller",
+    "SpeedGbps": 6,
+    "Status": {
+        "Health": null,
+        "HealthRollup": null,
+        "State": "Enabled"
+    },
+    "SupportedControllerProtocols": [
+        "PCIe"
+    ],
+    "SupportedDeviceProtocols": [
+        "SATA"
+    ]
+}

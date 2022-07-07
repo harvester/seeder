@@ -1,0 +1,28 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Thermal.Thermal",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Sensors/Temperatures/iDRAC.Embedded.1%23SystemBoardInletTemp",
+    "@odata.type": "#Thermal.v1_4_0.Temperature",
+    "LowerThresholdCritical": -7,
+    "LowerThresholdFatal": -7,
+    "LowerThresholdNonCritical": 3,
+    "MaxReadingRangeTemp": 47,
+    "MemberId": "iDRAC.Embedded.1#SystemBoardInletTemp",
+    "MinReadingRangeTemp": -7,
+    "Name": "System Board Inlet Temp",
+    "PhysicalContext": "SystemBoard",
+    "ReadingCelsius": 15,
+    "RelatedItem": [
+        {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+        }
+    ],
+    "RelatedItem@odata.count": 1,
+    "SensorNumber": 4,
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    },
+    "UpperThresholdCritical": 47,
+    "UpperThresholdFatal": 47,
+    "UpperThresholdNonCritical": 42
+}

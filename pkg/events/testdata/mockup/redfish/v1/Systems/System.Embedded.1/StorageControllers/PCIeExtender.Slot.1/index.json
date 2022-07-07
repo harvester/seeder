@@ -1,0 +1,32 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Storage.Storage",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/StorageControllers/PCIeExtender.Slot.1",
+    "@odata.type": "#Storage.v1_4_0.StorageController",
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+    },
+    "FirmwareVersion": "1",
+    "Identifiers": [
+        {
+            "DurableName": null,
+            "DurableNameFormat": null
+        }
+    ],
+    "Links": {},
+    "Manufacturer": "DELL",
+    "MemberId": "PCIeExtender.Slot.1",
+    "Model": "PCIe Extender 1",
+    "Name": "PCIe Extender 1",
+    "SpeedGbps": null,
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    },
+    "SupportedControllerProtocols": [
+        "PCIe"
+    ],
+    "SupportedDeviceProtocols": [
+        "PCIe"
+    ]
+}

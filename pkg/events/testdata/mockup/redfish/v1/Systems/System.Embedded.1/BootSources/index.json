@@ -1,0 +1,37 @@
+{
+    "@Redfish.Settings": {
+        "@odata.context": "/redfish/v1/$metadata#Settings.Settings",
+        "@odata.type": "#Settings.v1_1_0.Settings",
+        "SettingsObject": {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/BootSources/Settings"
+        },
+        "SupportedApplyTimes": [
+            "OnReset",
+            "AtMaintenanceWindowStart",
+            "InMaintenanceWindowOnReset"
+        ]
+    },
+    "@odata.context": "/redfish/v1/$metadata#DellBootSources.DellBootSources",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/BootSources",
+    "@odata.type": "#DellBootSources.v1_0_0.DellBootSources",
+    "AttributeRegistry": "DellBootSourcesRegistry.v1_0_0",
+    "Attributes": {
+        "UefiBootSeq": [
+            {
+                "Enabled": true,
+                "Id": "BIOS.Setup.1-1#UefiBootSeq#Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1#ddc9791dcfd0804f01a5c1aa4304d50c",
+                "Index": 0,
+                "Name": "Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1"
+            },
+            {
+                "Enabled": true,
+                "Id": "BIOS.Setup.1-1#UefiBootSeq#NIC.PxeDevice.1-1#709c0888d3f7fb4aa12e13c31f22ef1b",
+                "Index": 1,
+                "Name": "NIC.PxeDevice.1-1"
+            }
+        ]
+    },
+    "Description": "Boot Sources Current Settings",
+    "Id": "BootSources",
+    "Name": "Boot Sources Configuration Current Settings"
+}

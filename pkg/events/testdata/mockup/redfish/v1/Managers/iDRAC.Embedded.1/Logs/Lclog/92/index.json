@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/92",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-04T18:47:52-05:00",
+    "Description": " Log Entry 92",
+    "EntryType": "Oem",
+    "Id": "92",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+        }
+    },
+    "Message": "Auto Discovery feature disabled.",
+    "MessageId": "DIS002",
+    "Name": " Log Entry 92",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

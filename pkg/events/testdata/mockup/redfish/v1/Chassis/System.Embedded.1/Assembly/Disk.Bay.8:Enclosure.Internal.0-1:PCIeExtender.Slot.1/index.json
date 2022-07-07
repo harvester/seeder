@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Assembly.Assembly",
+    "@odata.etag": "1655848019",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly/Disk.Bay.8:Enclosure.Internal.0-1:PCIeExtender.Slot.1",
+    "@odata.type": "#Assembly.v1_0_0.AssemblyData",
+    "BinaryDataURI": null,
+    "Description": "",
+    "EngineeringChangeLevel": "",
+    "MemberId": "Disk.Bay.8:Enclosure.Internal.0-1:PCIeExtender.Slot.1",
+    "Model": "",
+    "Name": "Disk.Bay.8:Enclosure.Internal.0-1:PCIeExtender.Slot.1#FRU",
+    "PartNumber": "",
+    "Producer": "N/A",
+    "ProductionDate": null,
+    "SKU": null,
+    "SparePartNumber": null,
+    "Vendor": "DELL",
+    "Version": null
+}

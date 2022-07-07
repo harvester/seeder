@@ -1,0 +1,15 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#SoftwareInventory.SoftwareInventory",
+    "@odata.id": "/redfish/v1/UpdateService/FirmwareInventory/Installed-25806-4239A36",
+    "@odata.type": "#SoftwareInventory.v1_1_1.SoftwareInventory",
+    "Description": "Represents Firmware Inventory",
+    "Id": "Installed-25806-4239A36",
+    "Name": "Dell 32 Bit uEFI Diagnostics, version 4239, 4239A36, 4239.44",
+    "SoftwareId": "25806",
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    },
+    "Updateable": true,
+    "Version": "4239A36"
+}

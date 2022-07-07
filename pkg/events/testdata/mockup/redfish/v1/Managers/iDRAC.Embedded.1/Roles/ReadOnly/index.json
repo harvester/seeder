@@ -1,0 +1,14 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Role.Role",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Roles/ReadOnly",
+    "@odata.type": "#Role.v1_2_1.Role",
+    "AssignedPrivileges": [
+        "Login"
+    ],
+    "AssignedPrivileges@odata.count": 1,
+    "Description": "ReadOnly User Role",
+    "Id": "ReadOnly",
+    "IsPredefined": true,
+    "Name": "User Role",
+    "RoleId": "ReadOnly"
+}

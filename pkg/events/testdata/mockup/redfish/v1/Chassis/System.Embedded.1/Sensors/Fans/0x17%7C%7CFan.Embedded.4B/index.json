@@ -1,0 +1,33 @@
+{
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Sensors/Fans/0x17%7C%7CFan.Embedded.4B",
+    "@odata.type": "#Thermal.v1_4_0.Fan",
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+    },
+    "FanName": "System Board Fan4B",
+    "LowerThresholdCritical": 600,
+    "LowerThresholdFatal": 600,
+    "LowerThresholdNonCritical": 840,
+    "MaxReadingRange": null,
+    "MemberId": "0x17||Fan.Embedded.4B",
+    "MinReadingRange": 600,
+    "Name": "System Board Fan4B",
+    "PhysicalContext": "SystemBoard",
+    "Reading": 5760,
+    "ReadingUnits": "RPM",
+    "Redundancy": [],
+    "Redundancy@odata.count": 0,
+    "RelatedItem": [
+        {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+        }
+    ],
+    "RelatedItem@odata.count": 1,
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    },
+    "UpperThresholdCritical": null,
+    "UpperThresholdFatal": null,
+    "UpperThresholdNonCritical": null
+}

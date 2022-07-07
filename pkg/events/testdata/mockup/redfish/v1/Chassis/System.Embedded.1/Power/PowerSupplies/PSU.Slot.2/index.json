@@ -1,0 +1,65 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Power.Power",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Power/PowerSupplies/PSU.Slot.2",
+    "@odata.type": "#Power.v1_5_0.PowerSupply",
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+    },
+    "FirmwareVersion": "00.11.3F",
+    "HotPluggable": true,
+    "InputRanges": [
+        {
+            "InputType": "AC",
+            "OutputWattage": 750
+        }
+    ],
+    "InputRanges@odata.count": 1,
+    "LastPowerOutputWatts": null,
+    "LineInputVoltage": 206,
+    "LineInputVoltageType": "AC240V",
+    "Manufacturer": "Dell",
+    "MemberId": "PSU.Slot.2",
+    "Model": "PWR SPLY,750W,RDNT,EMSN       ",
+    "Name": "PS2 Status",
+    "PartNumber": "00XW8WA00",
+    "PowerInputWatts": 900,
+    "PowerSupplyType": "AC",
+    "Redundancy": [
+        {
+            "@odata.context": "/redfish/v1/$metadata#Redundancy.Redundancy",
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Power/Redundancy/iDRAC.Embedded.1%23SystemBoardPSRedundancy",
+            "@odata.type": "#Redundancy.v1_3_0.Redundancy",
+            "MaxNumSupported": 4,
+            "MemberId": "iDRAC.Embedded.1#SystemBoardPSRedundancy",
+            "MinNumNeeded": 2,
+            "Mode": "N+m",
+            "Name": "System Board PS Redundancy",
+            "RedundancySet": [
+                {
+                    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Power/PowerSupplies/PSU.Slot.1"
+                },
+                {
+                    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Power/PowerSupplies/PSU.Slot.2"
+                }
+            ],
+            "RedundancySet@odata.count": 2,
+            "Status": {
+                "Health": "OK",
+                "State": "Disabled"
+            }
+        }
+    ],
+    "Redundancy@odata.count": 1,
+    "RelatedItem": [
+        {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+        }
+    ],
+    "RelatedItem@odata.count": 1,
+    "SerialNumber": "PH1629859Q018S",
+    "SparePartNumber": "00XW8WA00",
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    }
+}

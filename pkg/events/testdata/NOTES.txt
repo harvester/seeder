@@ -1,0 +1,7 @@
+## How to generate mock data
+
+Use the redfish mock data creator to create mock data store from an existing redfish instance.
+
+For this sample we leverage a Dell iDRAC available in our environment
+
+docker run --rm --user="$(id -u):$(id -g)" -v $PWD/mockup:/mockup dmtf/redfish-mockup-creator:latest -u root -p calvin -r 172.19.1.10:443 -S

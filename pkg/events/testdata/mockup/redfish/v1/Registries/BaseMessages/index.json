@@ -1,0 +1,21 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#MessageRegistryFile.MessageRegistryFile",
+    "@odata.id": "/redfish/v1/Registries/BaseMessages",
+    "@odata.type": "#MessageRegistryFile.v1_1_0.MessageRegistryFile",
+    "Description": "Base Message Registry File locations",
+    "Id": "BaseMessages",
+    "Languages": [
+        "En"
+    ],
+    "Languages@odata.count": 1,
+    "Location": [
+        {
+            "Language": "En",
+            "PublicationUri": "https://redfish.dmtf.org/schemas/registries/v1/Base.1.2.0.json",
+            "Uri": "/redfish/v1/Registries/BaseMessages/BaseRegistry.json"
+        }
+    ],
+    "Location@odata.count": 1,
+    "Name": "Base Message Registry File",
+    "Registry": "Base.1.2.0"
+}

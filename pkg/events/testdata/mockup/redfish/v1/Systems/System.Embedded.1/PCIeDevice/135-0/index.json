@@ -1,0 +1,35 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#PCIeDevice.PCIeDevice",
+    "@odata.etag": "1655847847",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeDevice/135-0",
+    "@odata.type": "#PCIeDevice.v1_2_0.PCIeDevice",
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+    },
+    "AssetTag": null,
+    "Description": "NVMe SSD Controller SM981/PM981/PM983",
+    "DeviceType": "SingleFunction",
+    "FirmwareVersion": "EDA5402Q",
+    "Id": "135-0",
+    "Links": {
+        "Chassis": [],
+        "Chassis@odata.count": 0,
+        "PCIeFunctions": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/135-0-0"
+            }
+        ],
+        "PCIeFunctions@odata.count": 1
+    },
+    "Manufacturer": "Samsung Electronics Co Ltd",
+    "Model": null,
+    "Name": "NVMe SSD Controller SM981/PM981/PM983",
+    "PartNumber": "",
+    "SKU": null,
+    "SerialNumber": "",
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    }
+}

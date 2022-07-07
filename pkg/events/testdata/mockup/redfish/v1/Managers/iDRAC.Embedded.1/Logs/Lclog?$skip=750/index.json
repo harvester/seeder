@@ -1,0 +1,960 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntryCollection.LogEntryCollection",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog",
+    "@odata.type": "#LogEntryCollection.LogEntryCollection",
+    "Description": "LC Logs for this manager",
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/73",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:43-05:00",
+            "Description": " Log Entry 73",
+            "EntryType": "Oem",
+            "Id": "73",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Slot.3-2"
+                }
+            },
+            "Message": "New device detected: NIC(Slot 3-2)",
+            "MessageArgs": [
+                "NIC(Slot 3-2)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 73",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/72",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:43-05:00",
+            "Description": " Log Entry 72",
+            "EntryType": "Oem",
+            "Id": "72",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Slot.3-1"
+                }
+            },
+            "Message": "New device detected: NIC(Slot 3-1)",
+            "MessageArgs": [
+                "NIC(Slot 3-1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 72",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/71",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:43-05:00",
+            "Description": " Log Entry 71",
+            "EntryType": "Oem",
+            "Id": "71",
+            "Links": {},
+            "Message": "New device detected: Generic NVMe PCIe SSD Configuration Data(Bay 9:Enclosure Internal 0-1:PCIeExtender Slot 1)",
+            "MessageArgs": [
+                "Generic NVMe PCIe SSD Configuration Data(Bay 9:Enclosure Internal 0-1:PCIeExtender Slot 1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 71",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/70",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:43-05:00",
+            "Description": " Log Entry 70",
+            "EntryType": "Oem",
+            "Id": "70",
+            "Links": {},
+            "Message": "New device detected: Generic NVMe PCIe SSD Configuration Data(Bay 8:Enclosure Internal 0-1:PCIeExtender Slot 1)",
+            "MessageArgs": [
+                "Generic NVMe PCIe SSD Configuration Data(Bay 8:Enclosure Internal 0-1:PCIeExtender Slot 1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 70",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/69",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 69",
+            "EntryType": "Oem",
+            "Id": "69",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Processors//CPU.Socket.2"
+                }
+            },
+            "Message": "New device detected: Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz(Socket 2)",
+            "MessageArgs": [
+                "Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz(Socket 2)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 69",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/68",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 68",
+            "EntryType": "Oem",
+            "Id": "68",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Processors//CPU.Socket.1"
+                }
+            },
+            "Message": "New device detected: Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz(Socket 1)",
+            "MessageArgs": [
+                "Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz(Socket 1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 68",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/67",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 67",
+            "EntryType": "Oem",
+            "Id": "67",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket B8)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket B8)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 67",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/66",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 66",
+            "EntryType": "Oem",
+            "Id": "66",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket B7)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket B7)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 66",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/65",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 65",
+            "EntryType": "Oem",
+            "Id": "65",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket B6)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket B6)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 65",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/64",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 64",
+            "EntryType": "Oem",
+            "Id": "64",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket B5)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket B5)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 64",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/63",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 63",
+            "EntryType": "Oem",
+            "Id": "63",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket B4)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket B4)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 63",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/62",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 62",
+            "EntryType": "Oem",
+            "Id": "62",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket B3)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket B3)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 62",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/61",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 61",
+            "EntryType": "Oem",
+            "Id": "61",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket B2)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket B2)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 61",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/60",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 60",
+            "EntryType": "Oem",
+            "Id": "60",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket B1)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket B1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 60",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/59",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 59",
+            "EntryType": "Oem",
+            "Id": "59",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket A8)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket A8)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 59",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/58",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 58",
+            "EntryType": "Oem",
+            "Id": "58",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket A7)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket A7)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 58",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/57",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 57",
+            "EntryType": "Oem",
+            "Id": "57",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket A6)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket A6)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 57",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/56",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 56",
+            "EntryType": "Oem",
+            "Id": "56",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket A5)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket A5)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 56",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/55",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 55",
+            "EntryType": "Oem",
+            "Id": "55",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket A4)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket A4)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 55",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/54",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 54",
+            "EntryType": "Oem",
+            "Id": "54",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket A3)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket A3)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 54",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/53",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 53",
+            "EntryType": "Oem",
+            "Id": "53",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket A2)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket A2)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 53",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/52",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 52",
+            "EntryType": "Oem",
+            "Id": "52",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "A replacement part was detected for device: DDR4 DIMM(Socket A1)",
+            "MessageArgs": [
+                "DDR4 DIMM(Socket A1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 52",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/51",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:31:42-05:00",
+            "Description": " Log Entry 51",
+            "EntryType": "Oem",
+            "Id": "51",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 51",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/50",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:28:08-05:00",
+            "Description": " Log Entry 50",
+            "EntryType": "Oem",
+            "Id": "50",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 50",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/49",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:28:07-05:00",
+            "Description": " Log Entry 49",
+            "EntryType": "Oem",
+            "Id": "49",
+            "Links": {},
+            "Message": "Firmware update will not be performed. Firmware package is not present for POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR10",
+            "Name": " Log Entry 49",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/48",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:28:07-05:00",
+            "Description": " Log Entry 48",
+            "EntryType": "Oem",
+            "Id": "48",
+            "Links": {},
+            "Message": "New device detected: POWER SUPPLY(psu.slot.2)",
+            "MessageArgs": [
+                "POWER SUPPLY(psu.slot.2)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 48",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/47",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:28:07-05:00",
+            "Description": " Log Entry 47",
+            "EntryType": "Oem",
+            "Id": "47",
+            "Links": {},
+            "Message": "A replacement part was detected for device: POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 47",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/46",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:28:07-05:00",
+            "Description": " Log Entry 46",
+            "EntryType": "Oem",
+            "Id": "46",
+            "Links": {},
+            "Message": "Firmware update will not be performed. Firmware package is not present for POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR10",
+            "Name": " Log Entry 46",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/45",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:28:07-05:00",
+            "Description": " Log Entry 45",
+            "EntryType": "Oem",
+            "Id": "45",
+            "Links": {},
+            "Message": "New device detected: POWER SUPPLY(psu.slot.1)",
+            "MessageArgs": [
+                "POWER SUPPLY(psu.slot.1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 45",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/44",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:28:07-05:00",
+            "Description": " Log Entry 44",
+            "EntryType": "Oem",
+            "Id": "44",
+            "Links": {},
+            "Message": "A replacement part was detected for device: POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 44",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/43",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:28:07-05:00",
+            "Description": " Log Entry 43",
+            "EntryType": "Oem",
+            "Id": "43",
+            "Links": {},
+            "Message": "System is turning on.",
+            "MessageId": "SYS1000",
+            "Name": " Log Entry 43",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/42",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:27:58-05:00",
+            "Description": " Log Entry 42",
+            "EntryType": "Oem",
+            "Id": "42",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 42",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/41",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:27:58-05:00",
+            "Description": " Log Entry 41",
+            "EntryType": "Oem",
+            "Id": "41",
+            "Links": {},
+            "Message": "System is turning off.",
+            "MessageId": "SYS1001",
+            "Name": " Log Entry 41",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/40",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:27:58-05:00",
+            "Description": " Log Entry 40",
+            "EntryType": "Oem",
+            "Id": "40",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 40",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/39",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:25:58-05:00",
+            "Description": " Log Entry 39",
+            "EntryType": "Oem",
+            "Id": "39",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 39",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/38",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:25:20-05:00",
+            "Description": " Log Entry 38",
+            "EntryType": "Oem",
+            "Id": "38",
+            "Links": {},
+            "Message": "The iDRAC IP Address changed from 0.0.0.0 to 192.168.0.120.",
+            "MessageArgs": [
+                "0.0.0.0",
+                "192.168.0.120"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "IPA0100",
+            "Name": " Log Entry 38",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/37",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:25:20-05:00",
+            "Description": " Log Entry 37",
+            "EntryType": "Oem",
+            "Id": "37",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 37",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/36",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:24:21-05:00",
+            "Description": " Log Entry 36",
+            "EntryType": "Oem",
+            "Id": "36",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 36",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/35",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:21:55-05:00",
+            "Description": " Log Entry 35",
+            "EntryType": "Oem",
+            "Id": "35",
+            "Links": {},
+            "Message": "Firmware update will not be performed. Firmware package is not present for POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR10",
+            "Name": " Log Entry 35",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/34",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:21:55-05:00",
+            "Description": " Log Entry 34",
+            "EntryType": "Oem",
+            "Id": "34",
+            "Links": {},
+            "Message": "New device detected: POWER SUPPLY(psu.slot.2)",
+            "MessageArgs": [
+                "POWER SUPPLY(psu.slot.2)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 34",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/33",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:21:55-05:00",
+            "Description": " Log Entry 33",
+            "EntryType": "Oem",
+            "Id": "33",
+            "Links": {},
+            "Message": "A replacement part was detected for device: POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 33",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/32",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:21:54-05:00",
+            "Description": " Log Entry 32",
+            "EntryType": "Oem",
+            "Id": "32",
+            "Links": {},
+            "Message": "Firmware update will not be performed. Firmware package is not present for POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR10",
+            "Name": " Log Entry 32",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/31",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:21:54-05:00",
+            "Description": " Log Entry 31",
+            "EntryType": "Oem",
+            "Id": "31",
+            "Links": {},
+            "Message": "New device detected: POWER SUPPLY(psu.slot.1)",
+            "MessageArgs": [
+                "POWER SUPPLY(psu.slot.1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 31",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/30",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:21:54-05:00",
+            "Description": " Log Entry 30",
+            "EntryType": "Oem",
+            "Id": "30",
+            "Links": {},
+            "Message": "A replacement part was detected for device: POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 30",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/29",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:21:51-05:00",
+            "Description": " Log Entry 29",
+            "EntryType": "Oem",
+            "Id": "29",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "The chassis is closed while the power is on.",
+            "MessageId": "SEC0032",
+            "Name": " Log Entry 29",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/28",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:21:51-05:00",
+            "Description": " Log Entry 28",
+            "EntryType": "Oem",
+            "Id": "28",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 28",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/27",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:21:26-05:00",
+            "Description": " Log Entry 27",
+            "EntryType": "Oem",
+            "Id": "27",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 27",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/26",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:21:26-05:00",
+            "Description": " Log Entry 26",
+            "EntryType": "Oem",
+            "Id": "26",
+            "Links": {},
+            "Message": "System is turning on.",
+            "MessageId": "SYS1000",
+            "Name": " Log Entry 26",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/25",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:20:55-05:00",
+            "Description": " Log Entry 25",
+            "EntryType": "Oem",
+            "Id": "25",
+            "Links": {},
+            "Message": "Firmware update will not be performed. Firmware package is not present for POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR10",
+            "Name": " Log Entry 25",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/24",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T18:20:55-05:00",
+            "Description": " Log Entry 24",
+            "EntryType": "Oem",
+            "Id": "24",
+            "Links": {},
+            "Message": "New device detected: POWER SUPPLY(psu.slot.2)",
+            "MessageArgs": [
+                "POWER SUPPLY(psu.slot.2)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 24",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        }
+    ],
+    "Members@odata.count": 823,
+    "Members@odata.nextLink": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog?$skip=800",
+    "Name": "Log Entry Collection"
+}

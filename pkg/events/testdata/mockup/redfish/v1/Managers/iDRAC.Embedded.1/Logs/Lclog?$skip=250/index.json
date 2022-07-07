@@ -1,0 +1,1211 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntryCollection.LogEntryCollection",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog",
+    "@odata.type": "#LogEntryCollection.LogEntryCollection",
+    "Description": "LC Logs for this manager",
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/573",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:26-05:00",
+            "Description": " Log Entry 573",
+            "EntryType": "Oem",
+            "Id": "573",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 573",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/572",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:24-05:00",
+            "Description": " Log Entry 572",
+            "EntryType": "Oem",
+            "Id": "572",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using REDFISH is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 572",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/571",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:20-05:00",
+            "Description": " Log Entry 571",
+            "EntryType": "Oem",
+            "Id": "571",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 571",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/570",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:20-05:00",
+            "Description": " Log Entry 570",
+            "EntryType": "Oem",
+            "Id": "570",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 570",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/569",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:20-05:00",
+            "Description": " Log Entry 569",
+            "EntryType": "Oem",
+            "Id": "569",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 569",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/568",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:12-05:00",
+            "Description": " Log Entry 568",
+            "EntryType": "Oem",
+            "Id": "568",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using REDFISH is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 568",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/567",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:09-05:00",
+            "Description": " Log Entry 567",
+            "EntryType": "Oem",
+            "Id": "567",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 567",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/566",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:08-05:00",
+            "Description": " Log Entry 566",
+            "EntryType": "Oem",
+            "Id": "566",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 566",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/565",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:08-05:00",
+            "Description": " Log Entry 565",
+            "EntryType": "Oem",
+            "Id": "565",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 565",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/564",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:05-05:00",
+            "Description": " Log Entry 564",
+            "EntryType": "Oem",
+            "Id": "564",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using REDFISH is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 564",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/563",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:01-05:00",
+            "Description": " Log Entry 563",
+            "EntryType": "Oem",
+            "Id": "563",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 563",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/562",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:01-05:00",
+            "Description": " Log Entry 562",
+            "EntryType": "Oem",
+            "Id": "562",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 562",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/561",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:44:01-05:00",
+            "Description": " Log Entry 561",
+            "EntryType": "Oem",
+            "Id": "561",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 561",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/560",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:42:29-05:00",
+            "Description": " Log Entry 560",
+            "EntryType": "Oem",
+            "Id": "560",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using REDFISH is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 560",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/559",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:42:25-05:00",
+            "Description": " Log Entry 559",
+            "EntryType": "Oem",
+            "Id": "559",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 559",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/558",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:42:25-05:00",
+            "Description": " Log Entry 558",
+            "EntryType": "Oem",
+            "Id": "558",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 558",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/557",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:42:25-05:00",
+            "Description": " Log Entry 557",
+            "EntryType": "Oem",
+            "Id": "557",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 557",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/556",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:40:57-05:00",
+            "Description": " Log Entry 556",
+            "EntryType": "Oem",
+            "Id": "556",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using REDFISH is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 556",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/555",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:40:54-05:00",
+            "Description": " Log Entry 555",
+            "EntryType": "Oem",
+            "Id": "555",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 555",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/554",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:40:54-05:00",
+            "Description": " Log Entry 554",
+            "EntryType": "Oem",
+            "Id": "554",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 554",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/553",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:40:54-05:00",
+            "Description": " Log Entry 553",
+            "EntryType": "Oem",
+            "Id": "553",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 553",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/552",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:40:05-05:00",
+            "Description": " Log Entry 552",
+            "EntryType": "Oem",
+            "Id": "552",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using REDFISH is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 552",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/551",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:40:01-05:00",
+            "Description": " Log Entry 551",
+            "EntryType": "Oem",
+            "Id": "551",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 551",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/550",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:40:01-05:00",
+            "Description": " Log Entry 550",
+            "EntryType": "Oem",
+            "Id": "550",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 550",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/549",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:40:01-05:00",
+            "Description": " Log Entry 549",
+            "EntryType": "Oem",
+            "Id": "549",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 549",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/548",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:39:35-05:00",
+            "Description": " Log Entry 548",
+            "EntryType": "Oem",
+            "Id": "548",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using REDFISH is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 548",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/547",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:39:31-05:00",
+            "Description": " Log Entry 547",
+            "EntryType": "Oem",
+            "Id": "547",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 547",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/546",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:39:31-05:00",
+            "Description": " Log Entry 546",
+            "EntryType": "Oem",
+            "Id": "546",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 546",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/545",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:39:31-05:00",
+            "Description": " Log Entry 545",
+            "EntryType": "Oem",
+            "Id": "545",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 545",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/544",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:39:13-05:00",
+            "Description": " Log Entry 544",
+            "EntryType": "Oem",
+            "Id": "544",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using REDFISH is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 544",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/543",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:39:09-05:00",
+            "Description": " Log Entry 543",
+            "EntryType": "Oem",
+            "Id": "543",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 543",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/542",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:39:09-05:00",
+            "Description": " Log Entry 542",
+            "EntryType": "Oem",
+            "Id": "542",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 542",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/541",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:39:09-05:00",
+            "Description": " Log Entry 541",
+            "EntryType": "Oem",
+            "Id": "541",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 541",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/540",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:58-05:00",
+            "Description": " Log Entry 540",
+            "EntryType": "Oem",
+            "Id": "540",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using REDFISH is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 540",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/539",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:54-05:00",
+            "Description": " Log Entry 539",
+            "EntryType": "Oem",
+            "Id": "539",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 539",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/538",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:54-05:00",
+            "Description": " Log Entry 538",
+            "EntryType": "Oem",
+            "Id": "538",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 538",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/537",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:54-05:00",
+            "Description": " Log Entry 537",
+            "EntryType": "Oem",
+            "Id": "537",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 537",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/536",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:46-05:00",
+            "Description": " Log Entry 536",
+            "EntryType": "Oem",
+            "Id": "536",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using REDFISH is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 536",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/535",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:44-05:00",
+            "Description": " Log Entry 535",
+            "EntryType": "Oem",
+            "Id": "535",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 535",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/534",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:44-05:00",
+            "Description": " Log Entry 534",
+            "EntryType": "Oem",
+            "Id": "534",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 534",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/533",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:43-05:00",
+            "Description": " Log Entry 533",
+            "EntryType": "Oem",
+            "Id": "533",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 533",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/532",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:43-05:00",
+            "Description": " Log Entry 532",
+            "EntryType": "Oem",
+            "Id": "532",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 532",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/531",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:42-05:00",
+            "Description": " Log Entry 531",
+            "EntryType": "Oem",
+            "Id": "531",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 531",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/530",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:39-05:00",
+            "Description": " Log Entry 530",
+            "EntryType": "Oem",
+            "Id": "530",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using REDFISH is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 530",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/529",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:33-05:00",
+            "Description": " Log Entry 529",
+            "EntryType": "Oem",
+            "Id": "529",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 529",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/528",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:32-05:00",
+            "Description": " Log Entry 528",
+            "EntryType": "Oem",
+            "Id": "528",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 528",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/527",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:32-05:00",
+            "Description": " Log Entry 527",
+            "EntryType": "Oem",
+            "Id": "527",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and REDFISH.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 527",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/526",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:30-05:00",
+            "Description": " Log Entry 526",
+            "EntryType": "Oem",
+            "Id": "526",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using REDFISH is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "REDFISH"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 526",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/525",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:27-05:00",
+            "Description": " Log Entry 525",
+            "EntryType": "Oem",
+            "Id": "525",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.16.132.45 using IPMI over LAN is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 525",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/524",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-06-14T04:38:27-05:00",
+            "Description": " Log Entry 524",
+            "EntryType": "Oem",
+            "Id": "524",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+            "MessageArgs": [
+                "root",
+                "172.16.132.45",
+                "IPMI over LAN"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 524",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        }
+    ],
+    "Members@odata.count": 823,
+    "Members@odata.nextLink": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog?$skip=300",
+    "Name": "Log Entry Collection"
+}

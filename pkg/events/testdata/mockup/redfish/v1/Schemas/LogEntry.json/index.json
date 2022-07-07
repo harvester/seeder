@@ -1,0 +1,53 @@
+{
+    "$ref": "#/definitions/LogEntry",
+    "$schema": "/redfish/v1/Schemas/redfish-schema.v1_3_0.json",
+    "copyright": "Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright",
+    "definitions": {
+        "LogEntry": {
+            "anyOf": [
+                {
+                    "$ref": "/redfish/v1/Schemas/odata.v4_0_1.json#/definitions/idRef"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/LogEntry.v1_0_0.json#/definitions/LogEntry"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/LogEntry.v1_0_2.json#/definitions/LogEntry"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/LogEntry.v1_0_3.json#/definitions/LogEntry"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/LogEntry.v1_0_4.json#/definitions/LogEntry"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/LogEntry.v1_0_5.json#/definitions/LogEntry"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/LogEntry.v1_1_0.json#/definitions/LogEntry"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/LogEntry.v1_1_1.json#/definitions/LogEntry"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/LogEntry.v1_1_2.json#/definitions/LogEntry"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/LogEntry.v1_1_3.json#/definitions/LogEntry"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/LogEntry.v1_2_0.json#/definitions/LogEntry"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/LogEntry.v1_2_1.json#/definitions/LogEntry"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/LogEntry.v1_3_0.json#/definitions/LogEntry"
+                }
+            ],
+            "description": "This resource defines the record format for a log.  It is designed to be used for SEL logs (from IPMI) as well as Event Logs and OEM-specific log formats.  The EntryType field indicates the type of log and the resource includes several additional properties dependent on the EntryType.",
+            "longDescription": "This resource shall represent the log format for log services in a Redfish implementation."
+        }
+    },
+    "title": "#LogEntry.LogEntry"
+}

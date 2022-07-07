@@ -1,0 +1,32 @@
+{
+    "$ref": "#/definitions/SoftwareInventory",
+    "$schema": "/redfish/v1/Schemas/redfish-schema.v1_3_0.json",
+    "copyright": "Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright",
+    "definitions": {
+        "SoftwareInventory": {
+            "anyOf": [
+                {
+                    "$ref": "/redfish/v1/Schemas/odata.v4_0_1.json#/definitions/idRef"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/SoftwareInventory.v1_0_0.json#/definitions/SoftwareInventory"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/SoftwareInventory.v1_0_1.json#/definitions/SoftwareInventory"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/SoftwareInventory.v1_0_2.json#/definitions/SoftwareInventory"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/SoftwareInventory.v1_1_0.json#/definitions/SoftwareInventory"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/SoftwareInventory.v1_1_1.json#/definitions/SoftwareInventory"
+                }
+            ],
+            "description": "This schema defines an inventory of software components.",
+            "longDescription": "This resource shall be used to represent a single software component managed by this Redfish Service."
+        }
+    },
+    "title": "#SoftwareInventory.SoftwareInventory"
+}

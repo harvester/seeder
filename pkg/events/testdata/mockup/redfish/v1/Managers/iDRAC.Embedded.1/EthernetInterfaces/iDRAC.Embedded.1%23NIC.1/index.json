@@ -1,0 +1,149 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#EthernetInterface.EthernetInterface",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/EthernetInterfaces/iDRAC.Embedded.1%23NIC.1",
+    "@odata.type": "#EthernetInterface.v1_4_0.EthernetInterface",
+    "AutoNeg": true,
+    "Description": "Management Network Interface",
+    "FQDN": "",
+    "FullDuplex": true,
+    "HostName": "idrac-BYBG282",
+    "IPv4Addresses": [
+        {
+            "Address": "172.19.0.10",
+            "AddressOrigin": "DHCP",
+            "Gateway": "172.19.0.1",
+            "SubnetMask": "255.255.254.0"
+        }
+    ],
+    "IPv4Addresses@odata.count": 1,
+    "IPv6AddressPolicyTable": [],
+    "IPv6AddressPolicyTable@odata.count": 0,
+    "IPv6Addresses": [
+        {
+            "Address": "::",
+            "AddressOrigin": "Static",
+            "AddressState": "Preferred",
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": "DHCPv6",
+            "AddressState": "Failed",
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        },
+        {
+            "Address": "::",
+            "AddressOrigin": null,
+            "AddressState": null,
+            "PrefixLength": 64
+        }
+    ],
+    "IPv6Addresses@odata.count": 15,
+    "IPv6DefaultGateway": "::",
+    "IPv6StaticAddresses": [
+        {
+            "Address": "::",
+            "PrefixLength": 64
+        }
+    ],
+    "IPv6StaticAddresses@odata.count": 1,
+    "Id": "iDRAC.Embedded.1#NIC.1",
+    "InterfaceEnabled": true,
+    "MACAddress": "64:00:6A:C1:E7:F6",
+    "MTUSize": 1500,
+    "MaxIPv6StaticAddresses": 16,
+    "Name": "Manager Ethernet Interface",
+    "NameServers": [
+        "0.0.0.0",
+        "0.0.0.0",
+        "0.0.0.0",
+        "0.0.0.0",
+        "::",
+        "::",
+        "::",
+        "::"
+    ],
+    "NameServers@odata.count": 8,
+    "PermanentMACAddress": "64:00:6A:C1:E7:F6",
+    "SpeedMbps": 1000,
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    },
+    "VLAN": {
+        "VLANEnable": false,
+        "VLANId": 1
+    }
+}

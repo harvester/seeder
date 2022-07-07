@@ -1,0 +1,80 @@
+{
+    "$ref": "#/definitions/Manager",
+    "$schema": "/redfish/v1/Schemas/redfish-schema.v1_3_0.json",
+    "copyright": "Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright",
+    "definitions": {
+        "Manager": {
+            "anyOf": [
+                {
+                    "$ref": "/redfish/v1/Schemas/odata.v4_0_1.json#/definitions/idRef"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_0_0.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_0_1.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_0_2.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_0_3.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_0_4.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_0_5.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_0_6.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_1_0.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_1_1.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_1_2.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_1_3.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_1_4.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_2_0.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_2_1.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_2_2.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_2_3.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_2_4.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_3_0.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_3_1.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_3_2.json#/definitions/Manager"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Manager.v1_3_3.json#/definitions/Manager"
+                }
+            ],
+            "description": "In Redfish, a Manager is a systems management entity which may implement or provide access to a Redfish service.  Examples of managers are BMCs, Enclosure Managers, Management Controllers and other subsystems assigned managability functions.  There may be multiple Managers in an implementation, and they may or may not be directly accessible via a Redfish-defined interface.",
+            "longDescription": "This resource shall be used to represent a management subsystem for a Redfish implementation."
+        }
+    },
+    "title": "#Manager.Manager"
+}

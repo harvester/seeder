@@ -1,0 +1,44 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#PCIeDevice.PCIeDevice",
+    "@odata.etag": "1655847839",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeDevice/1-0",
+    "@odata.type": "#PCIeDevice.v1_2_0.PCIeDevice",
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+    },
+    "AssetTag": null,
+    "Description": "Gigabit 4P I350-t rNDC",
+    "DeviceType": "SingleFunction",
+    "FirmwareVersion": "19.5.12",
+    "Id": "1-0",
+    "Links": {
+        "Chassis": [],
+        "Chassis@odata.count": 0,
+        "PCIeFunctions": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/1-0-0"
+            },
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/1-0-1"
+            },
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/1-0-2"
+            },
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/1-0-3"
+            }
+        ],
+        "PCIeFunctions@odata.count": 4
+    },
+    "Manufacturer": "Intel Corporation",
+    "Model": null,
+    "Name": "Gigabit 4P I350-t rNDC",
+    "PartNumber": "0R1XFC",
+    "SKU": null,
+    "SerialNumber": "MY124025AG00Z5",
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    }
+}

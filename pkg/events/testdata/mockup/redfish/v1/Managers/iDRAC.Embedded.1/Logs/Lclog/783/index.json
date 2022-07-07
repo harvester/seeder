@@ -1,0 +1,25 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/783",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-06-30T05:48:52-05:00",
+    "Description": " Log Entry 783",
+    "EntryType": "Oem",
+    "Id": "783",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+        }
+    },
+    "Message": "Unable to log in for calvin from 172.16.31.2 using GUI.",
+    "MessageArgs": [
+        "calvin",
+        "172.16.31.2",
+        "GUI"
+    ],
+    "MessageArgs@odata.count": 3,
+    "MessageId": "USR0031",
+    "Name": " Log Entry 783",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

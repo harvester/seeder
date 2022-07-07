@@ -19,14 +19,18 @@ package controllers
 import (
 	"context"
 	"fmt"
+
 	"github.com/go-logr/logr"
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/tink"
 	"github.com/harvester/seeder/pkg/util"
 	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	typedCore "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/tools/clientcmd"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -76,6 +80,7 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		r.patchNodesAndPools,
 		r.createTinkerbellHardware,
 		r.reconcileNodes,
+		r.markClusterReady,
 	}
 	deletionReconcileList := []clusterReconciler{
 		r.cleanupClusterDeps,
@@ -150,7 +155,7 @@ func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, c *seeder
 // patchNodes will patch the node information and associate appropriate events to trigger
 // tinkerbell workflows to be generated and reboot initiated
 func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *seederv1alpha1.Cluster) error {
-	if c.Status.Status == seederv1alpha1.ClusterConfigReady {
+	if c.Status.Status == seederv1alpha1.ClusterConfigReady && len(c.Spec.Nodes) > 0 {
 		for n, nc := range c.Spec.Nodes {
 			pool := &seederv1alpha1.AddressPool{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: nc.AddressPoolReference.Namespace,
@@ -250,7 +255,7 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *seederv1a
 
 // createTinkerbellHardware will create hardware objects for all nodes in the cluster
 func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *seederv1alpha1.Cluster) error {
-	if c.Status.Status == seederv1alpha1.ClusterNodesPatched || c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted {
+	if c.Status.Status == seederv1alpha1.ClusterNodesPatched || c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted || c.Status.Status == seederv1alpha1.ClusterRunning {
 		for _, i := range c.Spec.Nodes {
 			var hardwareUpdated bool
 			inventory := &seederv1alpha1.Inventory{}
@@ -322,7 +327,7 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *see
 // removed from the cluster
 func (r *ClusterReconciler) reconcileNodes(ctx context.Context, c *seederv1alpha1.Cluster) error {
 
-	if c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted {
+	if c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted || c.Status.Status == seederv1alpha1.ClusterRunning {
 		items, err := util.ListInventoryAllocatedtoCluster(ctx, r.Client, c)
 		if err != nil {
 			return err
@@ -493,6 +498,32 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *seederv1a
 	return nil
 }
 
+// markClusterReady will use the cluster endpoint and token to try and generate a kubeconfig for target cluster
+// and will mark cluster running when the kubeconfig can be generated
+func (r *ClusterReconciler) markClusterReady(ctx context.Context, c *seederv1alpha1.Cluster) error {
+	// no need to reconcile until the hardware has been submitted
+	if c.Status.Status != seederv1alpha1.ClusterTinkHardwareSubmitted {
+		return nil
+	}
+
+	typedClient, err := genCoreTypedClient(ctx, c)
+	if err != nil {
+		return err
+	}
+
+	nl, err := typedClient.Nodes().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		return err
+	}
+
+	if len(nl.Items) < 1 {
+		return fmt.Errorf("api server is running but waiting for one of the nodes to be available")
+	}
+
+	c.Status.Status = seederv1alpha1.ClusterRunning
+	return r.Status().Update(ctx, c)
+}
+
 // SetupWithManager sets up the controller with the Manager.
 func (r *ClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
@@ -513,4 +544,28 @@ func (r *ClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 			return reconRequest
 		})).
 		Complete(r)
+}
+
+func genCoreTypedClient(ctx context.Context, c *seederv1alpha1.Cluster) (*typedCore.CoreV1Client, error) {
+	port, ok := c.Labels[seederv1alpha1.OverrideAPIPortLabel]
+	if !ok {
+		port = seederv1alpha1.DefaultAPIPort
+	}
+
+	kcBytes, err := util.GenerateKubeConfig(fmt.Sprintf("https://%s:%s", c.Status.ClusterAddress, port), seederv1alpha1.DefaultAPIPrefix, c.Status.ClusterToken)
+	if err != nil {
+		return nil, err
+	}
+
+	hcClientConfig, err := clientcmd.NewClientConfigFromBytes(kcBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	restConfig, err := hcClientConfig.ClientConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	return typedCore.NewForConfig(restConfig)
 }

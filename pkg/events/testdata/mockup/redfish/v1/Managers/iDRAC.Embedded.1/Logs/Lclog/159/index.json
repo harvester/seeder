@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/159",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-05T18:52:57-05:00",
+    "Description": " Log Entry 159",
+    "EntryType": "Oem",
+    "Id": "159",
+    "Links": {},
+    "Message": "A replacement part was detected for device: POWER SUPPLY",
+    "MessageArgs": [
+        "POWER SUPPLY"
+    ],
+    "MessageArgs@odata.count": 1,
+    "MessageId": "PR1",
+    "Name": " Log Entry 159",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

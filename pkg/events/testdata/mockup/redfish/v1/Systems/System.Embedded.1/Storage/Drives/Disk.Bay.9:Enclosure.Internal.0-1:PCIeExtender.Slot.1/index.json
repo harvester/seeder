@@ -1,0 +1,57 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Drive.Drive",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/Drives/Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1",
+    "@odata.type": "#Drive.v1_3_0.Drive",
+    "Actions": {
+        "#Drive.SecureErase": {
+            "target": "/redfish/v1/Systems/System.Embedded.1/Storage/Drives/Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1/Actions/Drive.SecureErase"
+        }
+    },
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+    },
+    "BlockSizeBytes": 0,
+    "CapableSpeedGbs": 0.0,
+    "CapacityBytes": 0,
+    "Description": "PCIe SSD in Slot 9 in Bay 1",
+    "EncryptionAbility": "None",
+    "EncryptionStatus": "Unencrypted",
+    "FailurePredicted": false,
+    "HotspareType": "None",
+    "Id": "Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1",
+    "Identifiers": [
+        {
+            "DurableName": null,
+            "DurableNameFormat": null
+        }
+    ],
+    "Links": {
+        "Chassis": {
+            "@odata.id": "/redfish/v1/Chassis/Enclosure.Internal.0-1:PCIeExtender.Slot.1"
+        },
+        "Volumes": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/Volumes/Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1"
+            }
+        ],
+        "Volumes@odata.count": 1
+    },
+    "Location": [],
+    "Manufacturer": "SAMSUNG",
+    "MediaType": "SSD",
+    "Model": "SAMSUNG MZQLB1T9HAJR-00007",
+    "Name": "PCIe SSD in Slot 9 in Bay 1",
+    "NegotiatedSpeedGbs": 0.0,
+    "Operations": [],
+    "PartNumber": "",
+    "PredictedMediaLifeLeftPercent": null,
+    "Protocol": "PCIe",
+    "Revision": "EDA5402Q",
+    "RotationSpeedRPM": 0,
+    "SerialNumber": "",
+    "Status": {
+        "Health": null,
+        "HealthRollup": null,
+        "State": "Enabled"
+    }
+}

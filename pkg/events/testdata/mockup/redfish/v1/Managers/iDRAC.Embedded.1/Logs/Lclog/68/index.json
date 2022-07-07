@@ -1,0 +1,23 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/68",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-04T18:31:42-05:00",
+    "Description": " Log Entry 68",
+    "EntryType": "Oem",
+    "Id": "68",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Processors//CPU.Socket.1"
+        }
+    },
+    "Message": "New device detected: Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz(Socket 1)",
+    "MessageArgs": [
+        "Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz(Socket 1)"
+    ],
+    "MessageArgs@odata.count": 1,
+    "MessageId": "PR7",
+    "Name": " Log Entry 68",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

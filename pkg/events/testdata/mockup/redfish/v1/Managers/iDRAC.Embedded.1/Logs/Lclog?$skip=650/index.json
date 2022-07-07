@@ -1,0 +1,879 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntryCollection.LogEntryCollection",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog",
+    "@odata.type": "#LogEntryCollection.LogEntryCollection",
+    "Description": "LC Logs for this manager",
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/173",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-06T19:20:22-05:00",
+            "Description": " Log Entry 173",
+            "EntryType": "Oem",
+            "Id": "173",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Power Supply 1: Status = 0x00, IOUT = 0x0, VOUT= 0x0, TEMP= 0x0, FAN = 0x0, INPUT= 0x0.",
+            "MessageArgs": [
+                "1",
+                "00",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0"
+            ],
+            "MessageArgs@odata.count": 7,
+            "MessageId": "PSU0800",
+            "Name": " Log Entry 173",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/172",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T19:49:25-05:00",
+            "Description": " Log Entry 172",
+            "EntryType": "Oem",
+            "Id": "172",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 172",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/171",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T19:49:24-05:00",
+            "Description": " Log Entry 171",
+            "EntryType": "Oem",
+            "Id": "171",
+            "Links": {},
+            "Message": "System is turning off.",
+            "MessageId": "SYS1001",
+            "Name": " Log Entry 171",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/170",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T19:49:25-05:00",
+            "Description": " Log Entry 170",
+            "EntryType": "Oem",
+            "Id": "170",
+            "Links": {},
+            "Message": "The previous log entry was repeated 5 times.",
+            "MessageArgs": [
+                "5"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 170",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/169",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T19:02:33-05:00",
+            "Description": " Log Entry 169",
+            "EntryType": "Oem",
+            "Id": "169",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 169",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/168",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T19:02:32-05:00",
+            "Description": " Log Entry 168",
+            "EntryType": "Oem",
+            "Id": "168",
+            "Links": {},
+            "Message": "System is turning on.",
+            "MessageId": "SYS1000",
+            "Name": " Log Entry 168",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/167",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T19:02:23-05:00",
+            "Description": " Log Entry 167",
+            "EntryType": "Oem",
+            "Id": "167",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 167",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/166",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T19:02:23-05:00",
+            "Description": " Log Entry 166",
+            "EntryType": "Oem",
+            "Id": "166",
+            "Links": {},
+            "Message": "System is turning off.",
+            "MessageId": "SYS1001",
+            "Name": " Log Entry 166",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/165",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T19:02:23-05:00",
+            "Description": " Log Entry 165",
+            "EntryType": "Oem",
+            "Id": "165",
+            "Links": {},
+            "Message": "The previous log entry was repeated 3 times.",
+            "MessageArgs": [
+                "3"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 165",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/164",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:54:57-05:00",
+            "Description": " Log Entry 164",
+            "EntryType": "Oem",
+            "Id": "164",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 164",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/163",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:54:49-05:00",
+            "Description": " Log Entry 163",
+            "EntryType": "Oem",
+            "Id": "163",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "New PCI card(s) have been detected in the system. Fan speeds may have changed to add additional cooling to the cards.",
+            "MessageId": "PCI3018",
+            "Name": " Log Entry 163",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/162",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:54:08-05:00",
+            "Description": " Log Entry 162",
+            "EntryType": "Oem",
+            "Id": "162",
+            "Links": {},
+            "Message": "The iDRAC IP Address changed from 0.0.0.0 to 192.168.0.120.",
+            "MessageArgs": [
+                "0.0.0.0",
+                "192.168.0.120"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "IPA0100",
+            "Name": " Log Entry 162",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/161",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:52:57-05:00",
+            "Description": " Log Entry 161",
+            "EntryType": "Oem",
+            "Id": "161",
+            "Links": {},
+            "Message": "Firmware update will not be performed. Firmware package is not present for POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR10",
+            "Name": " Log Entry 161",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/160",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:52:57-05:00",
+            "Description": " Log Entry 160",
+            "EntryType": "Oem",
+            "Id": "160",
+            "Links": {},
+            "Message": "New device detected: POWER SUPPLY(psu.slot.2)",
+            "MessageArgs": [
+                "POWER SUPPLY(psu.slot.2)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 160",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/159",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:52:57-05:00",
+            "Description": " Log Entry 159",
+            "EntryType": "Oem",
+            "Id": "159",
+            "Links": {},
+            "Message": "A replacement part was detected for device: POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 159",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/158",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:52:57-05:00",
+            "Description": " Log Entry 158",
+            "EntryType": "Oem",
+            "Id": "158",
+            "Links": {},
+            "Message": "Firmware update will not be performed. Firmware package is not present for POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR10",
+            "Name": " Log Entry 158",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/157",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:52:57-05:00",
+            "Description": " Log Entry 157",
+            "EntryType": "Oem",
+            "Id": "157",
+            "Links": {},
+            "Message": "New device detected: POWER SUPPLY(psu.slot.1)",
+            "MessageArgs": [
+                "POWER SUPPLY(psu.slot.1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 157",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/156",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:52:57-05:00",
+            "Description": " Log Entry 156",
+            "EntryType": "Oem",
+            "Id": "156",
+            "Links": {},
+            "Message": "A replacement part was detected for device: POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 156",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/155",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:52:42-05:00",
+            "Description": " Log Entry 155",
+            "EntryType": "Oem",
+            "Id": "155",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Auto Discovery feature disabled.",
+            "MessageId": "DIS002",
+            "Name": " Log Entry 155",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/154",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:52:42-05:00",
+            "Description": " Log Entry 154",
+            "EntryType": "Oem",
+            "Id": "154",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 154",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/153",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:52:38-05:00",
+            "Description": " Log Entry 153",
+            "EntryType": "Oem",
+            "Id": "153",
+            "Links": {},
+            "Message": "The iDRAC firmware was rebooted with the following reason: ac.",
+            "MessageArgs": [
+                "ac"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "RAC0182",
+            "Name": " Log Entry 153",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/152",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:52:06-05:00",
+            "Description": " Log Entry 152",
+            "EntryType": "Oem",
+            "Id": "152",
+            "Links": {},
+            "Message": "Device not detected: Generic NVMe PCIe SSD Configuration Data(Bay 8:Enclosure Internal 0-1:PCIeExtender Slot 1)",
+            "MessageArgs": [
+                "Generic NVMe PCIe SSD Configuration Data(Bay 8:Enclosure Internal 0-1:PCIeExtender Slot 1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR8",
+            "Name": " Log Entry 152",
+            "OemRecordFormat": "Dell",
+            "Severity": "Warning"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/151",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:52:06-05:00",
+            "Description": " Log Entry 151",
+            "EntryType": "Oem",
+            "Id": "151",
+            "Links": {},
+            "Message": "New device detected: Disk(Bay 9:Enclosure Internal 0-1:PCIeExtender Slot 1)",
+            "MessageArgs": [
+                "Disk(Bay 9:Enclosure Internal 0-1:PCIeExtender Slot 1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 151",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/150",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:50:49-05:00",
+            "Description": " Log Entry 150",
+            "EntryType": "Oem",
+            "Id": "150",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Power Supply 2: Status = 0x00, IOUT = 0x0, VOUT= 0x0, TEMP= 0x0, FAN = 0x0, INPUT= 0x0.",
+            "MessageArgs": [
+                "2",
+                "00",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0"
+            ],
+            "MessageArgs@odata.count": 7,
+            "MessageId": "PSU0800",
+            "Name": " Log Entry 150",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/149",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-05T18:50:49-05:00",
+            "Description": " Log Entry 149",
+            "EntryType": "Oem",
+            "Id": "149",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Power Supply 1: Status = 0x00, IOUT = 0x0, VOUT= 0x0, TEMP= 0x0, FAN = 0x0, INPUT= 0x0.",
+            "MessageArgs": [
+                "1",
+                "00",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0"
+            ],
+            "MessageArgs@odata.count": 7,
+            "MessageId": "PSU0800",
+            "Name": " Log Entry 149",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/148",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T22:20:14-05:00",
+            "Description": " Log Entry 148",
+            "EntryType": "Oem",
+            "Id": "148",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 148",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/147",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T22:20:14-05:00",
+            "Description": " Log Entry 147",
+            "EntryType": "Oem",
+            "Id": "147",
+            "Links": {},
+            "Message": "System is turning off.",
+            "MessageId": "SYS1001",
+            "Name": " Log Entry 147",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/146",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T22:20:14-05:00",
+            "Description": " Log Entry 146",
+            "EntryType": "Oem",
+            "Id": "146",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 146",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/145",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:40:40-05:00",
+            "Description": " Log Entry 145",
+            "EntryType": "Oem",
+            "Id": "145",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 145",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/144",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:35:19-05:00",
+            "Description": " Log Entry 144",
+            "EntryType": "Oem",
+            "Id": "144",
+            "Links": {},
+            "Message": "One or more keys in the keyboard is stuck and not functional.",
+            "MessageArgs": [],
+            "MessageArgs@odata.count": 0,
+            "MessageId": "UEFI0047",
+            "Name": " Log Entry 144",
+            "OemRecordFormat": "Dell",
+            "Severity": "Warning"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/143",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:34:11-05:00",
+            "Description": " Log Entry 143",
+            "EntryType": "Oem",
+            "Id": "143",
+            "Links": {},
+            "Message": "Drive 9 is installed in disk drive bay 1.",
+            "MessageArgs": [
+                "9",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "PDR1000",
+            "Name": " Log Entry 143",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/142",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:34:11-05:00",
+            "Description": " Log Entry 142",
+            "EntryType": "Oem",
+            "Id": "142",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 142",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/141",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:34:04-05:00",
+            "Description": " Log Entry 141",
+            "EntryType": "Oem",
+            "Id": "141",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 141",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/140",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:34:03-05:00",
+            "Description": " Log Entry 140",
+            "EntryType": "Oem",
+            "Id": "140",
+            "Links": {},
+            "Message": "Drive 7 is removed from disk drive bay 1.",
+            "MessageArgs": [
+                "7",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "PDR1016",
+            "Name": " Log Entry 140",
+            "OemRecordFormat": "Dell",
+            "Severity": "Critical"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/139",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:34:03-05:00",
+            "Description": " Log Entry 139",
+            "EntryType": "Oem",
+            "Id": "139",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 139",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/138",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:31:02-05:00",
+            "Description": " Log Entry 138",
+            "EntryType": "Oem",
+            "Id": "138",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 138",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/137",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:31:01-05:00",
+            "Description": " Log Entry 137",
+            "EntryType": "Oem",
+            "Id": "137",
+            "Links": {},
+            "Message": "System is turning on.",
+            "MessageId": "SYS1000",
+            "Name": " Log Entry 137",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/136",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:30:52-05:00",
+            "Description": " Log Entry 136",
+            "EntryType": "Oem",
+            "Id": "136",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 136",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/135",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:30:52-05:00",
+            "Description": " Log Entry 135",
+            "EntryType": "Oem",
+            "Id": "135",
+            "Links": {},
+            "Message": "System is turning off.",
+            "MessageId": "SYS1001",
+            "Name": " Log Entry 135",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/134",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:30:52-05:00",
+            "Description": " Log Entry 134",
+            "EntryType": "Oem",
+            "Id": "134",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 134",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/133",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:27:20-05:00",
+            "Description": " Log Entry 133",
+            "EntryType": "Oem",
+            "Id": "133",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 133",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/132",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:26:35-05:00",
+            "Description": " Log Entry 132",
+            "EntryType": "Oem",
+            "Id": "132",
+            "Links": {},
+            "Message": "Device not detected: Generic NVMe PCIe SSD Configuration Data(Bay 9:Enclosure Internal 0-1:PCIeExtender Slot 1)",
+            "MessageArgs": [
+                "Generic NVMe PCIe SSD Configuration Data(Bay 9:Enclosure Internal 0-1:PCIeExtender Slot 1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR8",
+            "Name": " Log Entry 132",
+            "OemRecordFormat": "Dell",
+            "Severity": "Warning"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/131",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:26:35-05:00",
+            "Description": " Log Entry 131",
+            "EntryType": "Oem",
+            "Id": "131",
+            "Links": {},
+            "Message": "New device detected: Generic NVMe PCIe SSD Configuration Data(Bay 7:Enclosure Internal 0-1:PCIeExtender Slot 1)",
+            "MessageArgs": [
+                "Generic NVMe PCIe SSD Configuration Data(Bay 7:Enclosure Internal 0-1:PCIeExtender Slot 1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 131",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/130",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:24:27-05:00",
+            "Description": " Log Entry 130",
+            "EntryType": "Oem",
+            "Id": "130",
+            "Links": {},
+            "Message": "Drive 9 is removed from disk drive bay 1.",
+            "MessageArgs": [
+                "9",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "PDR1016",
+            "Name": " Log Entry 130",
+            "OemRecordFormat": "Dell",
+            "Severity": "Critical"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/129",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:23:52-05:00",
+            "Description": " Log Entry 129",
+            "EntryType": "Oem",
+            "Id": "129",
+            "Links": {},
+            "Message": "Drive 9 is installed in disk drive bay 1.",
+            "MessageArgs": [
+                "9",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "PDR1000",
+            "Name": " Log Entry 129",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/128",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:23:52-05:00",
+            "Description": " Log Entry 128",
+            "EntryType": "Oem",
+            "Id": "128",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 128",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/127",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:23:51-05:00",
+            "Description": " Log Entry 127",
+            "EntryType": "Oem",
+            "Id": "127",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 127",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/126",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:17:21-05:00",
+            "Description": " Log Entry 126",
+            "EntryType": "Oem",
+            "Id": "126",
+            "Links": {},
+            "Message": "Drive 9 is removed from disk drive bay 1.",
+            "MessageArgs": [
+                "9",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "PDR1016",
+            "Name": " Log Entry 126",
+            "OemRecordFormat": "Dell",
+            "Severity": "Critical"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/125",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:15:31-05:00",
+            "Description": " Log Entry 125",
+            "EntryType": "Oem",
+            "Id": "125",
+            "Links": {},
+            "Message": "Drive 9 is installed in disk drive bay 1.",
+            "MessageArgs": [
+                "9",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "PDR1000",
+            "Name": " Log Entry 125",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/124",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-04T20:11:51-05:00",
+            "Description": " Log Entry 124",
+            "EntryType": "Oem",
+            "Id": "124",
+            "Links": {},
+            "Message": "Drive 9 is removed from disk drive bay 1.",
+            "MessageArgs": [
+                "9",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "PDR1016",
+            "Name": " Log Entry 124",
+            "OemRecordFormat": "Dell",
+            "Severity": "Critical"
+        }
+    ],
+    "Members@odata.count": 823,
+    "Members@odata.nextLink": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog?$skip=700",
+    "Name": "Log Entry Collection"
+}

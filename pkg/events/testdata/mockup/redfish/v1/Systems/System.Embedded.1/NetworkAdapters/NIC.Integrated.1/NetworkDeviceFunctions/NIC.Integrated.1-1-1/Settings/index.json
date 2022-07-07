@@ -1,0 +1,74 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#NetworkDeviceFunction.NetworkDeviceFunction",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkDeviceFunctions/NIC.Integrated.1-1-1/Settings",
+    "@odata.type": "#NetworkDeviceFunction.v1_2_0.NetworkDeviceFunction",
+    "AssignablePhysicalPorts": [
+        {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkPorts/NIC.Integrated.1-1"
+        }
+    ],
+    "AssignablePhysicalPorts@odata.count": 1,
+    "Description": "NetworkDeviceFunction",
+    "Ethernet": {
+        "MACAddress": "00:00:00:00:00:00",
+        "MTUSize": null,
+        "PermanentMACAddress": "EC:F4:BB:F0:46:54"
+    },
+    "FibreChannel": {
+        "BootTargets": [
+            {
+                "LUNID": null,
+                "WWPN": null
+            }
+        ],
+        "FCoEActiveVLANId": 0,
+        "FCoELocalVLANId": null,
+        "PermanentWWNN": null,
+        "PermanentWWPN": null,
+        "WWNN": null,
+        "WWNSource": "ProvidedByFabric",
+        "WWPN": null
+    },
+    "Id": "NIC.Integrated.1-1-1",
+    "MaxVirtualFunctions": 0,
+    "Name": "NetworkDeviceFunction",
+    "NetDevFuncCapabilities": [
+        "Disabled",
+        "Ethernet"
+    ],
+    "NetDevFuncType": "Ethernet",
+    "PhysicalPortAssignment": {
+        "@odata.id": "/redfish/v1/Systems/System.Embedded.1/NetworkAdapters/NIC.Integrated.1/NetworkPorts/NIC.Integrated.1-1"
+    },
+    "Status": {
+        "Health": null,
+        "HealthRollup": null,
+        "State": "Enabled"
+    },
+    "iSCSIBoot": {
+        "AuthenticationMethod": "None",
+        "CHAPSecret": "",
+        "CHAPUsername": "",
+        "IPAddressType": "IPv4",
+        "IPMaskDNSViaDHCP": true,
+        "InitiatorDefaultGateway": "0.0.0.0",
+        "InitiatorIPAddress": "0.0.0.0",
+        "InitiatorName": "",
+        "InitiatorNetmask": "0.0.0.0",
+        "PrimaryDNS": null,
+        "PrimaryLUN": 0,
+        "PrimaryTargetIPAddress": "0.0.0.0",
+        "PrimaryTargetName": "",
+        "PrimaryTargetTCPPort": 3260,
+        "PrimaryVLANEnable": null,
+        "PrimaryVLANId": null,
+        "SecondaryDNS": null,
+        "SecondaryLUN": null,
+        "SecondaryTargetIPAddress": null,
+        "SecondaryTargetName": null,
+        "SecondaryTargetTCPPort": null,
+        "SecondaryVLANEnable": null,
+        "SecondaryVLANId": null,
+        "TargetInfoViaDHCP": true
+    }
+}

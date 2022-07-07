@@ -1,0 +1,25 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/768",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-06-28T14:58:11-05:00",
+    "Description": " Log Entry 768",
+    "EntryType": "Oem",
+    "Id": "768",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+        }
+    },
+    "Message": "Successfully logged in using root, from 172.16.132.45 and IPMI over LAN.",
+    "MessageArgs": [
+        "root",
+        "172.16.132.45",
+        "IPMI over LAN"
+    ],
+    "MessageArgs@odata.count": 3,
+    "MessageId": "USR0030",
+    "Name": " Log Entry 768",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

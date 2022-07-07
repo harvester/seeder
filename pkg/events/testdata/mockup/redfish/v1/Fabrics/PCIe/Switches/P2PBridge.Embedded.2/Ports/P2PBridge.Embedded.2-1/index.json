@@ -1,0 +1,20 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Port.Port",
+    "@odata.etag": "1655847842",
+    "@odata.id": "/redfish/v1/Fabrics/PCIe/Switches/P2PBridge.Embedded.2/Ports/P2PBridge.Embedded.2-1",
+    "@odata.type": "#Port.v1_1_0.Port",
+    "CurrentSpeedGbps": 63.01538461538462,
+    "Description": "Xeon E7 v3/Xeon E5 v3/Core i7 PCI Express Root Port 1",
+    "Id": "0-1-0",
+    "MaxSpeedGbps": 63.01538461538462,
+    "Name": "P2PBridge.Embedded.2-1",
+    "PortId": "0-1-0",
+    "PortProtocol": "PCIe",
+    "PortType": null,
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    },
+    "Width": 8
+}

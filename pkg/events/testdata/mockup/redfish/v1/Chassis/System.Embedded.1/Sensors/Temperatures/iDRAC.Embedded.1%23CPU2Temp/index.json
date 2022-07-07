@@ -1,0 +1,28 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Thermal.Thermal",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Sensors/Temperatures/iDRAC.Embedded.1%23CPU2Temp",
+    "@odata.type": "#Thermal.v1_4_0.Temperature",
+    "LowerThresholdCritical": 3,
+    "LowerThresholdFatal": 3,
+    "LowerThresholdNonCritical": 8,
+    "MaxReadingRangeTemp": 84,
+    "MemberId": "iDRAC.Embedded.1#CPU2Temp",
+    "MinReadingRangeTemp": 3,
+    "Name": "CPU2 Temp",
+    "PhysicalContext": "CPU",
+    "ReadingCelsius": 48,
+    "RelatedItem": [
+        {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Processors/CPU.Socket.2"
+        }
+    ],
+    "RelatedItem@odata.count": 1,
+    "SensorNumber": 15,
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    },
+    "UpperThresholdCritical": 84,
+    "UpperThresholdFatal": 84,
+    "UpperThresholdNonCritical": 79
+}

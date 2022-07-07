@@ -1,0 +1,34 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#PCIeFunction.PCIeFunction",
+    "@odata.etag": "1655847839",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/0-0-0",
+    "@odata.type": "#PCIeFunction.v1_1_1.PCIeFunction",
+    "ClassCode": "0x000006",
+    "Description": "Xeon E7 v3/Xeon E5 v3/Core i7 DMI2",
+    "DeviceClass": "Bridge",
+    "DeviceId": "0x2f00",
+    "FunctionId": 0,
+    "FunctionType": "Physical",
+    "Id": "0-0-0",
+    "Links": {
+        "Drives": [],
+        "Drives@odata.count": 0,
+        "EthernetInterfaces": [],
+        "EthernetInterfaces@odata.count": 0,
+        "PCIeDevice": {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeDevice/0-0"
+        },
+        "StorageControllers": [],
+        "StorageControllers@odata.count": 0
+    },
+    "Name": "Xeon E7 v3/Xeon E5 v3/Core i7 DMI2",
+    "RevisionId": "0x02",
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    },
+    "SubsystemId": "0x0000",
+    "SubsystemVendorId": "0x8086",
+    "VendorId": "0x8086"
+}

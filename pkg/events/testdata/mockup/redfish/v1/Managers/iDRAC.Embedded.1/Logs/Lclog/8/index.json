@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/8",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2021-02-17T10:00:09-06:00",
+    "Description": " Log Entry 8",
+    "EntryType": "Oem",
+    "Id": "8",
+    "Links": {},
+    "Message": "New device detected: POWER SUPPLY(psu.slot.1)",
+    "MessageArgs": [
+        "POWER SUPPLY(psu.slot.1)"
+    ],
+    "MessageArgs@odata.count": 1,
+    "MessageId": "PR7",
+    "Name": " Log Entry 8",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

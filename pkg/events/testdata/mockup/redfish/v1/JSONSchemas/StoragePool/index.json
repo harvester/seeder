@@ -1,0 +1,21 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#JsonSchemaFile.JsonSchemaFile",
+    "@odata.id": "/redfish/v1/JSONSchemas/StoragePool",
+    "@odata.type": "#JsonSchemaFile.v1_0_2.JsonSchemaFile",
+    "Description": "StoragePool Schema File Location",
+    "Id": "StoragePool",
+    "Languages": [
+        "en"
+    ],
+    "Languages@odata.count": 1,
+    "Location": [
+        {
+            "Language": "en",
+            "PublicationUri": "http://redfish.dmtf.org/schemas/v1/StoragePool.json",
+            "Uri": "/redfish/v1/Schemas/StoragePool.json"
+        }
+    ],
+    "Location@odata.count": 1,
+    "Name": "StoragePool Schema File",
+    "Schema": "#StoragePool.StoragePool"
+}

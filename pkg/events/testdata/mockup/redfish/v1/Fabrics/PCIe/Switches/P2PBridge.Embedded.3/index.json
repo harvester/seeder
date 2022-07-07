@@ -1,0 +1,30 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Switch.Switch",
+    "@odata.etag": "1655847846",
+    "@odata.id": "/redfish/v1/Fabrics/PCIe/Switches/P2PBridge.Embedded.3",
+    "@odata.type": "#Switch.v1_1_0.Switch",
+    "AssetTag": null,
+    "DomainID": null,
+    "Id": "7-1",
+    "IndicatorLED": null,
+    "IsManaged": false,
+    "Manufacturer": "Renesas Technology Corp.",
+    "Model": null,
+    "Name": "P2PBridge.Embedded.3",
+    "PartNumber": null,
+    "Ports": {
+        "@odata.id": "/redfish/v1/Fabrics/PCIe/Switches/P2PBridge.Embedded.3/Ports"
+    },
+    "PowerState": "On",
+    "Redundancy": [],
+    "Redundancy@odata.count": 0,
+    "SKU": null,
+    "SerialNumber": "00:00:00:00:00:00:00:0",
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    },
+    "SwitchType": "PCIe",
+    "TotalSwitchWidth": null
+}

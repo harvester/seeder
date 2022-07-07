@@ -1,0 +1,25 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/811",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-06-30T10:22:52-05:00",
+    "Description": " Log Entry 811",
+    "EntryType": "Oem",
+    "Id": "811",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+        }
+    },
+    "Message": "The session for root from 172.16.31.2 using REDFISH is logged off.",
+    "MessageArgs": [
+        "root",
+        "172.16.31.2",
+        "REDFISH"
+    ],
+    "MessageArgs@odata.count": 3,
+    "MessageId": "USR0032",
+    "Name": " Log Entry 811",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

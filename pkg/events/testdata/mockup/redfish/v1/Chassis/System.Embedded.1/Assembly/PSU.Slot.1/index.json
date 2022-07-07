@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Assembly.Assembly",
+    "@odata.etag": "1651718878",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly/PSU.Slot.1",
+    "@odata.type": "#Assembly.v1_0_0.AssemblyData",
+    "BinaryDataURI": null,
+    "Description": "PWR SPLY,750W,RDNT,DELTA",
+    "EngineeringChangeLevel": "A00",
+    "MemberId": "PSU.Slot.1",
+    "Model": "PWR SPLY,750W,RDNT,DELTA",
+    "Name": "PSU.Slot.1#FRU",
+    "PartNumber": "0V1YJ6",
+    "Producer": "Dell",
+    "ProductionDate": null,
+    "SKU": null,
+    "SparePartNumber": null,
+    "Vendor": "DELL",
+    "Version": null
+}

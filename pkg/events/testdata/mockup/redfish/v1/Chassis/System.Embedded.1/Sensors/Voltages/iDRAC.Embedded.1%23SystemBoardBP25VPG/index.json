@@ -1,0 +1,26 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Power.Power",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Sensors/Voltages/iDRAC.Embedded.1%23SystemBoardBP25VPG",
+    "@odata.type": "#Power.v1_3_0.Voltage",
+    "LowerThresholdCritical": null,
+    "LowerThresholdFatal": null,
+    "LowerThresholdNonCritical": null,
+    "MemberId": "iDRAC.Embedded.1#SystemBoardBP25VPG",
+    "Name": "System Board BP2 5V PG",
+    "PhysicalContext": "SystemBoard",
+    "ReadingVolts": 1,
+    "RelatedItem": [
+        {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+        }
+    ],
+    "RelatedItem@odata.count": 1,
+    "SensorNumber": 248,
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    },
+    "UpperThresholdCritical": null,
+    "UpperThresholdFatal": null,
+    "UpperThresholdNonCritical": null
+}

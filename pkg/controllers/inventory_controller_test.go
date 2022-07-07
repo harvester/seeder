@@ -2,13 +2,14 @@ package controllers
 
 import (
 	"fmt"
+
 	"github.com/harvester/seeder/pkg/util"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
-	v1 "k8s.io/api/core/v1"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -16,7 +17,7 @@ import (
 
 var _ = Describe("Inventory controller and baseboard tests", func() {
 	var i *seederv1alpha1.Inventory
-	var creds *v1.Secret
+	var creds *corev1.Secret
 
 	BeforeEach(func() {
 		i = &seederv1alpha1.Inventory{
@@ -32,7 +33,7 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 						Host:        "localhost",
 						Port:        623,
 						InsecureTLS: true,
-						AuthSecretRef: v1.SecretReference{
+						AuthSecretRef: corev1.SecretReference{
 							Name:      "sample",
 							Namespace: "default",
 						},
@@ -41,7 +42,7 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 			},
 		}
 
-		creds = &v1.Secret{
+		creds = &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "sample",
 				Namespace: "default",
@@ -124,7 +125,7 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 
 var _ = Describe("inventory object deletion tests", func() {
 	var i *seederv1alpha1.Inventory
-	var creds *v1.Secret
+	var creds *corev1.Secret
 
 	BeforeEach(func() {
 		i = &seederv1alpha1.Inventory{
@@ -140,7 +141,7 @@ var _ = Describe("inventory object deletion tests", func() {
 						Host:        "localhost",
 						Port:        623,
 						InsecureTLS: true,
-						AuthSecretRef: v1.SecretReference{
+						AuthSecretRef: corev1.SecretReference{
 							Name:      "sample-deletion",
 							Namespace: "default",
 						},
@@ -149,7 +150,7 @@ var _ = Describe("inventory object deletion tests", func() {
 			},
 		}
 
-		creds = &v1.Secret{
+		creds = &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "sample-deletion",
 				Namespace: "default",
@@ -213,7 +214,7 @@ var _ = Describe("list inventory objects test", func() {
 						Host:        "localhost",
 						Port:        623,
 						InsecureTLS: true,
-						AuthSecretRef: v1.SecretReference{
+						AuthSecretRef: corev1.SecretReference{
 							Name:      "sample-deletion",
 							Namespace: "default",
 						},
@@ -235,7 +236,7 @@ var _ = Describe("list inventory objects test", func() {
 						Host:        "localhost",
 						Port:        623,
 						InsecureTLS: true,
-						AuthSecretRef: v1.SecretReference{
+						AuthSecretRef: corev1.SecretReference{
 							Name:      "sample-deletion",
 							Namespace: "default",
 						},

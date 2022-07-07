@@ -1,0 +1,18 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#ManagerAccount.ManagerAccount",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Accounts/2",
+    "@odata.type": "#ManagerAccount.v1_1_1.ManagerAccount",
+    "Description": "User Account",
+    "Enabled": true,
+    "Id": "2",
+    "Links": {
+        "Role": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Roles/Administrator"
+        }
+    },
+    "Locked": false,
+    "Name": "User Account",
+    "Password": null,
+    "RoleId": "Administrator",
+    "UserName": "root"
+}
