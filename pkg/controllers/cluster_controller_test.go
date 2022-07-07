@@ -863,7 +863,7 @@ var _ = Describe("cluster running test", func() {
 		//a k3s mock to validate kubeconfig
 		Eventually(func() error {
 			cObj := &seederv1alpha1.Cluster{}
-			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, cObj)
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
 			if err != nil {
 				return err
 			}
@@ -876,7 +876,7 @@ var _ = Describe("cluster running test", func() {
 				Name:       "k3s-mock",
 				Repository: "rancher/k3s",
 				Tag:        "v1.24.2-k3s1",
-				Cmd:        []string{"server"},
+				Cmd:        []string{"server", "--cluster-init"},
 				Env: []string{
 					fmt.Sprintf("K3S_TOKEN=%s", cObj.Status.ClusterToken),
 				},

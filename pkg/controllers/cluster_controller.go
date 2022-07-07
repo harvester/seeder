@@ -155,7 +155,7 @@ func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, c *seeder
 // patchNodes will patch the node information and associate appropriate events to trigger
 // tinkerbell workflows to be generated and reboot initiated
 func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *seederv1alpha1.Cluster) error {
-	if c.Status.Status == seederv1alpha1.ClusterConfigReady {
+	if c.Status.Status == seederv1alpha1.ClusterConfigReady && len(c.Spec.Nodes) > 0 {
 		for n, nc := range c.Spec.Nodes {
 			pool := &seederv1alpha1.AddressPool{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: nc.AddressPoolReference.Namespace,
@@ -552,7 +552,7 @@ func genCoreTypedClient(ctx context.Context, c *seederv1alpha1.Cluster) (*typedC
 		port = seederv1alpha1.DefaultAPIPort
 	}
 
-	kcBytes, err := util.FetchKubeConfig(fmt.Sprintf("https://%s:%s", c.Status.ClusterAddress, port), seederv1alpha1.DefaultAPIPrefix, c.Status.ClusterToken)
+	kcBytes, err := util.GenerateKubeConfig(fmt.Sprintf("https://%s:%s", c.Status.ClusterAddress, port), seederv1alpha1.DefaultAPIPrefix, c.Status.ClusterToken)
 	if err != nil {
 		return nil, err
 	}

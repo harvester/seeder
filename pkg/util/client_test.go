@@ -3,18 +3,16 @@ package util
 import (
 	"context"
 	"fmt"
+	"github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest/v3/docker"
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	typedCore "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/tools/clientcmd"
 	"log"
 	"os"
 	"testing"
 	"time"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/tools/clientcmd"
-
-	"github.com/ory/dockertest/v3"
-	"github.com/ory/dockertest/v3/docker"
-	"github.com/stretchr/testify/assert"
-	typedCore "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 var port string
@@ -34,7 +32,7 @@ func TestMain(t *testing.M) {
 		Name:       "k3s-mock",
 		Repository: "rancher/k3s",
 		Tag:        "v1.24.2-k3s1",
-		Cmd:        []string{"server"},
+		Cmd:        []string{"server", "--cluster-init"},
 		Env: []string{
 			fmt.Sprintf("K3S_TOKEN=%s", token),
 		},
@@ -68,17 +66,25 @@ func TestMain(t *testing.M) {
 
 }
 
-func Test_FetchKubeConfig(t *testing.T) {
-	resp, err := FetchKubeConfig(fmt.Sprintf("https://localhost:%s", port), "k3s",
-		token)
-	assert.NoError(t, err, "expected no error while fetching kubeconfig")
-	k8sclient, err := clientcmd.NewClientConfigFromBytes(resp)
-	assert.NoError(t, err, "expected no error while generating k8sclient")
+func Test_GenerateKubeConfig(t *testing.T) {
+	assert := require.New(t)
+	c, err := GenerateKubeConfig(fmt.Sprintf("https://localhost:%s", port), "k3s", token)
+	assert.NoError(err, "expected no error during generation of kubeconfig")
+	assert.NoError(err)
+	k8sclient, err := clientcmd.NewClientConfigFromBytes(c)
+	assert.NoError(err, "expected no error while generating k8sclient")
 	rest, err := k8sclient.ClientConfig()
-	assert.NoError(t, err, "expected no error while generating rest.Config")
+	assert.NoError(err, "expected no error while generating rest.Config")
 	typedClient, err := typedCore.NewForConfig(rest)
-	assert.NoError(t, err, "expected no error while generating typedClient")
+	assert.NoError(err, "expected no error while generating typedClient")
 	nodes, err := typedClient.Nodes().List(context.TODO(), metav1.ListOptions{})
-	assert.NoError(t, err, "error listing nodes")
-	assert.Len(t, nodes.Items, 1, "expected to find 1 node in the cluster")
+	assert.NoError(err, "error listing nodes")
+	assert.Len(nodes.Items, 1, "expected to find 1 node in the cluster")
+	node := nodes.Items[0]
+	if node.Labels == nil {
+		node.Labels = make(map[string]string)
+	}
+	node.Labels["random"] = "test"
+	_, err = typedClient.Nodes().Update(ctx, &node, metav1.UpdateOptions{})
+	assert.NoError(err, "expected no error while updating node")
 }

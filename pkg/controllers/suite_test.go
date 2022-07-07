@@ -149,8 +149,15 @@ var _ = BeforeSuite(func() {
 	err = (&InventoryEventReconciller{
 		Client:        mgr.GetClient(),
 		Scheme:        mgr.GetScheme(),
-		Logger:        log.Log.WithName("controller.cluster"),
+		Logger:        log.Log.WithName("controller.invenory-event"),
 		EventRecorder: mgr.GetEventRecorderFor("seeder"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&ClusterEventReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: log.Log.WithName("controller.cluster-event"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
