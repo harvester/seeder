@@ -1,0 +1,21 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#JsonSchemaFile.JsonSchemaFile",
+    "@odata.id": "/redfish/v1/JSONSchemas/OemManager",
+    "@odata.type": "#JsonSchemaFile.v1_0_2.JsonSchemaFile",
+    "Description": "OemManager Schema File Location",
+    "Id": "OemManager",
+    "Languages": [
+        "en"
+    ],
+    "Languages@odata.count": 1,
+    "Location": [
+        {
+            "Language": "en",
+            "PublicationUri": "http://downloads.dell.com/redfish/bmc/schemas/OemManager.json",
+            "Uri": "/redfish/v1/Schemas/OemManager.json"
+        }
+    ],
+    "Location@odata.count": 1,
+    "Name": "OemManager Schema File",
+    "Schema": "#OemManager.OemManager"
+}

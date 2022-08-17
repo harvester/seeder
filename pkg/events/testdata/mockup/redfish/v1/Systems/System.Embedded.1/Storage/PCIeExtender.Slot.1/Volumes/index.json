@@ -1,0 +1,16 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#VolumeCollection.VolumeCollection",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/PCIeExtender.Slot.1/Volumes",
+    "@odata.type": "#VolumeCollection.VolumeCollection",
+    "Description": "Collection Of Volume",
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/Volumes/Disk.Bay.8:Enclosure.Internal.0-1:PCIeExtender.Slot.1"
+        },
+        {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/Volumes/Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1"
+        }
+    ],
+    "Members@odata.count": 2,
+    "Name": "Volume Collection"
+}

@@ -1,0 +1,22 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/336",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-05-31T17:23:00-05:00",
+    "Description": " Log Entry 336",
+    "EntryType": "Oem",
+    "Id": "336",
+    "Links": {},
+    "Message": "User root via IP 172.16.31.5 requested state / configuration change to VirtualConsole using GUI.",
+    "MessageArgs": [
+        "root",
+        "172.16.31.5",
+        "VirtualConsole",
+        "GUI"
+    ],
+    "MessageArgs@odata.count": 4,
+    "MessageId": "RAC1195",
+    "Name": " Log Entry 336",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

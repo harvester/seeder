@@ -1,0 +1,21 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#JsonSchemaFile.JsonSchemaFile",
+    "@odata.id": "/redfish/v1/JSONSchemas/FileShare",
+    "@odata.type": "#JsonSchemaFile.v1_0_2.JsonSchemaFile",
+    "Description": "FileShare Schema File Location",
+    "Id": "FileShare",
+    "Languages": [
+        "en"
+    ],
+    "Languages@odata.count": 1,
+    "Location": [
+        {
+            "Language": "en",
+            "PublicationUri": "http://redfish.dmtf.org/schemas/v1/FileShare.json",
+            "Uri": "/redfish/v1/Schemas/FileShare.json"
+        }
+    ],
+    "Location@odata.count": 1,
+    "Name": "FileShare Schema File",
+    "Schema": "#FileShare.FileShare"
+}

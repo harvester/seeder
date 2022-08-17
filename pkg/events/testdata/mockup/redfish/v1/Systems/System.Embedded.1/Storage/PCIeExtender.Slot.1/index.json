@@ -1,0 +1,68 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Storage.Storage",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/PCIeExtender.Slot.1",
+    "@odata.type": "#Storage.v1_4_0.Storage",
+    "Description": "PCIe Extender 1",
+    "Drives": [
+        {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/Drives/Disk.Bay.8:Enclosure.Internal.0-1:PCIeExtender.Slot.1"
+        },
+        {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/Drives/Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1"
+        }
+    ],
+    "Drives@odata.count": 2,
+    "Id": "PCIeExtender.Slot.1",
+    "Links": {
+        "Enclosures": [
+            {
+                "@odata.id": "/redfish/v1/Chassis/Enclosure.Internal.0-1:PCIeExtender.Slot.1"
+            },
+            {
+                "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+            }
+        ],
+        "Enclosures@odata.count": 2
+    },
+    "Name": "PCIe Extender 1",
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    },
+    "StorageControllers": [
+        {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1/StorageControllers/PCIeExtender.Slot.1",
+            "Assembly": {
+                "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+            },
+            "FirmwareVersion": "1",
+            "Identifiers": [
+                {
+                    "DurableName": null,
+                    "DurableNameFormat": null
+                }
+            ],
+            "Links": {},
+            "Manufacturer": "DELL",
+            "MemberId": "PCIeExtender.Slot.1",
+            "Model": "PCIe Extender 1",
+            "Name": "PCIe Extender 1",
+            "Status": {
+                "Health": "OK",
+                "HealthRollup": "OK",
+                "State": "Enabled"
+            },
+            "SupportedControllerProtocols": [
+                "PCIe"
+            ],
+            "SupportedDeviceProtocols": [
+                "PCIe"
+            ]
+        }
+    ],
+    "StorageControllers@odata.count": 1,
+    "Volumes": {
+        "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/PCIeExtender.Slot.1/Volumes"
+    }
+}

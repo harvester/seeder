@@ -6,7 +6,7 @@ import (
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/mock"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -20,28 +20,31 @@ var (
 
 // Test_CheckSecretExists tests the CheckSecretExists utility function
 func Test_CheckSecretExists(t *testing.T) {
+	assert := require.New(t)
 	c, err := mock.GenerateFakeClient()
 
-	assert.Equal(t, nil, err, "error creating mock client")
+	assert.Equal(nil, err, "error creating mock client")
 
 	err = CheckSecretExists(ctx, c, l, v1.SecretReference{Name: "fiftytwo", Namespace: "default"})
-	assert.Equal(t, nil, err, "error looking up secret")
+	assert.Equal(nil, err, "error looking up secret")
 }
 
 // Test_CheckSecretExists tests the CheckSecretExists utility function
 func Test_CheckSecretExistsFailure(t *testing.T) {
+	assert := require.New(t)
 	c, err := mock.GenerateFakeClient()
 
-	assert.Equal(t, nil, err, "error creating mock client")
+	assert.Equal(nil, err, "error creating mock client")
 
 	err = CheckSecretExists(ctx, c, l, v1.SecretReference{Name: "fiftythree", Namespace: "default"})
-	assert.NotEqual(t, nil, err, "error looking up secret")
+	assert.NotEqual(nil, err, "error looking up secret")
 }
 
 // Test_CheckAndCreateBaseBoardObject tests the successful creation of a baseboard object
 func Test_CheckAndCreateBaseBoardObject(t *testing.T) {
+	assert := require.New(t)
 	c, err := mock.GenerateFakeClient()
-	assert.Equal(t, nil, err, "error creating mock client")
+	assert.Equal(nil, err, "error creating mock client")
 
 	i := &seederv1alpha1.Inventory{
 		ObjectMeta: metav1.ObjectMeta{
@@ -66,12 +69,13 @@ func Test_CheckAndCreateBaseBoardObject(t *testing.T) {
 	}
 
 	err = CheckAndCreateBaseBoardObject(ctx, c, l, i, c.Scheme())
-	assert.Equal(t, nil, err, "error creating baseboard object")
+	assert.Equal(nil, err, "error creating baseboard object")
 }
 
 func Test_CheckAndCreateBaseBoardObjectFailure(t *testing.T) {
+	assert := require.New(t)
 	c, err := mock.GenerateFakeClient()
-	assert.Equal(t, nil, err, "error creating mock client")
+	assert.Equal(nil, err, "error creating mock client")
 
 	i := &seederv1alpha1.Inventory{
 		ObjectMeta: metav1.ObjectMeta{
@@ -96,5 +100,5 @@ func Test_CheckAndCreateBaseBoardObjectFailure(t *testing.T) {
 	}
 
 	err = CheckAndCreateBaseBoardObject(ctx, c, l, i, c.Scheme())
-	assert.Equal(t, nil, err, "error creating baseboard object")
+	assert.Equal(nil, err, "error creating baseboard object")
 }

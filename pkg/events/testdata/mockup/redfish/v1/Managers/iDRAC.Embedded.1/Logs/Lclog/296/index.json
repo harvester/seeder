@@ -1,0 +1,22 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/296",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-05-03T19:49:30-05:00",
+    "Description": " Log Entry 296",
+    "EntryType": "Oem",
+    "Id": "296",
+    "Links": {},
+    "Message": "User root via IP 172.19.1.130 requested state / configuration change to Reset iDRAC using GUI.",
+    "MessageArgs": [
+        "root",
+        "172.19.1.130",
+        "Reset iDRAC",
+        "GUI"
+    ],
+    "MessageArgs@odata.count": 4,
+    "MessageId": "RAC1195",
+    "Name": " Log Entry 296",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

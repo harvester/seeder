@@ -1,0 +1,25 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/350",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-06-14T03:09:54-05:00",
+    "Description": " Log Entry 350",
+    "EntryType": "Oem",
+    "Id": "350",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+        }
+    },
+    "Message": "Successfully logged in using root, from 172.16.30.3 and GUI.",
+    "MessageArgs": [
+        "root",
+        "172.16.30.3",
+        "GUI"
+    ],
+    "MessageArgs@odata.count": 3,
+    "MessageId": "USR0030",
+    "Name": " Log Entry 350",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

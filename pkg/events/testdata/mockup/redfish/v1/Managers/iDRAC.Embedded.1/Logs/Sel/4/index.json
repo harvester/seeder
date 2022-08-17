@@ -1,0 +1,27 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Sel/4",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-05-03T16:35:50-05:00",
+    "Description": " Log Entry 4",
+    "EntryCode": [
+        {
+            "Member": "Assert"
+        }
+    ],
+    "EntryType": "SEL",
+    "Id": "4",
+    "Links": {},
+    "Message": "The power input for power supply 2 is lost.",
+    "MessageArgs": [],
+    "MessageArgs@odata.count": 0,
+    "MessageId": "3ffff",
+    "Name": " Log Entry 4",
+    "SensorNumber": 99,
+    "SensorType": [
+        {
+            "Member": "Power Supply / Converter"
+        }
+    ],
+    "Severity": "Critical"
+}

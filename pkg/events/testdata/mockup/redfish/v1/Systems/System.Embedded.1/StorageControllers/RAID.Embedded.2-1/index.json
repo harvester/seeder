@@ -1,0 +1,34 @@
+{
+    "error": {
+        "@Message.ExtendedInfo": [
+            {
+                "Message": "Unable to complete the operation because the resource /redfish/v1/Systems/System.Embedded.1/StorageControllers/RAID.Embedded.2-1 entered is not found.",
+                "MessageArgs": [
+                    "/redfish/v1/Systems/System.Embedded.1/StorageControllers/RAID.Embedded.2-1"
+                ],
+                "MessageArgs@odata.count": 1,
+                "MessageId": "IDRAC.1.6.SYS403",
+                "RelatedProperties": [],
+                "RelatedProperties@odata.count": 0,
+                "Resolution": "Enter the correct resource and retry the operation. For information about valid resource, see the Redfish Users Guide available on the support site.",
+                "Severity": "Critical"
+            },
+            {
+                "Message": "The resource at the URI /redfish/v1/Systems/System.Embedded.1/StorageControllers/RAID.Embedded.2-1 was not found.",
+                "MessageArgs": [
+                    "/redfish/v1/Systems/System.Embedded.1/StorageControllers/RAID.Embedded.2-1"
+                ],
+                "MessageArgs@odata.count": 1,
+                "MessageId": "Base.1.2.ResourceMissingAtURI",
+                "RelatedProperties": [
+                    ""
+                ],
+                "RelatedProperties@odata.count": 1,
+                "Resolution": "Place a valid resource at the URI or correct the URI and resubmit the request.",
+                "Severity": "Critical"
+            }
+        ],
+        "code": "Base.1.2.GeneralError",
+        "message": "A general error has occurred. See ExtendedInfo for more information"
+    }
+}

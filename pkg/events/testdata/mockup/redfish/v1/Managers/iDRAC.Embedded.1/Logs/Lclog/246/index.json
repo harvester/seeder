@@ -1,0 +1,20 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/246",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-07T15:40:08-05:00",
+    "Description": " Log Entry 246",
+    "EntryType": "Oem",
+    "Id": "246",
+    "Links": {},
+    "Message": "Successfully updated the Dell Server PowerEdge BIOS  R630/R730/R730XD Version 2.13.0 firmware to version 2.13.0.",
+    "MessageArgs": [
+        "Dell Server PowerEdge BIOS  R630/R730/R730XD Version 2.13.0",
+        "2.13.0"
+    ],
+    "MessageArgs@odata.count": 2,
+    "MessageId": "SUP0518",
+    "Name": " Log Entry 246",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

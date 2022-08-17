@@ -1,0 +1,60 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#DellBootSourcesRegistry.DellBootSourcesRegistry",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/BootSources/BootSourcesRegistry",
+    "@odata.type": "#DellBootSourcesRegistry.v1_0_0.DellBootSourcesRegistry",
+    "Description": "This registry defines a representation of Boot Sources instances",
+    "Id": "DellBootSourcesRegistry.v1_0_0",
+    "Language": "en",
+    "Name": "Dell Boot Sources Registry",
+    "OwningEntity": "DELL",
+    "RegistryEntries": {
+        "Attributes": [
+            {
+                "AttributeName": "UefiBootSeq",
+                "DisplayName": "UEFI Boot Sequence",
+                "DisplayOrder": 0,
+                "Entry": [
+                    {
+                        "DisplayName": "PCIe SSD in Slot 9 in Bay 1: ubuntu",
+                        "Enabled": null,
+                        "Id": "BIOS.Setup.1-1#UefiBootSeq#Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1#ddc9791dcfd0804f01a5c1aa4304d50c",
+                        "Index": null,
+                        "Name": "Disk.Bay.9:Enclosure.Internal.0-1:PCIeExtender.Slot.1"
+                    },
+                    {
+                        "DisplayName": "PXE Device 1: Integrated NIC 1 Port 1 Partition 1",
+                        "Enabled": null,
+                        "Id": "BIOS.Setup.1-1#UefiBootSeq#NIC.PxeDevice.1-1#709c0888d3f7fb4aa12e13c31f22ef1b",
+                        "Index": null,
+                        "Name": "NIC.PxeDevice.1-1"
+                    }
+                ],
+                "HelpText": "This field controls the UEFI boot order. The first option in the list will be attempted first, and if unsuccessful, the second option will be attempted and so on. This field applies only when Boot Mode is 'UEFI'; it has no effect when Boot Mode is 'BIOS'.",
+                "Hidden": false,
+                "MenuPath": "./BootSettingsRef/UefiBootSettingsRef",
+                "ReadOnly": false,
+                "Type": "OrderedList"
+            }
+        ],
+        "Dependencies": [
+            {
+                "Dependency": {
+                    "MapFrom": [
+                        {
+                            "MapFromAttribute": "BootMode",
+                            "MapFromCondition": "EQU",
+                            "MapFromProperty": "CurrentValue",
+                            "MapFromValue": "Bios"
+                        }
+                    ],
+                    "MapToAttribute": "UefiBootSeq",
+                    "MapToProperty": "ReadOnly",
+                    "MapToValue": true
+                },
+                "DependencyFor": "UefiBootSeq",
+                "Type": "Map"
+            }
+        ]
+    },
+    "RegistryVersion": "v1_0_0"
+}

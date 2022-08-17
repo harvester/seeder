@@ -1,0 +1,22 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/345",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-06-14T01:40:17-05:00",
+    "Description": " Log Entry 345",
+    "EntryType": "Oem",
+    "Id": "345",
+    "Links": {},
+    "Message": "User root via IP 172.16.31.2 requested state / configuration change to Serial over LAN using GUI.",
+    "MessageArgs": [
+        "root",
+        "172.16.31.2",
+        "Serial over LAN",
+        "GUI"
+    ],
+    "MessageArgs@odata.count": 4,
+    "MessageId": "RAC1195",
+    "Name": " Log Entry 345",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

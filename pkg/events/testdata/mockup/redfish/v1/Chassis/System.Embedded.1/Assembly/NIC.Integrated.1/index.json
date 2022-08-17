@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Assembly.Assembly",
+    "@odata.etag": "1651625577",
+    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly/NIC.Integrated.1",
+    "@odata.type": "#Assembly.v1_0_0.AssemblyData",
+    "BinaryDataURI": null,
+    "Description": "Intel(R) GbE 4P I350-t rNDC",
+    "EngineeringChangeLevel": "A00",
+    "MemberId": "NIC.Integrated.1",
+    "Model": "Intel(R) GbE 4P I350-t rNDC",
+    "Name": "NIC.Integrated.1#FRU",
+    "PartNumber": "0R1XFC",
+    "Producer": "Dell",
+    "ProductionDate": "2015-09-28T17:52:00Z",
+    "SKU": null,
+    "SparePartNumber": null,
+    "Vendor": "DELL",
+    "Version": null
+}

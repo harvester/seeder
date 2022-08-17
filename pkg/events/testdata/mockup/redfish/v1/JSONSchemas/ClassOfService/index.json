@@ -1,0 +1,21 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#JsonSchemaFile.JsonSchemaFile",
+    "@odata.id": "/redfish/v1/JSONSchemas/ClassOfService",
+    "@odata.type": "#JsonSchemaFile.v1_0_2.JsonSchemaFile",
+    "Description": "ClassOfService Schema File Location",
+    "Id": "ClassOfService",
+    "Languages": [
+        "en"
+    ],
+    "Languages@odata.count": 1,
+    "Location": [
+        {
+            "Language": "en",
+            "PublicationUri": "http://redfish.dmtf.org/schemas/v1/ClassOfService.json",
+            "Uri": "/redfish/v1/Schemas/ClassOfService.json"
+        }
+    ],
+    "Location@odata.count": 1,
+    "Name": "ClassOfService Schema File",
+    "Schema": "#ClassOfService.ClassOfService"
+}

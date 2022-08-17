@@ -1,0 +1,21 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#JsonSchemaFile.JsonSchemaFile",
+    "@odata.id": "/redfish/v1/JSONSchemas/Resource",
+    "@odata.type": "#JsonSchemaFile.v1_0_2.JsonSchemaFile",
+    "Description": "Resource Schema File Location",
+    "Id": "Resource",
+    "Languages": [
+        "en"
+    ],
+    "Languages@odata.count": 1,
+    "Location": [
+        {
+            "Language": "en",
+            "PublicationUri": "http://redfish.dmtf.org/schemas/v1/Resource.json",
+            "Uri": "/redfish/v1/Schemas/Resource.json"
+        }
+    ],
+    "Location@odata.count": 1,
+    "Name": "Resource Schema File",
+    "Schema": "#Resource.Resource"
+}

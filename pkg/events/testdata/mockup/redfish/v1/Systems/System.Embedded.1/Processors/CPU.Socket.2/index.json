@@ -1,0 +1,32 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Processor.Processor",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Processors/CPU.Socket.2",
+    "@odata.type": "#Processor.v1_2_0.Processor",
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+    },
+    "Description": "Represents the properties of a Processor attached to this System",
+    "Id": "CPU.Socket.2",
+    "InstructionSet": "x86-64",
+    "Manufacturer": "Intel",
+    "MaxSpeedMHz": 4000,
+    "Model": "Intel(R) Xeon(R) CPU E5-2676 v3 @ 2.40GHz",
+    "Name": "CPU 2",
+    "ProcessorArchitecture": "x86",
+    "ProcessorId": {
+        "EffectiveFamily": "6",
+        "EffectiveModel": "63",
+        "IdentificationRegisters": "0xBFEBFBFF000306F2",
+        "MicrocodeInfo": "0x46",
+        "Step": "2",
+        "VendorId": "GenuineIntel"
+    },
+    "ProcessorType": "CPU",
+    "Socket": "CPU.Socket.2",
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    },
+    "TotalCores": 12,
+    "TotalThreads": 24
+}

@@ -1,0 +1,17 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/111",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-04T19:35:26-05:00",
+    "Description": " Log Entry 111",
+    "EntryType": "Oem",
+    "Id": "111",
+    "Links": {},
+    "Message": "CPU Exception Type 0x03: Breakpoint (Software).",
+    "MessageArgs": [],
+    "MessageArgs@odata.count": 0,
+    "MessageId": "UEFI0001",
+    "Name": " Log Entry 111",
+    "OemRecordFormat": "Dell",
+    "Severity": "Critical"
+}

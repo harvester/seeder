@@ -1,0 +1,20 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#MessageRegistryFile.MessageRegistryFile",
+    "@odata.id": "/redfish/v1/Registries/Messages",
+    "@odata.type": "#MessageRegistryFile.v1_1_0.MessageRegistryFile",
+    "Description": "iDRAC Message Registry File locations",
+    "Id": "Messages",
+    "Languages": [
+        "En"
+    ],
+    "Languages@odata.count": 1,
+    "Location": [
+        {
+            "Language": "En",
+            "Uri": "/redfish/v1/Registries/Messages/EEMIRegistry"
+        }
+    ],
+    "Location@odata.count": 1,
+    "Name": "iDRAC Message Registry File",
+    "Registry": "iDRAC.1.6.1"
+}

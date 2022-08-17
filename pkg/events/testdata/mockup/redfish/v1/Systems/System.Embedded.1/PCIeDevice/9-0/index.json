@@ -1,0 +1,35 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#PCIeDevice.PCIeDevice",
+    "@odata.etag": "1655847839",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeDevice/9-0",
+    "@odata.type": "#PCIeDevice.v1_2_0.PCIeDevice",
+    "Assembly": {
+        "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Assembly"
+    },
+    "AssetTag": null,
+    "Description": "G200eR2",
+    "DeviceType": "SingleFunction",
+    "FirmwareVersion": "",
+    "Id": "9-0",
+    "Links": {
+        "Chassis": [],
+        "Chassis@odata.count": 0,
+        "PCIeFunctions": [
+            {
+                "@odata.id": "/redfish/v1/Systems/System.Embedded.1/PCIeFunction/9-0-0"
+            }
+        ],
+        "PCIeFunctions@odata.count": 1
+    },
+    "Manufacturer": "Matrox Electronics Systems Ltd.",
+    "Model": null,
+    "Name": "G200eR2",
+    "PartNumber": null,
+    "SKU": null,
+    "SerialNumber": null,
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    }
+}

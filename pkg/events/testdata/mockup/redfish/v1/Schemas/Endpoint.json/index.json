@@ -1,0 +1,32 @@
+{
+    "$ref": "#/definitions/Endpoint",
+    "$schema": "/redfish/v1/Schemas/redfish-schema.v1_3_0.json",
+    "copyright": "Copyright 2014-2017 Distributed Management Task Force, Inc. (DMTF). For the full DMTF copyright policy, see http://www.dmtf.org/about/policies/copyright",
+    "definitions": {
+        "Endpoint": {
+            "anyOf": [
+                {
+                    "$ref": "/redfish/v1/Schemas/odata.v4_0_1.json#/definitions/idRef"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Endpoint.v1_0_0.json#/definitions/Endpoint"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Endpoint.v1_0_1.json#/definitions/Endpoint"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Endpoint.v1_0_2.json#/definitions/Endpoint"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Endpoint.v1_0_3.json#/definitions/Endpoint"
+                },
+                {
+                    "$ref": "/redfish/v1/Schemas/Endpoint.v1_1_0.json#/definitions/Endpoint"
+                }
+            ],
+            "description": "The Endpoint schema defines the properties of an Endpoint resource.  It represents the properties of an entity that sends or receives protocol defined messages over a transport.",
+            "longDescription": "This resource shall be used to represent a fabric endpoint for a Redfish implementation."
+        }
+    },
+    "title": "#Endpoint.Endpoint"
+}

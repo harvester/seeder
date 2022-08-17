@@ -1,0 +1,11 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#HostInterface.HostInterface",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/HostInterfaces/iDRAC.Embedded.1%23Host.1",
+    "@odata.type": "#HostInterface.v1_1_1.HostInterface",
+    "Description": "Management for Host Interface",
+    "ExternallyAccessible": false,
+    "HostInterfaceType": "NetworkHostInterface",
+    "Id": "iDRAC.Embedded.1#Host.1",
+    "InterfaceEnabled": false,
+    "Name": "Managed Host Interface 1"
+}

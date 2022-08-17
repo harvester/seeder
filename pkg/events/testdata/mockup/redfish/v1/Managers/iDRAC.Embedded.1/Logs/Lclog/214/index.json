@@ -1,0 +1,20 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/214",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-06T22:38:10-05:00",
+    "Description": " Log Entry 214",
+    "EntryType": "Oem",
+    "Id": "214",
+    "Links": {},
+    "Message": "Drive 8 is installed in disk drive bay 1.",
+    "MessageArgs": [
+        "8",
+        "1"
+    ],
+    "MessageArgs@odata.count": 2,
+    "MessageId": "PDR1000",
+    "Name": " Log Entry 214",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

@@ -1,0 +1,140 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntryCollection.LogEntryCollection",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Sel",
+    "@odata.type": "#LogEntryCollection.LogEntryCollection",
+    "Description": "System Event Logs for this manager",
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Sel/5",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T17:05:06-05:00",
+            "Description": " Log Entry 5",
+            "EntryCode": [
+                {
+                    "Member": "Deassert"
+                }
+            ],
+            "EntryType": "SEL",
+            "Id": "5",
+            "Links": {},
+            "Message": "The input power for power supply 2 has been restored.",
+            "MessageArgs": [],
+            "MessageArgs@odata.count": 0,
+            "MessageId": "3ffff",
+            "Name": " Log Entry 5",
+            "SensorNumber": 99,
+            "SensorType": [
+                {
+                    "Member": "Power Supply / Converter"
+                }
+            ],
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Sel/4",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:35:50-05:00",
+            "Description": " Log Entry 4",
+            "EntryCode": [
+                {
+                    "Member": "Assert"
+                }
+            ],
+            "EntryType": "SEL",
+            "Id": "4",
+            "Links": {},
+            "Message": "The power input for power supply 2 is lost.",
+            "MessageArgs": [],
+            "MessageArgs@odata.count": 0,
+            "MessageId": "3ffff",
+            "Name": " Log Entry 4",
+            "SensorNumber": 99,
+            "SensorType": [
+                {
+                    "Member": "Power Supply / Converter"
+                }
+            ],
+            "Severity": "Critical"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Sel/3",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:35:47-05:00",
+            "Description": " Log Entry 3",
+            "EntryCode": [
+                {
+                    "Member": "Deassert"
+                }
+            ],
+            "EntryType": "SEL",
+            "Id": "3",
+            "Links": {},
+            "Message": "The chassis is closed while the power is off.",
+            "MessageArgs": [],
+            "MessageArgs@odata.count": 0,
+            "MessageId": "802ff",
+            "Name": " Log Entry 3",
+            "SensorNumber": 115,
+            "SensorType": [
+                {
+                    "Member": "Physical Chassis Security"
+                }
+            ],
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Sel/2",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:35:42-05:00",
+            "Description": " Log Entry 2",
+            "EntryCode": [
+                {
+                    "Member": "Assert"
+                }
+            ],
+            "EntryType": "SEL",
+            "Id": "2",
+            "Links": {},
+            "Message": "The chassis is open while the power is off.",
+            "MessageArgs": [],
+            "MessageArgs@odata.count": 0,
+            "MessageId": "802ff",
+            "Name": " Log Entry 2",
+            "SensorNumber": 115,
+            "SensorType": [
+                {
+                    "Member": "Physical Chassis Security"
+                }
+            ],
+            "Severity": "Critical"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Sel/1",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-04-07T15:37:27-05:00",
+            "Description": " Log Entry 1",
+            "EntryCode": [
+                {
+                    "Member": "Assert"
+                }
+            ],
+            "EntryType": "SEL",
+            "Id": "1",
+            "Links": {},
+            "Message": "Log cleared.",
+            "MessageArgs": [],
+            "MessageArgs@odata.count": 0,
+            "MessageId": "2ffff",
+            "Name": " Log Entry 1",
+            "SensorNumber": 114,
+            "SensorType": [
+                {
+                    "Member": "Event Logging Disabled"
+                }
+            ],
+            "Severity": "OK"
+        }
+    ],
+    "Members@odata.count": 5,
+    "Name": "Log Entry Collection"
+}

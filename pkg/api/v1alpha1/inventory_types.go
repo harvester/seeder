@@ -58,6 +58,7 @@ type InventorySpec struct {
 	PrimaryDisk                   string `json:"primaryDisk"`
 	ManagementInterfaceMacAddress string `json:"managementInterfaceMacAddress"`
 	rufio.BaseboardManagementSpec `json:"baseboardSpec"`
+	Events                        `json:"events"`
 }
 
 type BMCSecretReference struct {
@@ -87,6 +88,12 @@ type Conditions struct {
 	StartTime      metav1.Time   `json:"startTime"`
 	LastUpdateTime metav1.Time   `json:"lastUpdateTime,omitempty"`
 	Message        string        `json:"message,omitempty"`
+}
+
+type Events struct {
+	Enabled bool `json:"enabled"`
+	// +kubebuilder:default:="1h"
+	PollingInterval string `json:"pollingInterval,omitempty"`
 }
 
 //+kubebuilder:object:root=true

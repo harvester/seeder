@@ -1,0 +1,1024 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntryCollection.LogEntryCollection",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog",
+    "@odata.type": "#LogEntryCollection.LogEntryCollection",
+    "Description": "LC Logs for this manager",
+    "Members": [
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/323",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-09T23:25:41-05:00",
+            "Description": " Log Entry 323",
+            "EntryType": "Oem",
+            "Id": "323",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Integrated.1-1-1"
+                }
+            },
+            "Message": "The NIC Integrated 1 Port 1 network link is started.",
+            "MessageArgs": [
+                "NIC Integrated 1",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "NIC101",
+            "Name": " Log Entry 323",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/322",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-09T23:23:25-05:00",
+            "Description": " Log Entry 322",
+            "EntryType": "Oem",
+            "Id": "322",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Integrated.1-1-1"
+                }
+            },
+            "Message": "The NIC Integrated 1 Port 1 network link is down.",
+            "MessageArgs": [
+                "NIC Integrated 1",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "NIC100",
+            "Name": " Log Entry 322",
+            "OemRecordFormat": "Dell",
+            "Severity": "Warning"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/321",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-09T23:22:30-05:00",
+            "Description": " Log Entry 321",
+            "EntryType": "Oem",
+            "Id": "321",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Integrated.1-1-1"
+                }
+            },
+            "Message": "The NIC Integrated 1 Port 1 network link is started.",
+            "MessageArgs": [
+                "NIC Integrated 1",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "NIC101",
+            "Name": " Log Entry 321",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/320",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-09T23:21:55-05:00",
+            "Description": " Log Entry 320",
+            "EntryType": "Oem",
+            "Id": "320",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Integrated.1-1-1"
+                }
+            },
+            "Message": "The NIC Integrated 1 Port 1 network link is down.",
+            "MessageArgs": [
+                "NIC Integrated 1",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "NIC100",
+            "Name": " Log Entry 320",
+            "OemRecordFormat": "Dell",
+            "Severity": "Warning"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/319",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-09T23:19:42-05:00",
+            "Description": " Log Entry 319",
+            "EntryType": "Oem",
+            "Id": "319",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Virtual Console session created.",
+            "MessageId": "VME0007",
+            "Name": " Log Entry 319",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/318",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-09T23:19:42-05:00",
+            "Description": " Log Entry 318",
+            "EntryType": "Oem",
+            "Id": "318",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Virtual Console session started.",
+            "MessageId": "VME0001",
+            "Name": " Log Entry 318",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/317",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-09T23:19:42-05:00",
+            "Description": " Log Entry 317",
+            "EntryType": "Oem",
+            "Id": "317",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.31.2 and Virtual Console.",
+            "MessageArgs": [
+                "root",
+                "172.16.31.2",
+                "Virtual Console"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 317",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/316",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-09T23:19:09-05:00",
+            "Description": " Log Entry 316",
+            "EntryType": "Oem",
+            "Id": "316",
+            "Links": {},
+            "Message": "User root via IP 172.16.31.2 requested state / configuration change to VirtualConsole using GUI.",
+            "MessageArgs": [
+                "root",
+                "172.16.31.2",
+                "VirtualConsole",
+                "GUI"
+            ],
+            "MessageArgs@odata.count": 4,
+            "MessageId": "RAC1195",
+            "Name": " Log Entry 316",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/315",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-09T23:18:49-05:00",
+            "Description": " Log Entry 315",
+            "EntryType": "Oem",
+            "Id": "315",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.16.31.2 and GUI.",
+            "MessageArgs": [
+                "root",
+                "172.16.31.2",
+                "GUI"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 315",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/314",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-06T22:05:47-05:00",
+            "Description": " Log Entry 314",
+            "EntryType": "Oem",
+            "Id": "314",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Integrated.1-1-1"
+                }
+            },
+            "Message": "The NIC Integrated 1 Port 1 network link is started.",
+            "MessageArgs": [
+                "NIC Integrated 1",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "NIC101",
+            "Name": " Log Entry 314",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/313",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-06T22:04:02-05:00",
+            "Description": " Log Entry 313",
+            "EntryType": "Oem",
+            "Id": "313",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Integrated.1-1-1"
+                }
+            },
+            "Message": "The NIC Integrated 1 Port 1 network link is down.",
+            "MessageArgs": [
+                "NIC Integrated 1",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "NIC100",
+            "Name": " Log Entry 313",
+            "OemRecordFormat": "Dell",
+            "Severity": "Warning"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/312",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-06T22:03:32-05:00",
+            "Description": " Log Entry 312",
+            "EntryType": "Oem",
+            "Id": "312",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Integrated.1-1-1"
+                }
+            },
+            "Message": "The NIC Integrated 1 Port 1 network link is started.",
+            "MessageArgs": [
+                "NIC Integrated 1",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "NIC101",
+            "Name": " Log Entry 312",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/311",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-06T22:03:22-05:00",
+            "Description": " Log Entry 311",
+            "EntryType": "Oem",
+            "Id": "311",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Integrated.1-1-1"
+                }
+            },
+            "Message": "The NIC Integrated 1 Port 1 network link is down.",
+            "MessageArgs": [
+                "NIC Integrated 1",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "NIC100",
+            "Name": " Log Entry 311",
+            "OemRecordFormat": "Dell",
+            "Severity": "Warning"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/310",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-04T21:50:14-05:00",
+            "Description": " Log Entry 310",
+            "EntryType": "Oem",
+            "Id": "310",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/EthernetInterfaces/NIC.Integrated.1-1-1"
+                }
+            },
+            "Message": "The NIC Integrated 1 Port 1 network link is started.",
+            "MessageArgs": [
+                "NIC Integrated 1",
+                "1"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "NIC101",
+            "Name": " Log Entry 310",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/309",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-04T21:50:01-05:00",
+            "Description": " Log Entry 309",
+            "EntryType": "Oem",
+            "Id": "309",
+            "Links": {},
+            "Message": "The iDRAC IP Address changed from 0.0.0.0 to 172.19.0.11.",
+            "MessageArgs": [
+                "0.0.0.0",
+                "172.19.0.11"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "IPA0100",
+            "Name": " Log Entry 309",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/308",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-04T21:49:57-05:00",
+            "Description": " Log Entry 308",
+            "EntryType": "Oem",
+            "Id": "308",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "New PCI card(s) have been detected in the system. Fan speeds may have changed to add additional cooling to the cards.",
+            "MessageId": "PCI3018",
+            "Name": " Log Entry 308",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/307",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-04T21:47:46-05:00",
+            "Description": " Log Entry 307",
+            "EntryType": "Oem",
+            "Id": "307",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Power Supply 2: Status = 0x00, IOUT = 0x0, VOUT= 0x0, TEMP= 0x0, FAN = 0x0, INPUT= 0x0.",
+            "MessageArgs": [
+                "2",
+                "00",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0"
+            ],
+            "MessageArgs@odata.count": 7,
+            "MessageId": "PSU0800",
+            "Name": " Log Entry 307",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/306",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-04T21:47:46-05:00",
+            "Description": " Log Entry 306",
+            "EntryType": "Oem",
+            "Id": "306",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Power Supply 1: Status = 0x00, IOUT = 0x0, VOUT= 0x0, TEMP= 0x0, FAN = 0x0, INPUT= 0x0.",
+            "MessageArgs": [
+                "1",
+                "00",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0"
+            ],
+            "MessageArgs@odata.count": 7,
+            "MessageId": "PSU0800",
+            "Name": " Log Entry 306",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/305",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-04T21:47:46-05:00",
+            "Description": " Log Entry 305",
+            "EntryType": "Oem",
+            "Id": "305",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 305",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/304",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-04T21:47:43-05:00",
+            "Description": " Log Entry 304",
+            "EntryType": "Oem",
+            "Id": "304",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 304",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/303",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-04T21:47:42-05:00",
+            "Description": " Log Entry 303",
+            "EntryType": "Oem",
+            "Id": "303",
+            "Links": {},
+            "Message": "System is turning on.",
+            "MessageId": "SYS1000",
+            "Name": " Log Entry 303",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/302",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T20:51:37-05:00",
+            "Description": " Log Entry 302",
+            "EntryType": "Oem",
+            "Id": "302",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.19.1.130 using GUI is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.19.1.130",
+                "GUI"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 302",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/301",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T20:20:55-05:00",
+            "Description": " Log Entry 301",
+            "EntryType": "Oem",
+            "Id": "301",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.19.1.130 and GUI.",
+            "MessageArgs": [
+                "root",
+                "172.19.1.130",
+                "GUI"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 301",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/300",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:52:33-05:00",
+            "Description": " Log Entry 300",
+            "EntryType": "Oem",
+            "Id": "300",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Auto Discovery feature disabled.",
+            "MessageId": "DIS002",
+            "Name": " Log Entry 300",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/299",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:52:33-05:00",
+            "Description": " Log Entry 299",
+            "EntryType": "Oem",
+            "Id": "299",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 299",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/298",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:52:28-05:00",
+            "Description": " Log Entry 298",
+            "EntryType": "Oem",
+            "Id": "298",
+            "Links": {},
+            "Message": "The iDRAC firmware was rebooted with the following reason: user initiated.",
+            "MessageArgs": [
+                "user initiated"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "RAC0182",
+            "Name": " Log Entry 298",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/297",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:49:31-05:00",
+            "Description": " Log Entry 297",
+            "EntryType": "Oem",
+            "Id": "297",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The session for root from 172.19.1.130 using GUI is logged off.",
+            "MessageArgs": [
+                "root",
+                "172.19.1.130",
+                "GUI"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0032",
+            "Name": " Log Entry 297",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/296",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:49:30-05:00",
+            "Description": " Log Entry 296",
+            "EntryType": "Oem",
+            "Id": "296",
+            "Links": {},
+            "Message": "User root via IP 172.19.1.130 requested state / configuration change to Reset iDRAC using GUI.",
+            "MessageArgs": [
+                "root",
+                "172.19.1.130",
+                "Reset iDRAC",
+                "GUI"
+            ],
+            "MessageArgs@odata.count": 4,
+            "MessageId": "RAC1195",
+            "Name": " Log Entry 296",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/295",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:49:28-05:00",
+            "Description": " Log Entry 295",
+            "EntryType": "Oem",
+            "Id": "295",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Requested system powerdown.",
+            "MessageId": "RAC0704",
+            "Name": " Log Entry 295",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/294",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:49:26-05:00",
+            "Description": " Log Entry 294",
+            "EntryType": "Oem",
+            "Id": "294",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 294",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/293",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:49:26-05:00",
+            "Description": " Log Entry 293",
+            "EntryType": "Oem",
+            "Id": "293",
+            "Links": {},
+            "Message": "System is turning off.",
+            "MessageId": "SYS1001",
+            "Name": " Log Entry 293",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/292",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:49:21-05:00",
+            "Description": " Log Entry 292",
+            "EntryType": "Oem",
+            "Id": "292",
+            "Links": {},
+            "Message": "User root via IP 172.19.1.130 requested state / configuration change to Power Control using GUI.",
+            "MessageArgs": [
+                "root",
+                "172.19.1.130",
+                "Power Control",
+                "GUI"
+            ],
+            "MessageArgs@odata.count": 4,
+            "MessageId": "RAC1195",
+            "Name": " Log Entry 292",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/291",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:48:42-05:00",
+            "Description": " Log Entry 291",
+            "EntryType": "Oem",
+            "Id": "291",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "The Default Login Warning feature is disabled.",
+            "MessageId": "USR0008",
+            "Name": " Log Entry 291",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/290",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:48:42-05:00",
+            "Description": " Log Entry 290",
+            "EntryType": "Oem",
+            "Id": "290",
+            "Links": {},
+            "Message": "User root via IP 172.19.1.130 requested state / configuration change to Users using GUI.",
+            "MessageArgs": [
+                "root",
+                "172.19.1.130",
+                "Users",
+                "GUI"
+            ],
+            "MessageArgs@odata.count": 4,
+            "MessageId": "RAC1195",
+            "Name": " Log Entry 290",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/289",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:48:38-05:00",
+            "Description": " Log Entry 289",
+            "EntryType": "Oem",
+            "Id": "289",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Successfully logged in using root, from 172.19.1.130 and GUI.",
+            "MessageArgs": [
+                "root",
+                "172.19.1.130",
+                "GUI"
+            ],
+            "MessageArgs@odata.count": 3,
+            "MessageId": "USR0030",
+            "Name": " Log Entry 289",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/288",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:48:38-05:00",
+            "Description": " Log Entry 288",
+            "EntryType": "Oem",
+            "Id": "288",
+            "Links": {},
+            "Message": "The previous log entry was repeated 1 times.",
+            "MessageArgs": [
+                "1"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "LOG007",
+            "Name": " Log Entry 288",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/287",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:43:10-05:00",
+            "Description": " Log Entry 287",
+            "EntryType": "Oem",
+            "Id": "287",
+            "Links": {},
+            "Message": "System CPU Resetting.",
+            "MessageId": "SYS1003",
+            "Name": " Log Entry 287",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/286",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T19:38:32-05:00",
+            "Description": " Log Entry 286",
+            "EntryType": "Oem",
+            "Id": "286",
+            "Links": {},
+            "Message": "The iDRAC IP Address changed from 0.0.0.0 to 172.19.1.132.",
+            "MessageArgs": [
+                "0.0.0.0",
+                "172.19.1.132"
+            ],
+            "MessageArgs@odata.count": 2,
+            "MessageId": "IPA0100",
+            "Name": " Log Entry 286",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/285",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T17:05:06-05:00",
+            "Description": " Log Entry 285",
+            "EntryType": "Oem",
+            "Id": "285",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Power/PowerSupplies/PSU.Slot.2"
+                }
+            },
+            "Message": "The input power for power supply 2 has been restored.",
+            "MessageArgs": [
+                "2"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PSU0019",
+            "Name": " Log Entry 285",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/284",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T17:05:01-05:00",
+            "Description": " Log Entry 284",
+            "EntryType": "Oem",
+            "Id": "284",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1"
+                }
+            },
+            "Message": "Power Supply 2: Status = 0x00, IOUT = 0x0, VOUT= 0x0, TEMP= 0x0, FAN = 0x0, INPUT= 0x0.",
+            "MessageArgs": [
+                "2",
+                "00",
+                "0",
+                "0",
+                "0",
+                "0",
+                "0"
+            ],
+            "MessageArgs@odata.count": 7,
+            "MessageId": "PSU0800",
+            "Name": " Log Entry 284",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/283",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:39:43-05:00",
+            "Description": " Log Entry 283",
+            "EntryType": "Oem",
+            "Id": "283",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "New PCI card(s) have been detected in the system. Fan speeds may have changed to add additional cooling to the cards.",
+            "MessageId": "PCI3018",
+            "Name": " Log Entry 283",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/282",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:38:58-05:00",
+            "Description": " Log Entry 282",
+            "EntryType": "Oem",
+            "Id": "282",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Chassis/System.Embedded.1/Power/PowerSupplies/PSU.Slot.2"
+                }
+            },
+            "Message": "The power input for power supply 2 is lost.",
+            "MessageArgs": [
+                "2"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PSU0003",
+            "Name": " Log Entry 282",
+            "OemRecordFormat": "Dell",
+            "Severity": "Critical"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/281",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:38:54-05:00",
+            "Description": " Log Entry 281",
+            "EntryType": "Oem",
+            "Id": "281",
+            "Links": {},
+            "Message": "Firmware update will not be performed. Firmware package is not present for POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR10",
+            "Name": " Log Entry 281",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/280",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:38:54-05:00",
+            "Description": " Log Entry 280",
+            "EntryType": "Oem",
+            "Id": "280",
+            "Links": {},
+            "Message": "New device detected: POWER SUPPLY(psu.slot.2)",
+            "MessageArgs": [
+                "POWER SUPPLY(psu.slot.2)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 280",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/279",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:38:54-05:00",
+            "Description": " Log Entry 279",
+            "EntryType": "Oem",
+            "Id": "279",
+            "Links": {},
+            "Message": "A replacement part was detected for device: POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 279",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/278",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:38:54-05:00",
+            "Description": " Log Entry 278",
+            "EntryType": "Oem",
+            "Id": "278",
+            "Links": {},
+            "Message": "Firmware update will not be performed. Firmware package is not present for POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR10",
+            "Name": " Log Entry 278",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/277",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:38:54-05:00",
+            "Description": " Log Entry 277",
+            "EntryType": "Oem",
+            "Id": "277",
+            "Links": {},
+            "Message": "New device detected: POWER SUPPLY(psu.slot.1)",
+            "MessageArgs": [
+                "POWER SUPPLY(psu.slot.1)"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR7",
+            "Name": " Log Entry 277",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/276",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:38:54-05:00",
+            "Description": " Log Entry 276",
+            "EntryType": "Oem",
+            "Id": "276",
+            "Links": {},
+            "Message": "A replacement part was detected for device: POWER SUPPLY",
+            "MessageArgs": [
+                "POWER SUPPLY"
+            ],
+            "MessageArgs@odata.count": 1,
+            "MessageId": "PR1",
+            "Name": " Log Entry 276",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/275",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:38:44-05:00",
+            "Description": " Log Entry 275",
+            "EntryType": "Oem",
+            "Id": "275",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "The chassis is closed while the power is off.",
+            "MessageId": "SEC0034",
+            "Name": " Log Entry 275",
+            "OemRecordFormat": "Dell",
+            "Severity": "OK"
+        },
+        {
+            "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/274",
+            "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+            "Created": "2022-05-03T16:38:03-05:00",
+            "Description": " Log Entry 274",
+            "EntryType": "Oem",
+            "Id": "274",
+            "Links": {
+                "OriginOfCondition": {
+                    "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+                }
+            },
+            "Message": "The chassis is open while the power is off.",
+            "MessageId": "SEC0033",
+            "Name": " Log Entry 274",
+            "OemRecordFormat": "Dell",
+            "Severity": "Critical"
+        }
+    ],
+    "Members@odata.count": 823,
+    "Members@odata.nextLink": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog?$skip=550",
+    "Name": "Log Entry Collection"
+}

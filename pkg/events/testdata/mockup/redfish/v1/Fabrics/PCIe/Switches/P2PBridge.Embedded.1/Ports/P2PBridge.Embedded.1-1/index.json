@@ -1,0 +1,20 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Port.Port",
+    "@odata.etag": "1655847840",
+    "@odata.id": "/redfish/v1/Fabrics/PCIe/Switches/P2PBridge.Embedded.1/Ports/P2PBridge.Embedded.1-1",
+    "@odata.type": "#Port.v1_1_0.Port",
+    "CurrentSpeedGbps": 2.461538461538462,
+    "Description": "SH7758 PCIe Switch [PS]",
+    "Id": "6-0-0",
+    "MaxSpeedGbps": 2.461538461538462,
+    "Name": "P2PBridge.Embedded.1-1",
+    "PortId": "6-0-0",
+    "PortProtocol": "PCIe",
+    "PortType": "UpstreamPort",
+    "Status": {
+        "Health": "OK",
+        "HealthRollup": "OK",
+        "State": "Enabled"
+    },
+    "Width": 1
+}

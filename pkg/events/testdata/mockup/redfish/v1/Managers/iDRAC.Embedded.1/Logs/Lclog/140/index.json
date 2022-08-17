@@ -1,0 +1,20 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/140",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-04T20:34:03-05:00",
+    "Description": " Log Entry 140",
+    "EntryType": "Oem",
+    "Id": "140",
+    "Links": {},
+    "Message": "Drive 7 is removed from disk drive bay 1.",
+    "MessageArgs": [
+        "7",
+        "1"
+    ],
+    "MessageArgs@odata.count": 2,
+    "MessageId": "PDR1016",
+    "Name": " Log Entry 140",
+    "OemRecordFormat": "Dell",
+    "Severity": "Critical"
+}

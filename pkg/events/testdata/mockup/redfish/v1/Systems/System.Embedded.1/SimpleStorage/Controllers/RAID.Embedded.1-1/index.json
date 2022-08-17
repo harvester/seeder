@@ -1,0 +1,21 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#SimpleStorage.SimpleStorage",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Storage/RAID.Embedded.1-1",
+    "@odata.type": "#SimpleStorage.v1_2_0.SimpleStorage",
+    "Description": "Simple Storage Controller",
+    "Devices": [],
+    "Devices@odata.count": 0,
+    "Id": "RAID.Embedded.1-1",
+    "Links": {
+        "Chassis": {
+            "@odata.id": "/redfish/v1/Chassis/System.Embedded.1"
+        }
+    },
+    "Name": "PERC S130 Controller",
+    "Status": {
+        "Health": null,
+        "HealthRollup": null,
+        "State": "Enabled"
+    },
+    "UefiDevicePath": "PciRoot(0x0)/Pci(0x11,0x4)"
+}

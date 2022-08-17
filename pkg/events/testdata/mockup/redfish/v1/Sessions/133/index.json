@@ -1,0 +1,10 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#Session.Session",
+    "@odata.id": "/redfish/v1/Sessions/133",
+    "@odata.type": "#Session.v1_1_0.Session",
+    "Description": "User Session",
+    "Id": "133",
+    "Name": "User Session",
+    "Password": null,
+    "UserName": "root"
+}

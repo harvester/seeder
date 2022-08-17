@@ -1,0 +1,19 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#LogEntry.LogEntry",
+    "@odata.id": "/redfish/v1/Managers/iDRAC.Embedded.1/Logs/Lclog/234",
+    "@odata.type": "#LogEntry.v1_3_0.LogEntry",
+    "Created": "2022-04-07T14:21:43-05:00",
+    "Description": " Log Entry 234",
+    "EntryType": "Oem",
+    "Id": "234",
+    "Links": {
+        "OriginOfCondition": {
+            "@odata.id": "/redfish/v1/Systems/System.Embedded.1"
+        }
+    },
+    "Message": "New PCI card(s) have been detected in the system. Fan speeds may have changed to add additional cooling to the cards.",
+    "MessageId": "PCI3018",
+    "Name": " Log Entry 234",
+    "OemRecordFormat": "Dell",
+    "Severity": "OK"
+}

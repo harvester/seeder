@@ -1,0 +1,15 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#SoftwareInventory.SoftwareInventory",
+    "@odata.id": "/redfish/v1/UpdateService/FirmwareInventory/Installed-0-4.3.0-0002",
+    "@odata.type": "#SoftwareInventory.v1_1_1.SoftwareInventory",
+    "Description": "Represents Firmware Inventory",
+    "Id": "Installed-0-4.3.0-0002",
+    "Name": "PERC S130 Controller",
+    "SoftwareId": "0",
+    "Status": {
+        "Health": "OK",
+        "State": "Enabled"
+    },
+    "Updateable": false,
+    "Version": "4.3.0-0002"
+}

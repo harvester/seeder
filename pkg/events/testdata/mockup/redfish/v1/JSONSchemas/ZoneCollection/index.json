@@ -1,0 +1,21 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#JsonSchemaFile.JsonSchemaFile",
+    "@odata.id": "/redfish/v1/JSONSchemas/ZoneCollection",
+    "@odata.type": "#JsonSchemaFile.v1_0_2.JsonSchemaFile",
+    "Description": "ZoneCollection Schema File Location",
+    "Id": "ZoneCollection",
+    "Languages": [
+        "en"
+    ],
+    "Languages@odata.count": 1,
+    "Location": [
+        {
+            "Language": "en",
+            "PublicationUri": "http://redfish.dmtf.org/schemas/v1/ZoneCollection.json",
+            "Uri": "/redfish/v1/Schemas/ZoneCollection.json"
+        }
+    ],
+    "Location@odata.count": 1,
+    "Name": "ZoneCollection Schema File",
+    "Schema": "#ZoneCollection.ZoneCollection"
+}

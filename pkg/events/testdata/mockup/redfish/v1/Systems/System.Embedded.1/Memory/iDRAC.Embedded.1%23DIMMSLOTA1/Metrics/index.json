@@ -1,0 +1,17 @@
+{
+    "@odata.context": "/redfish/v1/$metadata#MemoryMetrics.MemoryMetrics",
+    "@odata.id": "/redfish/v1/Systems/System.Embedded.1/Memory/iDRAC.Embedded.1%23DIMMSLOTA1/Metrics",
+    "@odata.type": "#MemoryMetrics.v1_1_3.MemoryMetrics",
+    "Description": "Metrics of the memory device",
+    "HealthData": {
+        "AlarmTrips": {
+            "AddressParityError": null,
+            "CorrectableECCError": null,
+            "Temperature": null,
+            "UncorrectableECCError": null
+        },
+        "DataLossDetected": null
+    },
+    "Id": "Metrics",
+    "Name": "DIMM A1 Metrics"
+}
