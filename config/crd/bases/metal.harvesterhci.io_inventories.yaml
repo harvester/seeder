@@ -92,6 +92,7 @@ spec:
               events:
                 properties:
                   enabled:
+                    default: false
                     type: boolean
                   pollingInterval:
                     default: 1h

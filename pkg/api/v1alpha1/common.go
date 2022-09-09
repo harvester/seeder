@@ -4,7 +4,7 @@ package v1alpha1
 const (
 	DefaultNS            = "metal-system"
 	TinkConfig           = "tinkerbell"
-	DefaultAPIPort       = "6443"
+	DefaultAPIPort       = "9345"
 	OverrideAPIPortLabel = "clusterPort.harvesterhci.io"
 )
 

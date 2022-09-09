@@ -552,7 +552,7 @@ func genCoreTypedClient(ctx context.Context, c *seederv1alpha1.Cluster) (*typedC
 		port = seederv1alpha1.DefaultAPIPort
 	}
 
-	kcBytes, err := util.GenerateKubeConfig(fmt.Sprintf("https://%s:%s", c.Status.ClusterAddress, port), seederv1alpha1.DefaultAPIPrefix, c.Status.ClusterToken)
+	kcBytes, err := util.GenerateKubeConfig(c.Status.ClusterAddress, port, seederv1alpha1.DefaultAPIPrefix, c.Status.ClusterToken)
 	if err != nil {
 		return nil, err
 	}

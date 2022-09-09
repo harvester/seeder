@@ -68,7 +68,7 @@ func TestMain(t *testing.M) {
 
 func Test_GenerateKubeConfig(t *testing.T) {
 	assert := require.New(t)
-	c, err := GenerateKubeConfig(fmt.Sprintf("https://localhost:%s", port), "k3s", token)
+	c, err := GenerateKubeConfig("localhost", port, "k3s", token)
 	assert.NoError(err, "expected no error during generation of kubeconfig")
 	assert.NoError(err)
 	k8sclient, err := clientcmd.NewClientConfigFromBytes(c)
