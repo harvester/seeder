@@ -126,9 +126,19 @@ func main() {
 	}
 
 	if err = (&controllers.InventoryEventReconciller{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: log.FromContext(ctx).WithName("inventory-	event-controller"),
+		EventRecorder: mgr.GetEventRecorderFor("seeder"),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "InventoryEvent")
+		os.Exit(1)
+	}
+
+	if err = (&controllers.ClusterEventReconciler{
 		Client:        mgr.GetClient(),
 		Scheme:        mgr.GetScheme(),
-		Logger:        log.FromContext(ctx).WithName("inventoryevent-controller"),
+		Logger:        log.FromContext(ctx).WithName("cluster-event-controller"),
 		EventRecorder: mgr.GetEventRecorderFor("seeder"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "InventoryEvent")
