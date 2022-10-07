@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -26,7 +27,7 @@ type Config struct {
 }
 
 // Generate kubeconfig impersontates as a server and renders an admin kubeconfig which can be used to monitor and patch clusters
-func GenerateKubeConfig(serverURL, prefix, token string) ([]byte, error) {
+func GenerateKubeConfig(serverURL, port, prefix, token string) ([]byte, error) {
 
 	c := &http.Client{Transport: &http.Transport{
 		IdleConnTimeout: 30 * time.Second,
@@ -34,9 +35,9 @@ func GenerateKubeConfig(serverURL, prefix, token string) ([]byte, error) {
 			InsecureSkipVerify: true,
 		},
 	},
-		Timeout: 30 * time.Second}
+		Timeout: 5 * time.Second}
 
-	configURL := fmt.Sprintf("%s/v1-%s/server-bootstrap", serverURL, prefix)
+	configURL := fmt.Sprintf("https://%s:%s/v1-%s/server-bootstrap", serverURL, port, prefix)
 	req, err := http.NewRequest("GET", configURL, nil)
 	if err != nil {
 		return nil, err
@@ -88,11 +89,21 @@ func GenerateKubeConfig(serverURL, prefix, token string) ([]byte, error) {
 		InternalCAKey: internalCAKeyByte,
 	}
 
-	return renderKubeConfig(serverConfig, serverURL)
+	// override to assist with unit tests
+	apiPort := "6443"
+	if port != seederv1alpha1.DefaultAPIPort {
+		apiPort = port
+	}
+	return renderKubeConfig(serverConfig, serverURL, apiPort)
 }
 
 // GenerateKubeConfig will generate an admin kubeconfig using the serverconfig generated
-func renderKubeConfig(c *Config, serverURL string) ([]byte, error) {
+func renderKubeConfig(c *Config, serverURL, port string) ([]byte, error) {
+	// rke2 k8s api and registration ports are different
+	// 9345 for registration
+	// 6443 for apiserver
+	// need to change the port in serverURL
+
 	adminTemplateKey, err := certutil.NewPrivateKey()
 	if err != nil {
 		return nil, err
@@ -126,7 +137,7 @@ func renderKubeConfig(c *Config, serverURL string) ([]byte, error) {
 
 	cluster := clientcmdapi.NewCluster()
 	cluster.CertificateAuthorityData = c.ServerCA
-	cluster.Server = serverURL
+	cluster.Server = fmt.Sprintf("https://%s:%s", serverURL, port)
 	//cluster.InsecureSkipTLSVerify = true
 
 	authInfo := clientcmdapi.NewAuthInfo()
