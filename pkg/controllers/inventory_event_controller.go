@@ -121,8 +121,11 @@ func (r *InventoryEventReconciller) getInventoryInfo(ctx context.Context, i *see
 		return fmt.Errorf("secret %s has no key password", s.Name)
 	}
 
-	bmcendpoint := i.Spec.BaseboardManagementSpec.Connection.Host
-	rc, err := events.NewEventFetcher(ctx, string(username), string(password), fmt.Sprintf("https://%s", bmcendpoint))
+	bmcendpoint := fmt.Sprintf("https://%s", i.Spec.BaseboardManagementSpec.Connection.Host)
+	if port, ok := i.Labels[seederv1alpha1.OverrideRedfishPortLabel]; ok {
+		bmcendpoint = fmt.Sprintf("https://%s:%s", i.Spec.BaseboardManagementSpec.Connection.Host, port)
+	}
+	rc, err := events.NewEventFetcher(ctx, string(username), string(password), bmcendpoint)
 	if err != nil {
 		return err
 	}

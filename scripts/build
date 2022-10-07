@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+cd $(dirname $0)/..
+go fmt ./...
+go vet ./...
+controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
+CGO_ENABLED=0 go build -o bin/manager .
+mkdir -p bin

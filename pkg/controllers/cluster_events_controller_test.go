@@ -213,6 +213,19 @@ var _ = Describe("cluster events test", func() {
 
 	It("check for cluster event reconcilliation", func() {
 		// poll for cluster to be ready for and for nodes to be patched with inventory info
+
+		Eventually(func() error {
+			iObj := &seederv1alpha1.Inventory{}
+			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj); err != nil {
+				return err
+			}
+			iObj.Labels = map[string]string{
+				seederv1alpha1.OverrideRedfishPortLabel: redfishPort,
+			}
+			return k8sClient.Update(ctx, iObj)
+
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
 		Eventually(func() error {
 			cObj := &seederv1alpha1.Cluster{}
 			fmt.Println(cObj.Spec.Nodes)
