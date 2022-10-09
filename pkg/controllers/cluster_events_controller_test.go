@@ -255,8 +255,8 @@ var _ = Describe("cluster events test", func() {
 				for _, a := range v.Status.Addresses {
 					if a.Address == iObj.Status.Address {
 						found = true
-						if _, ok := v.Labels["totalCpuCores"]; !ok {
-							return fmt.Errorf("waiting for cpu cores to be populated")
+						if _, ok := v.Labels["manufacturer"]; !ok {
+							return fmt.Errorf("waiting for manufacturer to be populated")
 						}
 					}
 				}

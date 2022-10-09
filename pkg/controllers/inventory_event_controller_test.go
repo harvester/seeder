@@ -96,9 +96,9 @@ var _ = Describe("Inventory event controller tests", func() {
 				return err
 			}
 
-			_, ok := iObj.Labels["totalCpuCores"]
+			_, ok := iObj.Labels["manufacturer"]
 			if !ok {
-				return fmt.Errorf("waiting for totalCpuCores to be populated")
+				return fmt.Errorf("waiting for manufacturer to be populated")
 			}
 			return nil
 		}, "120s", "5s").ShouldNot(HaveOccurred())
