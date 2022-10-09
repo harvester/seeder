@@ -49,7 +49,7 @@ var _ = Describe("cluster events test", func() {
 
 		i = &seederv1alpha1.Inventory{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "event-test",
+				Name:      "cluster-event-test",
 				Namespace: "default",
 			},
 			Spec: seederv1alpha1.InventorySpec{
@@ -61,7 +61,7 @@ var _ = Describe("cluster events test", func() {
 						Port:        623,
 						InsecureTLS: true,
 						AuthSecretRef: corev1.SecretReference{
-							Name:      "event-test",
+							Name:      "cluster-event-test",
 							Namespace: "default",
 						},
 					},
@@ -74,7 +74,7 @@ var _ = Describe("cluster events test", func() {
 
 		s = &corev1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "event-test",
+				Name:      "cluster-event-test",
 				Namespace: "default",
 			},
 			StringData: map[string]string{
@@ -213,7 +213,6 @@ var _ = Describe("cluster events test", func() {
 
 	It("check for cluster event reconcilliation", func() {
 		// poll for cluster to be ready for and for nodes to be patched with inventory info
-
 		Eventually(func() error {
 			iObj := &seederv1alpha1.Inventory{}
 			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj); err != nil {
@@ -279,7 +278,7 @@ var _ = Describe("cluster events test", func() {
 				return fmt.Errorf("waiting to find node matching ip address allocated to inventory %s", iObj.Status.Address)
 			}
 			return nil
-		}, "60s", "5s").ShouldNot(HaveOccurred())
+		}, "120s", "5s").ShouldNot(HaveOccurred())
 	})
 
 	AfterEach(func() {

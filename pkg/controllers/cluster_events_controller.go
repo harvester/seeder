@@ -99,7 +99,11 @@ func (r *ClusterEventReconciler) updateNodes(ctx context.Context, c *seederv1alp
 			}
 			username := s.Data["username"]
 			password := s.Data["password"]
-			e, err := events.NewEventFetcher(ctx, string(username), string(password), fmt.Sprintf("https://%s", i.Spec.Connection.Host))
+			bmcendpoint := fmt.Sprintf("https://%s", i.Spec.BaseboardManagementSpec.Connection.Host)
+			if port, ok := i.Labels[seederv1alpha1.OverrideRedfishPortLabel]; ok {
+				bmcendpoint = fmt.Sprintf("https://%s:%s", i.Spec.BaseboardManagementSpec.Connection.Host, port)
+			}
+			e, err := events.NewEventFetcher(ctx, string(username), string(password), bmcendpoint)
 			if err != nil {
 				return err
 			}
