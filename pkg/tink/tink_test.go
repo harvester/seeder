@@ -11,13 +11,24 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func Test_generateMetaData(t *testing.T) {
+func Test_generateMetaDataV10(t *testing.T) {
 	assert := require.New(t)
-	m, err := generateMetaData("http://localhost", "v1.0.1", "xx:xx:xx:xx:xx", "create",
+	m, err := generateMetaDataV10("http://localhost", "v1.0.1", "xx:xx:xx:xx:xx", "create",
 		"/dev/sda", "192.168.1.100", "token", "password", "v1.0.2", []string{"8.8.8.8"}, []string{"abc"})
 	assert.NoError(err, "no error should have occured")
 	assert.Contains(m, "harvester.install.mode=create", "expected to find create mode in metadata")
 	assert.Contains(m, "hwAddr:xx:xx:xx:xx:xx", "expected to find mac address in metadata")
+	assert.NotContains(m, "scheme_version", "expected to not find scheme_version")
+}
+
+func Test_generateMetaDataV11(t *testing.T) {
+	assert := require.New(t)
+	m, err := generateMetaDataV11("http://localhost", "v1.0.1", "xx:xx:xx:xx:xx", "create",
+		"/dev/sda", "192.168.1.100", "token", "password", "v1.0.2", []string{"8.8.8.8"}, []string{"abc"})
+	assert.NoError(err, "no error should have occured")
+	assert.Contains(m, "harvester.install.mode=create", "expected to find create mode in metadata")
+	assert.Contains(m, "hwAddr:xx:xx:xx:xx:xx", "expected to find mac address in metadata")
+	assert.Contains(m, "scheme_version", "expected to find scheme_version")
 }
 
 var (
@@ -109,7 +120,7 @@ var (
 	}
 )
 
-func Test_GenerateHWRequest(t *testing.T) {
+func Test_GenerateHWRequestV10(t *testing.T) {
 	assert := require.New(t)
 	hw, err := GenerateHWRequest(i, c)
 	assert.NoError(err, "no error should occur during hardware generation")
@@ -125,6 +136,31 @@ func Test_GenerateHWRequest(t *testing.T) {
 	assert.Equal(hw.Spec.Interfaces[0].DHCP.IP.Gateway, i.Status.Gateway, "expected to find correct gateway")
 	assert.Equal(hw.Spec.Interfaces[0].DHCP.IP.Address, i.Status.Address, "expected to find correct address")
 	assert.Equal(hw.Spec.Interfaces[0].DHCP.IP.Netmask, i.Status.Netmask, "expected to find correct netmask")
+	assert.NotContains(hw.Spec.Metadata.Instance.Userdata, "scheme_version")
+	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.networks.harvester-mgmt", "expected to find harvester-mgmt in interfaces")
+	assert.NotContains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.management_interface", "expected to not find management_interface")
+}
+
+func Test_GenerateHWRequestV11(t *testing.T) {
+	assert := require.New(t)
+	c.Spec.HarvesterVersion = "v1.1.0"
+	hw, err := GenerateHWRequest(i, c)
+	assert.NoError(err, "no error should occur during hardware generation")
+	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.mode=create", "expected to find create mode in metadata")
+	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "hwAddr:xx:xx:xx:xx:xx", "expected to find mac address in metadata")
+	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "dns_nameservers=8.8.8.8", "expected to find correct nameserver")
+	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "ssh_authorized_keys=\\\"- abc ", "expected to find ssh_keys")
+	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "token=token", "expected to find token")
+	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "password=password", "expected to find password")
+	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.vip=192.168.1.100", "expected to find a vip")
+	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.vip_mode=static", "expected to find vipMode static")
+	assert.Equal(hw.Spec.Interfaces[0].DHCP.MAC, i.Spec.ManagementInterfaceMacAddress, "expected to find correct hardware address")
+	assert.Equal(hw.Spec.Interfaces[0].DHCP.IP.Gateway, i.Status.Gateway, "expected to find correct gateway")
+	assert.Equal(hw.Spec.Interfaces[0].DHCP.IP.Address, i.Status.Address, "expected to find correct address")
+	assert.Equal(hw.Spec.Interfaces[0].DHCP.IP.Netmask, i.Status.Netmask, "expected to find correct netmask")
+	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "scheme_version")
+	assert.NotContains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.networks.harvester-mgmt", "expected to find harvester-mgmt in interfaces")
+	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.management_interface", "expected to not find management_interface")
 }
 
 func Test_GenerateHWRequestWithJoin(t *testing.T) {
