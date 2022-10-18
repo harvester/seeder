@@ -143,8 +143,9 @@ func Test_GenerateHWRequestV10(t *testing.T) {
 
 func Test_GenerateHWRequestV11(t *testing.T) {
 	assert := require.New(t)
-	c.Spec.HarvesterVersion = "v1.1.0"
-	hw, err := GenerateHWRequest(i, c)
+	clusterCopy := c.DeepCopy()
+	clusterCopy.Spec.HarvesterVersion = "v1.1.0"
+	hw, err := GenerateHWRequest(i, clusterCopy)
 	assert.NoError(err, "no error should occur during hardware generation")
 	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.mode=create", "expected to find create mode in metadata")
 	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "hwAddr:xx:xx:xx:xx:xx", "expected to find mac address in metadata")
@@ -163,10 +164,20 @@ func Test_GenerateHWRequestV11(t *testing.T) {
 	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.management_interface", "expected to not find management_interface")
 }
 
-func Test_GenerateHWRequestWithJoin(t *testing.T) {
+func Test_GenerateHWRequestWithJoinV10(t *testing.T) {
 	assert := require.New(t)
 	i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.HarvesterCreateNode)
 	hw, err := GenerateHWRequest(i, c)
 	assert.NoError(err, "no error should occur during hardware generation")
 	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.server_url=https://192.168.1.100:8443", "expected to find join url")
+}
+
+func Test_GenerateHWRequestWithJoinV11(t *testing.T) {
+	assert := require.New(t)
+	i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.HarvesterCreateNode)
+	clusterCopy := c.DeepCopy()
+	clusterCopy.Spec.HarvesterVersion = "v1.1.0"
+	hw, err := GenerateHWRequest(i, clusterCopy)
+	assert.NoError(err, "no error should occur during hardware generation")
+	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.server_url=https://192.168.1.100", "expected to find join url")
 }
