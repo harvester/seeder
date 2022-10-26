@@ -29,7 +29,6 @@ import (
 	"github.com/harvester/seeder/pkg/mock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/ory/dockertest/v3/docker"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -54,8 +53,8 @@ var (
 	//eg          *errgroup.Group
 	//egctx       context.Context
 	//setupLog    = ctrl.Log.WithName("setup")
-	pool *dockertest.Pool
-	//redfishPort string
+	pool        *dockertest.Pool
+	redfishPort string
 	redfishMock *dockertest.Resource
 )
 
@@ -178,14 +177,12 @@ var _ = BeforeSuite(func() {
 			"--key",
 			"/mockup/localhost.key",
 		},
-		PortBindings: map[docker.Port][]docker.PortBinding{
-			"8000/tcp": {{HostPort: "443"}},
-		},
 	}
 
 	redfishMock, err = pool.BuildAndRunWithBuildOptions(redfishBuildOpts, redfishRunOpts)
 	Expect(err).NotTo(HaveOccurred())
 	time.Sleep(30 * time.Second)
+	redfishPort = redfishMock.GetPort("8000/tcp")
 })
 
 var _ = AfterSuite(func() {

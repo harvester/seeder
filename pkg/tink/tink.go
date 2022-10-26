@@ -3,11 +3,13 @@ package tink
 import (
 	"bytes"
 	"fmt"
+	"html/template"
+	"strings"
+
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/util"
 	"github.com/pkg/errors"
 	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
-	"html/template"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -19,7 +21,7 @@ const (
 	defaultISOURL       = "https://releases.rancher.com/harvester/"
 )
 
-//GenerateHWRequest will generate the tinkerbell Hardware type object
+// GenerateHWRequest will generate the tinkerbell Hardware type object
 func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (hw *tinkv1alpha1.Hardware, err error) {
 
 	// generate metadata
@@ -28,8 +30,14 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 		mode = "create"
 	}
 
-	m, err := generateMetaData(c.Spec.ConfigURL, c.Spec.HarvesterVersion, i.Spec.ManagementInterfaceMacAddress, mode,
-		i.Spec.PrimaryDisk, c.Status.ClusterAddress, c.Status.ClusterToken, i.Status.GeneratedPassword, c.Spec.ImageURL, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys)
+	var m string
+	if strings.Contains(c.Spec.HarvesterVersion, "v1.1") {
+		m, err = generateMetaDataV11(c.Spec.ConfigURL, c.Spec.HarvesterVersion, i.Spec.ManagementInterfaceMacAddress, mode,
+			i.Spec.PrimaryDisk, c.Status.ClusterAddress, c.Status.ClusterToken, i.Status.GeneratedPassword, c.Spec.ImageURL, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys)
+	} else {
+		m, err = generateMetaDataV10(c.Spec.ConfigURL, c.Spec.HarvesterVersion, i.Spec.ManagementInterfaceMacAddress, mode,
+			i.Spec.PrimaryDisk, c.Status.ClusterAddress, c.Status.ClusterToken, i.Status.GeneratedPassword, c.Spec.ImageURL, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys)
+	}
 	if err != nil {
 		return nil, errors.Wrap(err, "error during metadata generation")
 	}
@@ -85,8 +93,8 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 	return hw, nil
 }
 
-// generateMetaData is a wrapper to generate metadata for nodes to create or join a cluster
-func generateMetaData(configURL, version, hwAddress, mode, disk, vip, token, password, imageurl string, Nameservers, SSHKeys []string) (metadata string, err error) {
+// generateMetaDataV10 is a wrapper to generate metadata for nodes to create or join a cluster
+func generateMetaDataV10(configURL, version, hwAddress, mode, disk, vip, token, password, imageurl string, Nameservers, SSHKeys []string) (metadata string, err error) {
 
 	var tmpStruct struct {
 		ConfigURL   string
@@ -118,6 +126,51 @@ func generateMetaData(configURL, version, hwAddress, mode, disk, vip, token, pas
 	tmpStruct.IsoURL = fmt.Sprintf("%s/%s/harvester-%s-amd64.iso", endpoint, version, version)
 
 	var metaDataStruct = `{{ if ne .ConfigURL ""}}harvester.install.config_url={{ .ConfigURL }}{{end}} harvester.install.networks.harvester-mgmt.interfaces="hwAddr:{{ .HWAddress }}" ip=dhcp harvester.install.networks.harvester-mgmt.method=dhcp harvester.install.networks.harvester-mgmt.bond_options.mode=balance-tlb harvester.install.networks.harvester-mgmt.bond_options.miimon=100 console=ttyS1,115200  harvester.install.mode={{ .Mode }} harvester.token={{ .Token }} harvester.os.password={{ .Password }} {{ range $v := .SSHKeys}}harvester.os.ssh_authorized_keys=\"- {{ $v }} \ "{{ end }}{{range $v := .Nameservers}}harvester.os.dns_nameservers={{ $v }} {{end}} harvester.install.vip={{ .VIP }} harvester.install.vip_mode=static harvester.install.iso_url={{ .IsoURL }} harvester.install.device={{ .Disk }} {{if eq .Mode "join"}}harvester.server_url={{ printf "https://%s:8443" .VIP }}{{end}}`
+
+	metadataTmpl := template.Must(template.New("MetaData").Parse(metaDataStruct))
+
+	err = metadataTmpl.Execute(&output, tmpStruct)
+
+	if err != nil {
+		return metadata, err
+	}
+
+	metadata = output.String()
+	return metadata, nil
+}
+
+func generateMetaDataV11(configURL, version, hwAddress, mode, disk, vip, token, password, imageurl string, Nameservers, SSHKeys []string) (metadata string, err error) {
+
+	var tmpStruct struct {
+		ConfigURL   string
+		HWAddress   string
+		Mode        string
+		Disk        string
+		VIP         string
+		Token       string
+		SSHKeys     []string
+		Nameservers []string
+		Password    string
+		IsoURL      string
+	}
+	var output bytes.Buffer
+	tmpStruct.ConfigURL = configURL
+	tmpStruct.HWAddress = hwAddress
+	tmpStruct.Mode = mode
+	tmpStruct.Disk = disk
+	tmpStruct.VIP = vip
+	tmpStruct.Token = token
+	tmpStruct.Password = password
+	tmpStruct.SSHKeys = SSHKeys
+	tmpStruct.Nameservers = Nameservers
+	tmpStruct.Password = password
+	endpoint := defaultISOURL
+	if imageurl != "" {
+		endpoint = imageurl
+	}
+	tmpStruct.IsoURL = fmt.Sprintf("%s/%s/harvester-%s-amd64.iso", endpoint, version, version)
+
+	var metaDataStruct = `{{ if ne .ConfigURL ""}}harvester.install.config_url={{ .ConfigURL }}{{end}} harvester.install.management_interface.interfaces="hwAddr:{{ .HWAddress }}" ip=dhcp harvester.install.management_interface.method=dhcp harvester.management_interface.bond_options.mode=balance-tlb harvester.install.management_interface.bond_options.miimon=100 console=ttyS1,115200  harvester.install.mode={{ .Mode }} harvester.token={{ .Token }} harvester.os.password={{ .Password }} {{ range $v := .SSHKeys}}harvester.os.ssh_authorized_keys=\"- {{ $v }} \ "{{ end }}{{range $v := .Nameservers}}harvester.os.dns_nameservers={{ $v }} {{end}} harvester.install.vip={{ .VIP }} harvester.install.vip_mode=static harvester.install.iso_url={{ .IsoURL }} harvester.install.device={{ .Disk }} {{if eq .Mode "join"}}harvester.server_url={{ printf "https://%s:443" .VIP }}{{end}} harvester.scheme_version=1`
 
 	metadataTmpl := template.Must(template.New("MetaData").Parse(metaDataStruct))
 

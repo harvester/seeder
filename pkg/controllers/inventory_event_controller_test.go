@@ -78,6 +78,18 @@ var _ = Describe("Inventory event controller tests", func() {
 	It("check inventory and baremetal reconcile", func() {
 		Eventually(func() error {
 			iObj := &seederv1alpha1.Inventory{}
+			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj); err != nil {
+				return err
+			}
+			iObj.Labels = map[string]string{
+				seederv1alpha1.OverrideRedfishPortLabel: redfishPort,
+			}
+			return k8sClient.Update(ctx, iObj)
+
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			iObj := &seederv1alpha1.Inventory{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj)
 			if err != nil {
 				return err
@@ -96,9 +108,9 @@ var _ = Describe("Inventory event controller tests", func() {
 				return err
 			}
 
-			_, ok := iObj.Labels["totalCpuCores"]
+			_, ok := iObj.Labels["manufacturer"]
 			if !ok {
-				return fmt.Errorf("waiting for totalCpuCores to be populated")
+				return fmt.Errorf("waiting for manufacturer to be populated")
 			}
 			return nil
 		}, "120s", "5s").ShouldNot(HaveOccurred())

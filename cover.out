@@ -1,0 +1,21 @@
+mode: set
+github.com/harvester/seeder/pkg/events/events.go:16.103,25.16 3 1
+github.com/harvester/seeder/pkg/events/events.go:29.2,29.56 1 1
+github.com/harvester/seeder/pkg/events/events.go:25.16,27.3 1 0
+github.com/harvester/seeder/pkg/events/events.go:32.72,34.16 2 1
+github.com/harvester/seeder/pkg/events/events.go:38.2,40.28 3 1
+github.com/harvester/seeder/pkg/events/events.go:73.2,81.28 8 1
+github.com/harvester/seeder/pkg/events/events.go:34.16,36.3 1 0
+github.com/harvester/seeder/pkg/events/events.go:40.28,41.27 1 1
+github.com/harvester/seeder/pkg/events/events.go:44.3,49.17 6 1
+github.com/harvester/seeder/pkg/events/events.go:52.3,52.24 1 1
+github.com/harvester/seeder/pkg/events/events.go:41.27,42.12 1 1
+github.com/harvester/seeder/pkg/events/events.go:49.17,51.4 1 0
+github.com/harvester/seeder/pkg/events/events.go:52.24,54.18 2 1
+github.com/harvester/seeder/pkg/events/events.go:58.4,58.29 1 1
+github.com/harvester/seeder/pkg/events/events.go:62.4,63.18 2 1
+github.com/harvester/seeder/pkg/events/events.go:66.4,66.33 1 1
+github.com/harvester/seeder/pkg/events/events.go:54.18,56.5 1 0
+github.com/harvester/seeder/pkg/events/events.go:58.29,60.5 1 1
+github.com/harvester/seeder/pkg/events/events.go:63.18,65.5 1 0
+github.com/harvester/seeder/pkg/events/events.go:66.33,69.5 2 1
