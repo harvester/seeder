@@ -19,7 +19,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-
 	"github.com/go-logr/logr"
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/tink"
@@ -64,9 +63,9 @@ type clusterReconciler func(context.Context, *seederv1alpha1.Cluster) error
 func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	r.Info("Reconcilling inventory objects", req.Name, req.Namespace)
 	// TODO(user): your logic here
-	c := &seederv1alpha1.Cluster{}
+	cObj := &seederv1alpha1.Cluster{}
 
-	err := r.Get(ctx, req.NamespacedName, c)
+	err := r.Get(ctx, req.NamespacedName, cObj)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
 			return ctrl.Result{}, nil
@@ -75,6 +74,7 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, err
 	}
 
+	c := cObj.DeepCopy()
 	reconcileList := []clusterReconciler{
 		r.generateClusterConfig,
 		r.patchNodesAndPools,
@@ -194,10 +194,21 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *seederv1a
 					return fmt.Errorf("waiting for address pool %s to be ready", pool.Name)
 				}
 				nodeAddress, err = util.AllocateAddress(pool.Status.DeepCopy(), nc.StaticAddress)
-			}
+				if err != nil {
+					return err
+				}
 
-			if err != nil {
-				return err
+				pool.Status.AddressAllocation[nodeAddress] = seederv1alpha1.ObjectReferenceWithKind{
+					ObjectReference: seederv1alpha1.ObjectReference{
+						Namespace: i.Namespace,
+						Name:      i.Name,
+					},
+					Kind: seederv1alpha1.KindInventory,
+				}
+				err = r.Status().Update(ctx, pool)
+				if err != nil {
+					return fmt.Errorf("error updating address pool after allocation: %v", err)
+				}
 			}
 
 			i.Status.PXEBootInterface.Address = nodeAddress
@@ -222,20 +233,7 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *seederv1a
 			if err != nil {
 				return err
 			}
-			// update pool with node allocation if not already done
-			if !found {
-				pool.Status.AddressAllocation[nodeAddress] = seederv1alpha1.ObjectReferenceWithKind{
-					ObjectReference: seederv1alpha1.ObjectReference{
-						Namespace: i.Namespace,
-						Name:      i.Name,
-					},
-					Kind: seederv1alpha1.KindInventory,
-				}
-				err = r.Status().Update(ctx, pool)
-				if err != nil {
-					return err
-				}
-			}
+
 		}
 
 		c.Status.Status = seederv1alpha1.ClusterNodesPatched

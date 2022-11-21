@@ -976,3 +976,251 @@ var _ = Describe("cluster running test", func() {
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 })
+
+// multi-node cluster test
+var _ = Describe("multi-node cluster provisioning test", func() {
+	var i, i2, i3 *seederv1alpha1.Inventory
+	var c *seederv1alpha1.Cluster
+	var a *seederv1alpha1.AddressPool
+	var creds *v1.Secret
+	BeforeEach(func() {
+		a = &seederv1alpha1.AddressPool{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "multi-node-test",
+				Namespace: "default",
+			},
+			Spec: seederv1alpha1.AddressSpec{
+				CIDR:    "192.168.1.1/29",
+				Gateway: "192.168.1.7",
+			},
+		}
+
+		i = &seederv1alpha1.Inventory{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "multi-node1",
+				Namespace: "default",
+			},
+			Spec: seederv1alpha1.InventorySpec{
+				PrimaryDisk:                   "/dev/sda",
+				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
+				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+					Connection: rufio.Connection{
+						Host:        "localhost",
+						Port:        623,
+						InsecureTLS: true,
+						AuthSecretRef: v1.SecretReference{
+							Name:      "common",
+							Namespace: "default",
+						},
+					},
+				},
+			},
+		}
+
+		i2 = &seederv1alpha1.Inventory{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "multi-node2",
+				Namespace: "default",
+			},
+			Spec: seederv1alpha1.InventorySpec{
+				PrimaryDisk:                   "/dev/sda",
+				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
+				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+					Connection: rufio.Connection{
+						Host:        "localhost",
+						Port:        623,
+						InsecureTLS: true,
+						AuthSecretRef: v1.SecretReference{
+							Name:      "common",
+							Namespace: "default",
+						},
+					},
+				},
+			},
+		}
+
+		i3 = &seederv1alpha1.Inventory{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "multi-node3",
+				Namespace: "default",
+			},
+			Spec: seederv1alpha1.InventorySpec{
+				PrimaryDisk:                   "/dev/sda",
+				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
+				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+					Connection: rufio.Connection{
+						Host:        "localhost",
+						Port:        623,
+						InsecureTLS: true,
+						AuthSecretRef: v1.SecretReference{
+							Name:      "common",
+							Namespace: "default",
+						},
+					},
+				},
+			},
+		}
+
+		creds = &v1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "common",
+				Namespace: "default",
+			},
+			StringData: map[string]string{
+				"username": "admin",
+				"password": "password",
+			},
+		}
+
+		c = &seederv1alpha1.Cluster{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "multi-node-cluster",
+				Namespace: "default",
+			},
+			Spec: seederv1alpha1.ClusterSpec{
+				HarvesterVersion: "harvester_1_0_2",
+				Nodes: []seederv1alpha1.NodeConfig{
+					{
+						InventoryReference: seederv1alpha1.ObjectReference{
+							Name:      "multi-node1",
+							Namespace: "default",
+						},
+						AddressPoolReference: seederv1alpha1.ObjectReference{
+							Name:      "multi-node-test",
+							Namespace: "default",
+						},
+					},
+					{
+						InventoryReference: seederv1alpha1.ObjectReference{
+							Name:      "multi-node2",
+							Namespace: "default",
+						},
+						AddressPoolReference: seederv1alpha1.ObjectReference{
+							Name:      "multi-node-test",
+							Namespace: "default",
+						},
+					},
+					{
+						InventoryReference: seederv1alpha1.ObjectReference{
+							Name:      "multi-node3",
+							Namespace: "default",
+						},
+						AddressPoolReference: seederv1alpha1.ObjectReference{
+							Name:      "multi-node-test",
+							Namespace: "default",
+						},
+					},
+				},
+				VIPConfig: seederv1alpha1.VIPConfig{
+					AddressPoolReference: seederv1alpha1.ObjectReference{
+						Name:      "multi-node-test",
+						Namespace: "default",
+					},
+				},
+				ClusterConfig: seederv1alpha1.ClusterConfig{
+					SSHKeys: []string{
+						"abc",
+						"def",
+					},
+					ConfigURL: "localhost:30300/config.yaml",
+				},
+			},
+		}
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, a)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, creds)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, i)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, i2)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, i3)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, c)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
+
+	It("inventory reconcile in cluster controller workflow", func() {
+		addMap := make(map[string]string)
+		Eventually(func() error {
+			cObj := &seederv1alpha1.Cluster{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
+			if err != nil {
+				return err
+			}
+			if cObj.Status.Status != seederv1alpha1.ClusterTinkHardwareSubmitted {
+				return fmt.Errorf("expected to find cluster status %s, but got %s", seederv1alpha1.ClusterTinkHardwareSubmitted, cObj.Status.Status)
+			}
+			return nil
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		invList := []*seederv1alpha1.Inventory{i, i2, i3}
+		for _, v := range invList {
+			Eventually(func() error {
+				iObj := &seederv1alpha1.Inventory{}
+				err := k8sClient.Get(ctx, types.NamespacedName{Namespace: v.Namespace, Name: v.Name}, iObj)
+				if err != nil {
+					return fmt.Errorf("error fetching inventory %s: %v", v.Name, err)
+				}
+				if nodeName, ok := addMap[iObj.Status.Address]; !ok {
+					addMap[iObj.Status.Address] = iObj.Name
+				} else {
+					return fmt.Errorf("duplicate address: %s assigned to %s is already allocated to %s", iObj.Status.Address, iObj.Name, nodeName)
+				}
+
+				return nil
+			}, "30s", "5s").ShouldNot(HaveOccurred())
+		}
+
+	})
+
+	AfterEach(func() {
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, c)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, i)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, i2)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, i3)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, creds)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, a)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			cObj := &seederv1alpha1.Cluster{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
+			if err != nil {
+				if apierrors.IsNotFound(err) {
+					return nil
+				}
+				return err
+			}
+
+			return fmt.Errorf("waiting for cluster finalizers to finish")
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
+})
