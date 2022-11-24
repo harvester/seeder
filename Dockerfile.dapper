@@ -15,7 +15,7 @@ RUN apt update && \
     apt install -y bash git gcc docker.io vim less file curl wget ca-certificates qemu-utils
 
 ENV DAPPER_ENV REPO TAG DRONE_TAG CROSS
-ENV DAPPER_SOURCE /go/src/github.com/harvester/vm-import-controller
+ENV DAPPER_SOURCE /go/src/github.com/harvester/seeder
 ENV DAPPER_OUTPUT ./bin ./pkg/api ./config
 ENV DAPPER_DOCKER_SOCKET true
 ENV DAPPER_RUN_ARGS "--network=host"
