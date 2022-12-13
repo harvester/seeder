@@ -19,9 +19,10 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 	"testing"
 	"time"
+
+	"github.com/harvester/seeder/pkg/crd"
 
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
@@ -77,15 +78,15 @@ var _ = BeforeSuite(func() {
 	log.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
 	ctx, cancel = context.WithCancel(context.TODO())
 	By("bootstrapping test environment")
-	testEnv = &envtest.Environment{
-		CRDDirectoryPaths:     []string{filepath.Join("..", "..", "config", "crd", "bases")},
-		ErrorIfCRDPathMissing: true,
-	}
+	testEnv = &envtest.Environment{}
 
 	cfg, err := testEnv.Start()
 	Expect(err).NotTo(HaveOccurred())
 	Expect(cfg).NotTo(BeNil())
 
+	// install CRD's
+	err = crd.Create(ctx, cfg)
+	Expect(err).NotTo(HaveOccurred())
 	err = seederv1alpha1.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -158,6 +159,22 @@ var _ = BeforeSuite(func() {
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 		Logger: log.Log.WithName("controller.cluster-event"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&LocalClusterReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		Logger:        log.Log.WithName("controller.local-cluster"),
+		EventRecorder: mgr.GetEventRecorderFor("seeder"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&LocalNodeReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		Logger:        log.Log.WithName("controller.local-node"),
+		EventRecorder: mgr.GetEventRecorderFor("seeder"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 

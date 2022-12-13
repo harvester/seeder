@@ -34,7 +34,9 @@ const (
 	KindInventory string = "inventory"
 )
 const (
-	InventoryFinalizer = "finalizer.inventory.harvesterhci.io"
+	InventoryFinalizer             = "finalizer.inventory.harvesterhci.io"
+	LocalInventoryAnnotation       = "metal.harvesterhci.io/localInventory"
+	LocalInventoryStatusAnnotation = "metal.harvesterhci.io/localInventoryStatus"
 )
 
 const (
@@ -55,9 +57,9 @@ const (
 
 // InventorySpec defines the desired state of Inventory
 type InventorySpec struct {
-	PrimaryDisk                   string `json:"primaryDisk"`
-	ManagementInterfaceMacAddress string `json:"managementInterfaceMacAddress"`
-	rufio.BaseboardManagementSpec `json:"baseboardSpec"`
+	PrimaryDisk                   string            `json:"primaryDisk"`
+	ManagementInterfaceMacAddress string            `json:"managementInterfaceMacAddress"`
+	BaseboardManagementSpec       rufio.MachineSpec `json:"baseboardSpec"`
 	Events                        `json:"events"`
 }
 

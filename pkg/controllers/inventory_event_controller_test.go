@@ -33,7 +33,7 @@ var _ = Describe("Inventory event controller tests", func() {
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+				BaseboardManagementSpec: rufio.MachineSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,

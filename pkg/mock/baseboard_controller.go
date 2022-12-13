@@ -18,7 +18,7 @@ type FakeBaseboardReconciller struct {
 }
 
 func (f *FakeBaseboardReconciller) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	b := &rufio.BaseboardManagement{}
+	b := &rufio.Machine{}
 	f.Info("Reconcilling baseboard objects", req.Name, req.Namespace)
 	err := f.Get(ctx, req.NamespacedName, b)
 	if err != nil {
@@ -37,6 +37,6 @@ func (f *FakeBaseboardReconciller) Reconcile(ctx context.Context, req ctrl.Reque
 // SetupWithManager sets up the controller with the Manager.
 func (f *FakeBaseboardReconciller) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&rufio.BaseboardManagement{}).
+		For(&rufio.Machine{}).
 		Complete(f)
 }

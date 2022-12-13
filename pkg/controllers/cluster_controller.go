@@ -30,6 +30,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	typedCore "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -76,6 +77,12 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	c := cObj.DeepCopy()
+
+	// ignore the local cluster
+	if c.Name == seederv1alpha1.DefaultLocalClusterName && c.Namespace == seederv1alpha1.DefaultLocalClusterNamespace {
+		return ctrl.Result{}, nil
+	}
+
 	reconcileList := []clusterReconciler{
 		r.generateClusterConfig,
 		r.patchNodesAndPools,
@@ -545,19 +552,34 @@ func genCoreTypedClient(ctx context.Context, c *seederv1alpha1.Cluster) (*typedC
 		port = seederv1alpha1.DefaultAPIPort
 	}
 
-	kcBytes, err := util.GenerateKubeConfig(c.Status.ClusterAddress, port, seederv1alpha1.DefaultAPIPrefix, c.Status.ClusterToken)
-	if err != nil {
-		return nil, err
+	var isLocalCluster bool
+	var restConfig *rest.Config
+	if c.Name == seederv1alpha1.DefaultLocalClusterName && c.Namespace == seederv1alpha1.DefaultLocalClusterNamespace {
+		isLocalCluster = true
 	}
 
-	hcClientConfig, err := clientcmd.NewClientConfigFromBytes(kcBytes)
-	if err != nil {
-		return nil, err
-	}
+	// special handling for local cluster to use InClusterConfig
+	if isLocalCluster {
+		var err error
+		restConfig, err = ctrl.GetConfig()
+		if err != nil {
+			return nil, fmt.Errorf("error fetching incluster config: %v", err)
+		}
+	} else {
+		kcBytes, err := util.GenerateKubeConfig(c.Status.ClusterAddress, port, seederv1alpha1.DefaultAPIPrefix, c.Status.ClusterToken)
+		if err != nil {
+			return nil, err
+		}
 
-	restConfig, err := hcClientConfig.ClientConfig()
-	if err != nil {
-		return nil, err
+		hcClientConfig, err := clientcmd.NewClientConfigFromBytes(kcBytes)
+		if err != nil {
+			return nil, err
+		}
+
+		restConfig, err = hcClientConfig.ClientConfig()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return typedCore.NewForConfig(restConfig)

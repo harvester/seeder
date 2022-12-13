@@ -131,7 +131,7 @@ func (r *ClusterEventReconciler) updateNodes(ctx context.Context, c *seederv1alp
 			} else {
 				update = "Warning"
 			}
-			recorder.Event(updatedNode, update, "SeederUpdated", fmt.Sprintf("Underlying inventory %s status is %s", i.Name, status))
+			recorder.Event(updatedNode, update, seederv1alpha1.EventLoggerName, fmt.Sprintf("Underlying inventory %s status is %s", i.Name, status))
 		}
 	}
 	return nil

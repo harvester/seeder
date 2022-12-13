@@ -54,7 +54,7 @@ func Test_CheckAndCreateBaseBoardObject(t *testing.T) {
 		Spec: seederv1alpha1.InventorySpec{
 			PrimaryDisk:                   "/dev/sda1",
 			ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-			BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+			BaseboardManagementSpec: rufio.MachineSpec{
 				Connection: rufio.Connection{
 					Host:        "localhost",
 					Port:        623,
@@ -85,7 +85,7 @@ func Test_CheckAndCreateBaseBoardObjectFailure(t *testing.T) {
 		Spec: seederv1alpha1.InventorySpec{
 			PrimaryDisk:                   "/dev/sda1",
 			ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-			BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+			BaseboardManagementSpec: rufio.MachineSpec{
 				Connection: rufio.Connection{
 					Host:        "localhost",
 					Port:        623,
@@ -101,4 +101,52 @@ func Test_CheckAndCreateBaseBoardObjectFailure(t *testing.T) {
 
 	err = CheckAndCreateBaseBoardObject(ctx, c, l, i, c.Scheme())
 	assert.Equal(nil, err, "error creating baseboard object")
+}
+
+func Test_ListInventory(t *testing.T) {
+	var Inventory = `
+---
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: Inventory
+metadata:
+  name: node1
+  namespace: default
+spec:
+  primaryDisk: "/dev/sda"
+  managementInterfaceMacAddress: "xx:xx:xx:xx:xx"
+  baseboardSpec:
+    connection:
+      host: "localhost"
+      port: 623
+      insecureTLS: true
+      authSecretRef:
+        name: node
+        namespace: default
+---
+---
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: Inventory
+metadata:
+  name: node2
+  namespace: kube-system
+spec:
+  primaryDisk: "/dev/sda"
+  managementInterfaceMacAddress: "xx:xx:xx:xx:xx"
+  baseboardSpec:
+    connection:
+      host: "localhost"
+      port: 623
+      insecureTLS: true
+      authSecretRef:
+        name: node
+        namespace: default
+`
+	assert := require.New(t)
+	objs, err := mock.GenerateObjectsFromVar(Inventory)
+	assert.NoError(err, "expected no error during object creation")
+	c, err := mock.GenerateFakeClientFromObjects(objs)
+	assert.NoError(err, "expected no error during mock client generation")
+	inv, err := ListInventory(context.TODO(), c)
+	assert.NoError(err, "expected no error while listing inventory")
+	assert.Len(inv, 2, "expected to find 2 inventory objects")
 }

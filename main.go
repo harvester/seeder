@@ -19,6 +19,16 @@ package main
 import (
 	"flag"
 	"os"
+	"strings"
+
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/harvester/seeder/pkg/util"
+
+	"github.com/harvester/seeder/pkg/crd"
+
+	"github.com/harvester/seeder/pkg/rufiojobwrapper"
+	rufiocontrollers "github.com/tinkerbell/rufio/controllers"
 
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
@@ -45,6 +55,10 @@ var (
 	setupLog = ctrl.Log.WithName("setup")
 )
 
+type controller interface {
+	SetupWithManager(ctrl.Manager) error
+}
+
 const (
 	defaultNamespace = "default"
 )
@@ -63,10 +77,15 @@ func main() {
 	var enableLeaderElection bool
 	var probeAddr string
 	var leaderElectionNamespace string
-
+	var embedMode bool
 	ns, ok := os.LookupEnv("LEADER_ELECTION_NAMESPACE")
 	if !ok {
 		ns = defaultNamespace
+	}
+
+	// trigger custom reconcile loops when in embedded loop
+	if val, ok := os.LookupEnv("SEEDER_EMBEDDED_MODE"); ok && strings.ToLower(val) == "true" {
+		embedMode = true
 	}
 
 	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
@@ -99,50 +118,104 @@ func main() {
 
 	ctx := ctrl.SetupSignalHandler()
 
-	if err = (&controllers.ClusterReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-		Logger: log.FromContext(ctx).WithName("cluster-controller"),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Cluster")
-		os.Exit(1)
-	}
-	if err = (&controllers.InventoryReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-		Logger: log.FromContext(ctx).WithName("inventory-controller"),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "Inventory")
+	// create CRDs
+	err = crd.Create(ctx, mgr.GetConfig())
+	if err != nil {
+		setupLog.Error(err, "unable to create crds")
 		os.Exit(1)
 	}
 
-	if err = (&controllers.AddressPoolReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-		Logger: log.FromContext(ctx).WithName("addresspool-controller"),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "AddressPool")
-		os.Exit(1)
+	var enabledControllers []controller
+	var coreControllers = []controller{
+		&controllers.ClusterReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+			Logger: log.FromContext(ctx).WithName("cluster-controller"),
+		},
+		&controllers.InventoryReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+			Logger: log.FromContext(ctx).WithName("inventory-controller"),
+		},
+		&controllers.ClusterEventReconciler{
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
+			Logger:        log.FromContext(ctx).WithName("cluster-event-controller"),
+			EventRecorder: mgr.GetEventRecorderFor("seeder"),
+		},
+		rufiocontrollers.NewMachineReconciler(
+			mgr.GetClient(),
+			mgr.GetEventRecorderFor("machine-controller"),
+			rufiocontrollers.NewBMCClientFactoryFunc(ctx),
+			ctrl.Log.WithName("controller").WithName("Machine"),
+		),
+		rufiojobwrapper.NewRufioWrapper(ctx,
+			mgr.GetClient(),
+			ctrl.Log.WithName("controller").WithName("Job"),
+		),
+		rufiocontrollers.NewTaskReconciler(
+			mgr.GetClient(),
+			rufiocontrollers.NewBMCClientFactoryFunc(ctx),
+		),
 	}
 
-	if err = (&controllers.InventoryEventReconciller{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-		Logger: log.FromContext(ctx).WithName("inventory-	event-controller"),
-		EventRecorder: mgr.GetEventRecorderFor("seeder"),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "InventoryEvent")
-		os.Exit(1)
+	// embed mode doesnt need inventory events as they eventually flow into cluster events
+	var nonEmbedModeControllers = []controller{
+		&controllers.AddressPoolReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+			Logger: log.FromContext(ctx).WithName("addresspool-controller"),
+		},
+		&controllers.InventoryEventReconciller{
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
+			Logger:        log.FromContext(ctx).WithName("inventory-event-controller"),
+			EventRecorder: mgr.GetEventRecorderFor("seeder"),
+		},
 	}
 
-	if err = (&controllers.ClusterEventReconciler{
-		Client:        mgr.GetClient(),
-		Scheme:        mgr.GetScheme(),
-		Logger:        log.FromContext(ctx).WithName("cluster-event-controller"),
-		EventRecorder: mgr.GetEventRecorderFor("seeder"),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "InventoryEvent")
-		os.Exit(1)
+	var embedModeControllers = []controller{
+		&controllers.LocalClusterReconciler{
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
+			Logger:        log.FromContext(ctx).WithName("local-cluster-controller"),
+			EventRecorder: mgr.GetEventRecorderFor("seeder"),
+		},
+		&controllers.LocalNodeReconciler{
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
+			Logger:        log.FromContext(ctx).WithName("local-node-controller"),
+			EventRecorder: mgr.GetEventRecorderFor("seeder"),
+		},
+	}
+
+	if embedMode {
+		enabledControllers = append(coreControllers, embedModeControllers...)
+	} else {
+		enabledControllers = append(coreControllers, nonEmbedModeControllers...)
+	}
+
+	for _, v := range enabledControllers {
+		if err := v.SetupWithManager(mgr); err != nil {
+			setupLog.Error(err, "error starting controller")
+			os.Exit(1)
+		}
+	}
+
+	// need a tmp client as mgr.Client read caches are unavailable
+	// until manager has been started
+	if embedMode {
+		tmpClient, err := client.New(mgr.GetConfig(), client.Options{
+			Scheme: scheme,
+		})
+		if err != nil {
+			setupLog.Error(err, "error creating temp client for local cluster setup")
+		}
+		err = util.SetupLocalCluster(ctx, tmpClient)
+		if err != nil {
+			setupLog.Error(err, "error setting up local cluster in embed mode")
+			os.Exit(1)
+		}
 	}
 
 	//+kubebuilder:scaffold:builder
