@@ -3,8 +3,6 @@ package controllers
 import (
 	"fmt"
 
-	"github.com/harvester/seeder/pkg/util"
-
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -28,7 +26,7 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+				BaseboardManagementSpec: rufio.MachineSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,
@@ -80,7 +78,7 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 
 	It("delete baseboardobject", func() {
 		Eventually(func() error {
-			b := &rufio.BaseboardManagement{}
+			b := &rufio.Machine{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
 			if err != nil {
 				return fmt.Errorf("error looking up baseboard object: %v", err)
@@ -93,7 +91,7 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 
 	It("wait for baseboard to be recreated", func() {
 		Eventually(func() error {
-			b := &rufio.BaseboardManagement{}
+			b := &rufio.Machine{}
 			return k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
@@ -136,7 +134,7 @@ var _ = Describe("inventory object deletion tests", func() {
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+				BaseboardManagementSpec: rufio.MachineSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,
@@ -178,7 +176,7 @@ var _ = Describe("inventory object deletion tests", func() {
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 
 		Eventually(func() error {
-			b := &rufio.BaseboardManagement{}
+			b := &rufio.Machine{}
 			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
 			if err != nil {
 				if apierrors.IsNotFound(err) {
@@ -193,81 +191,6 @@ var _ = Describe("inventory object deletion tests", func() {
 		Eventually(func() error {
 			err := k8sClient.Delete(ctx, creds)
 			return err
-		}, "30s", "5s").ShouldNot(HaveOccurred())
-	})
-})
-
-var _ = Describe("list inventory objects test", func() {
-	var one, two *seederv1alpha1.Inventory
-
-	BeforeEach(func() {
-		one = &seederv1alpha1.Inventory{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "one",
-				Namespace: "default",
-			},
-			Spec: seederv1alpha1.InventorySpec{
-				PrimaryDisk:                   "/dev/sda",
-				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
-					Connection: rufio.Connection{
-						Host:        "localhost",
-						Port:        623,
-						InsecureTLS: true,
-						AuthSecretRef: corev1.SecretReference{
-							Name:      "sample-deletion",
-							Namespace: "default",
-						},
-					},
-				},
-			},
-		}
-
-		two = &seederv1alpha1.Inventory{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "two",
-				Namespace: "kube-system",
-			},
-			Spec: seederv1alpha1.InventorySpec{
-				PrimaryDisk:                   "/dev/sda",
-				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
-					Connection: rufio.Connection{
-						Host:        "localhost",
-						Port:        623,
-						InsecureTLS: true,
-						AuthSecretRef: corev1.SecretReference{
-							Name:      "sample-deletion",
-							Namespace: "default",
-						},
-					},
-				},
-			},
-		}
-
-		Eventually(func() error {
-			err := k8sClient.Create(ctx, two)
-			if err != nil {
-				return err
-			}
-			err = k8sClient.Create(ctx, one)
-			return err
-		}, "30s", "5s").ShouldNot(HaveOccurred())
-	})
-
-	It("run list inventory tests", func() {
-		items, err := util.ListInventory(ctx, k8sClient)
-		Expect(err).ToNot(HaveOccurred())
-		Expect(len(items)).To(Equal(2))
-	})
-
-	AfterEach(func() {
-		Eventually(func() error {
-			err := k8sClient.Delete(ctx, one)
-			if err != nil {
-				return err
-			}
-			return k8sClient.Delete(ctx, two)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 })

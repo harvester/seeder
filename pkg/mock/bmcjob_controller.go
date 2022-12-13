@@ -19,7 +19,7 @@ type FakeBaseboardJobReconciller struct {
 }
 
 func (f *FakeBaseboardJobReconciller) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	b := &rufio.BMCJob{}
+	b := &rufio.Job{}
 	f.Info("Reconcilling baseboard job objects", req.Name, req.Namespace)
 	err := f.Get(ctx, req.NamespacedName, b)
 	if err != nil {
@@ -38,6 +38,6 @@ func (f *FakeBaseboardJobReconciller) Reconcile(ctx context.Context, req ctrl.Re
 // SetupWithManager sets up the controller with the Manager.
 func (f *FakeBaseboardJobReconciller) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&rufio.BMCJob{}).
+		For(&rufio.Job{}).
 		Complete(f)
 }

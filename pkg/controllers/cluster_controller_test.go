@@ -41,7 +41,7 @@ var _ = Describe("Create cluster tests", func() {
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+				BaseboardManagementSpec: rufio.MachineSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,
@@ -277,7 +277,7 @@ var _ = Describe("add inventory to cluster tests", func() {
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+				BaseboardManagementSpec: rufio.MachineSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,
@@ -299,7 +299,7 @@ var _ = Describe("add inventory to cluster tests", func() {
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+				BaseboardManagementSpec: rufio.MachineSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,
@@ -513,7 +513,7 @@ var _ = Describe("delete inventory from cluster tests", func() {
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+				BaseboardManagementSpec: rufio.MachineSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,
@@ -535,7 +535,7 @@ var _ = Describe("delete inventory from cluster tests", func() {
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+				BaseboardManagementSpec: rufio.MachineSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,
@@ -780,7 +780,7 @@ var _ = Describe("cluster running test", func() {
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+				BaseboardManagementSpec: rufio.MachineSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,
@@ -975,7 +975,7 @@ var _ = Describe("multi-node cluster provisioning test", func() {
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+				BaseboardManagementSpec: rufio.MachineSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,
@@ -997,7 +997,7 @@ var _ = Describe("multi-node cluster provisioning test", func() {
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+				BaseboardManagementSpec: rufio.MachineSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,
@@ -1019,7 +1019,7 @@ var _ = Describe("multi-node cluster provisioning test", func() {
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
 				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
-				BaseboardManagementSpec: rufio.BaseboardManagementSpec{
+				BaseboardManagementSpec: rufio.MachineSpec{
 					Connection: rufio.Connection{
 						Host:        "localhost",
 						Port:        623,

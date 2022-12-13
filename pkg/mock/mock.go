@@ -1,6 +1,8 @@
 package mock
 
 import (
+	"strings"
+
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/rancher/wrangler/pkg/yaml"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
@@ -9,13 +11,12 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
-	"strings"
 )
 
 const (
 	DefaultObjects = `
 apiVersion: bmc.tinkerbell.org/v1alpha1
-kind: BaseboardManagement
+kind: Machine
 metadata:
   name: fiftytwo
 spec:
@@ -29,7 +30,7 @@ spec:
   power: "on"
 ---
 apiVersion: bmc.tinkerbell.org/v1alpha1
-kind: BaseboardManagement
+kind: Machine
 metadata:
   name: fiftythree
 spec:
@@ -59,11 +60,21 @@ metadata:
 stringData:
   "username": "ADMIN"
   "password": "ADMIN"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: "harvester-system"
 `
 )
 
 func generateObjects() ([]runtime.Object, error) {
-	objs, err := yaml.ToObjects(strings.NewReader(DefaultObjects))
+	objs, err := GenerateObjectsFromVar(DefaultObjects)
+	return objs, err
+}
+
+func GenerateObjectsFromVar(v string) ([]runtime.Object, error) {
+	objs, err := yaml.ToObjects(strings.NewReader(v))
 	return objs, err
 }
 
@@ -73,6 +84,11 @@ func GenerateFakeClient() (client.WithWatch, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	return GenerateFakeClientFromObjects(objs)
+}
+
+func GenerateFakeClientFromObjects(objs []runtime.Object) (client.WithWatch, error) {
 	scheme := runtime.NewScheme()
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(seederv1alpha1.AddToScheme(scheme))

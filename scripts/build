@@ -5,5 +5,5 @@ cd $(dirname $0)/..
 go fmt ./...
 go vet ./...
 controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
-CGO_ENABLED=0 go build -o bin/manager .
+CGO_ENABLED=0 ASSUME_NO_MOVING_GC_UNSAFE_RISK_IT_WITH=go1.19 go build -o bin/manager .
 mkdir -p bin

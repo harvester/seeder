@@ -30,7 +30,7 @@ func CheckSecretExists(ctx context.Context, client client.Client, log logr.Logge
 // CheckAndCreateBaseBoardObject will take the BMCSpec and generate a baseboardobject of the same name
 // and set owner references.
 func CheckAndCreateBaseBoardObject(ctx context.Context, client client.Client, log logr.Logger, instanceObj *seederv1alpha1.Inventory, schema *runtime.Scheme) error {
-	b := &rufio.BaseboardManagement{
+	b := &rufio.Machine{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      instanceObj.Name,
 			Namespace: instanceObj.Namespace,
@@ -39,7 +39,7 @@ func CheckAndCreateBaseBoardObject(ctx context.Context, client client.Client, lo
 	}
 
 	controllerutil.AddFinalizer(b, seederv1alpha1.InventoryFinalizer)
-	existingObj := &rufio.BaseboardManagement{}
+	existingObj := &rufio.Machine{}
 	err := client.Get(ctx, types.NamespacedName{Name: b.Name, Namespace: b.Namespace}, existingObj)
 	if err != nil {
 		if apierrors.IsNotFound(err) {
@@ -70,7 +70,7 @@ func CreateObject(ctx context.Context, client client.Client, obj client.Object, 
 }
 
 // IsBaseboardReady checks if the BaseboardConnectivity is setup and true
-func IsBaseboardReady(b *rufio.BaseboardManagement) bool {
+func IsBaseboardReady(b *rufio.Machine) bool {
 	var ready bool
 	for _, c := range b.Status.Conditions {
 		if c.Type == rufio.Contactable && c.Status == rufio.ConditionTrue {

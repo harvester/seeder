@@ -80,6 +80,11 @@ func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	}
 
+	// if inventory object has LocalInventoryAnnotation then skip reconcile as this will be handled by the local_cluster_controller
+	if val, ok := inventoryObj.Annotations[seederv1alpha1.LocalInventoryAnnotation]; ok && val == "true" {
+		return ctrl.Result{}, nil
+	}
+
 	reconcileList := []inventoryReconciler{
 		r.manageBaseboardObject,
 		r.checkAndMarkNodeReady,
@@ -145,7 +150,7 @@ func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, i *seed
 		}
 
 		// check status of boseboard object
-		b := &rufio.BaseboardManagement{}
+		b := &rufio.Machine{}
 		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
 		if err != nil {
 			r.Error(err, "error fetching associated baseboard object in checkAndMarkNodeReady")
@@ -173,7 +178,7 @@ func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, i *seed
 func (r *InventoryReconciler) handleBaseboardDeletion(ctx context.Context, i *seederv1alpha1.Inventory) error {
 	// if no status is present then nothing is needed yet as BMC has not yet been created
 	if i.Status.Status == seederv1alpha1.InventoryReady {
-		b := &rufio.BaseboardManagement{}
+		b := &rufio.Machine{}
 		err := r.Get(ctx, types.NamespacedName{Name: i.Name, Namespace: i.Namespace}, b)
 		if err != nil {
 			r.Error(err, "error looking up baseboard object")
@@ -199,7 +204,7 @@ func (r *InventoryReconciler) handleBaseboardDeletion(ctx context.Context, i *se
 // handleInventoryDeletion cleans up the finalizer on boseboard object allowing it to be cleaned up
 func (r *InventoryReconciler) handleInventoryDeletion(ctx context.Context, i *seederv1alpha1.Inventory) error {
 	if controllerutil.ContainsFinalizer(i, seederv1alpha1.InventoryFinalizer) {
-		b := &rufio.BaseboardManagement{}
+		b := &rufio.Machine{}
 		var skipcleanup bool
 		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
 		if err != nil {
@@ -231,7 +236,7 @@ func (r *InventoryReconciler) handleInventoryDeletion(ctx context.Context, i *se
 func (r *InventoryReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&seederv1alpha1.Inventory{}).
-		Watches(&source.Kind{Type: &rufio.BaseboardManagement{}}, handler.EnqueueRequestsFromMapFunc(func(a client.Object) []reconcile.Request {
+		Watches(&source.Kind{Type: &rufio.Machine{}}, handler.EnqueueRequestsFromMapFunc(func(a client.Object) []reconcile.Request {
 			return []reconcile.Request{{
 				NamespacedName: types.NamespacedName{
 					Namespace: a.GetNamespace(),
@@ -249,9 +254,9 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *seederv1alph
 	// then reboot the hardware using BMC tasks
 	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i.Status.Conditions, seederv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) {
 		// submit BMC task
-		off := rufio.HardPowerOff
+		off := rufio.PowerHardOff
 		on := rufio.PowerOn
-		job := &rufio.BMCJob{
+		job := &rufio.Job{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      fmt.Sprintf("%s-reboot", i.Name),
 				Namespace: i.Namespace,
@@ -260,12 +265,12 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *seederv1alph
 				},
 			},
 
-			Spec: rufio.BMCJobSpec{
-				BaseboardManagementRef: rufio.BaseboardManagementRef{
+			Spec: rufio.JobSpec{
+				MachineRef: rufio.MachineRef{
 					Name:      i.Name,
 					Namespace: i.Namespace,
 				},
-				Tasks: []rufio.Task{
+				Tasks: []rufio.Action{
 					{
 						PowerAction: &off,
 					},
@@ -304,7 +309,7 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, i *seederv1alph
 func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, i *seederv1alpha1.Inventory) error {
 
 	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) {
-		j := &rufio.BMCJob{}
+		j := &rufio.Job{}
 		var jobFound bool
 		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: fmt.Sprintf("%s-reboot", i.Name)}, j)
 		if err != nil {
@@ -345,7 +350,7 @@ func (r *InventoryReconciler) inventoryFreed(ctx context.Context, i *seederv1alp
 	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryFreed) {
 		// check and submit a power off job
 		var notFound bool
-		j := &rufio.BMCJob{}
+		j := &rufio.Job{}
 		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: fmt.Sprintf("%s-poweroff", i.Name)}, j)
 		if err != nil {
 			if apierrors.IsNotFound(err) {
@@ -356,8 +361,8 @@ func (r *InventoryReconciler) inventoryFreed(ctx context.Context, i *seederv1alp
 		}
 
 		if notFound {
-			off := rufio.HardPowerOff
-			job := &rufio.BMCJob{
+			off := rufio.PowerHardOff
+			job := &rufio.Job{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("%s-poweroff", i.Name),
 					Namespace: i.Namespace,
@@ -365,12 +370,12 @@ func (r *InventoryReconciler) inventoryFreed(ctx context.Context, i *seederv1alp
 						"inventory": i.Name,
 					},
 				},
-				Spec: rufio.BMCJobSpec{
-					BaseboardManagementRef: rufio.BaseboardManagementRef{
+				Spec: rufio.JobSpec{
+					MachineRef: rufio.MachineRef{
 						Name:      i.Name,
 						Namespace: i.Namespace,
 					},
-					Tasks: []rufio.Task{
+					Tasks: []rufio.Action{
 						{
 							PowerAction: &off,
 						},
@@ -394,7 +399,7 @@ func (r *InventoryReconciler) inventoryFreed(ctx context.Context, i *seederv1alp
 
 func (r *InventoryReconciler) housekeepingBMCJob(ctx context.Context, i *seederv1alpha1.Inventory) error {
 	if !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryFreed) {
-		bmcjoblist := &rufio.BMCJobList{}
+		bmcjoblist := &rufio.JobList{}
 		l, err := labels.Parse(fmt.Sprintf("inventory=%s", i.Name))
 		if err != nil {
 			return err
