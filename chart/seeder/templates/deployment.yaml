@@ -6,6 +6,8 @@ metadata:
     {{- include "seeder.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  strategy:
+{{ toYaml .Values.strategy | indent 4 }}
   selector:
     matchLabels:
       {{- include "seeder.selectorLabels" . | nindent 6 }}
@@ -23,6 +25,8 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "seeder.serviceAccountName" . }}
+      affinity:
+  {{ include "seeder.apiAffinity" . | indent 8 }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -32,6 +36,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+          {{ if .Values.embeddedMode -}}
+          - name: SEEDER_EMBEDDED_MODE
+            value: "true"
+          {{ end -}}
           - name: LEADER_ELECTION_NAMESPACE
             valueFrom:
               fieldRef:
