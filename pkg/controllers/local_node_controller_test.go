@@ -15,7 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-var _ = FDescribe("test local node controller", func() {
+var _ = Describe("test local node controller", func() {
 	var n *corev1.Node
 	var i *seederv1alpha1.Inventory
 

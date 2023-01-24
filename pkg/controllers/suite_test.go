@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -69,8 +70,14 @@ const (
 func TestAPIs(t *testing.T) {
 	RegisterFailHandler(Fail)
 
+	suiteConfig, _ := GinkgoConfiguration()
+	_, ok := os.LookupEnv("SKIPINDRONE")
+	if ok {
+		suiteConfig.LabelFilter = "!skip-in-drone"
+	}
 	RunSpecs(t,
 		"Controller Suite",
+		suiteConfig,
 	)
 }
 

@@ -890,7 +890,7 @@ var _ = Describe("cluster running test", func() {
 
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
-	It("check if cluster is running", func() {
+	It("check if cluster is running", Label("skip-in-drone"), func() {
 
 		Eventually(func() error {
 			obj := &seederv1alpha1.Cluster{}

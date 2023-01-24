@@ -3,6 +3,7 @@ module github.com/harvester/seeder
 go 1.19
 
 require (
+	github.com/bmc-toolbox/bmclib/v2 v2.0.1-0.20221202150410-31e3dc1a1588
 	github.com/go-logr/logr v1.2.3
 	github.com/google/uuid v1.3.0
 	github.com/onsi/ginkgo/v2 v2.5.0
@@ -31,7 +32,6 @@ require (
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/VictorLowther/simplexml v0.0.0-20180716164440-0bff93621230 // indirect
 	github.com/VictorLowther/soap v0.0.0-20150314151524-8e36fca84b22 // indirect
-	github.com/bmc-toolbox/bmclib/v2 v2.0.1-0.20221202150410-31e3dc1a1588 // indirect
 	github.com/bmc-toolbox/common v0.0.0-20221115135648-0b584f504396 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/containerd/continuity v0.3.0 // indirect
@@ -136,4 +136,5 @@ replace (
 	// override to incorporate the fix: https://github.com/bmc-toolbox/bmclib/pull/301
 	github.com/bmc-toolbox/bmclib/v2 v2.0.1-0.20221202150410-31e3dc1a1588 => github.com/bmc-toolbox/bmclib/v2 v2.0.1-0.20230106151741-828737c08f6e
 	github.com/tinkerbell/tink v0.6.0 => github.com/tinkerbell/tink v0.6.1-0.20220524234633-0a800a4b5e25
+	go4.org/unsafe/assume-no-moving-gc v0.0.0-20211027215541-db492cf91b37 => go4.org/unsafe/assume-no-moving-gc v0.0.0-20220617031537-928513b29760
 )
