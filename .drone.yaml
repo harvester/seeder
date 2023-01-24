@@ -1,0 +1,73 @@
+---
+kind: pipeline
+name: harvester-seeder
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: fetch
+  image: alpine/git
+  commands:
+  - git fetch --tags
+  when:
+    instance:
+      - drone-publish.rancher.io
+    ref:
+      - refs/head/master
+      - refs/tags/*
+    event:
+      - tag
+
+- name: build
+  image: rancher/dapper:v0.4.1
+  commands:
+  - dapper ci
+  volumes:
+  - name: docker
+    path: /var/run/docker.sock
+
+- name: docker-publish-master
+  image: plugins/docker
+  settings:
+    build_args:
+      - VERSION=${DRONE_BRANCH}-${DRONE_COMMIT_SHA:0:8}-head
+    dockerfile: package/Dockerfile
+    password:
+      from_secret: docker_password
+    repo:  "rancher/harvester-seeder"
+    tag: ${DRONE_BRANCH}-head
+    username:
+      from_secret: docker_username
+  when:
+    branch: main
+    event:
+      - push
+
+- name: docker-publish
+  image: plugins/docker
+  settings:
+    build_args:
+    - "VERSION=${DRONE_TAG}"
+    custom_dns: 1.1.1.1
+    dockerfile: package/Dockerfile
+    password:
+      from_secret: docker_password
+    repo: "rancher/harvester-seeder"
+    tag: "${DRONE_TAG}"
+    username:
+      from_secret: docker_username
+  when:
+    instance:
+    - drone-publish.rancher.io
+    ref:
+    - refs/head/main
+    - refs/tags/*
+    event:
+    - tag
+
+volumes:
+- name: docker
+  host:
+    path: /var/run/docker.sock
