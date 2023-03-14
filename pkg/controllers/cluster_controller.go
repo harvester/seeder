@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+
 	"github.com/go-logr/logr"
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/tink"
@@ -255,7 +256,6 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *seederv1a
 func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *seederv1alpha1.Cluster) error {
 	if c.Status.Status == seederv1alpha1.ClusterNodesPatched || c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted || c.Status.Status == seederv1alpha1.ClusterRunning {
 		for _, i := range c.Spec.Nodes {
-			var hardwareUpdated bool
 			inventory := &seederv1alpha1.Inventory{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: i.InventoryReference.Namespace, Name: i.InventoryReference.Name}, inventory)
 			if err != nil {
@@ -289,23 +289,7 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *see
 					if err := r.Create(ctx, hw); err != nil {
 						return err
 					}
-					hardwareUpdated = true
 				} else {
-					return err
-				}
-			} /*else {
-				if !reflect.DeepEqual(lookupHw.Spec, hw.Spec) {
-					lookupHw.Spec = hw.Spec
-					if err := r.Update(ctx, lookupHw); err != nil {
-						return err
-					}
-					hardwareUpdated = true
-				}
-			}*/
-
-			if hardwareUpdated {
-				inventory.Status.Conditions = util.CreateOrUpdateCondition(inventory.Status.Conditions, seederv1alpha1.TinkWorkflowCreated, "tink workflow created")
-				if err := r.Status().Update(ctx, inventory); err != nil {
 					return err
 				}
 			}
@@ -458,6 +442,8 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *seederv1a
 			i.Status.Cluster = seederv1alpha1.ObjectReference{}
 			i.Status.GeneratedPassword = ""
 			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster)
+			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.HarvesterJoinNode)
+			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.HarvesterCreateNode)
 			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.InventoryFreed, "")
 			err = r.Status().Update(ctx, i)
 			if err != nil {
