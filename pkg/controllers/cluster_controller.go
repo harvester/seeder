@@ -256,6 +256,7 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *seederv1a
 func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *seederv1alpha1.Cluster) error {
 	if c.Status.Status == seederv1alpha1.ClusterNodesPatched || c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted || c.Status.Status == seederv1alpha1.ClusterRunning {
 		for _, i := range c.Spec.Nodes {
+			var hardwareUpdated bool
 			inventory := &seederv1alpha1.Inventory{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: i.InventoryReference.Namespace, Name: i.InventoryReference.Name}, inventory)
 			if err != nil {
@@ -289,7 +290,15 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *see
 					if err := r.Create(ctx, hw); err != nil {
 						return err
 					}
+					hardwareUpdated = true
 				} else {
+					return err
+				}
+			}
+
+			if hardwareUpdated {
+				inventory.Status.Conditions = util.CreateOrUpdateCondition(inventory.Status.Conditions, seederv1alpha1.TinkWorkflowCreated, "tink workflow created")
+				if err := r.Status().Update(ctx, inventory); err != nil {
 					return err
 				}
 			}
