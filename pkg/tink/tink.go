@@ -31,11 +31,11 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 	}
 
 	var m string
-	if strings.Contains(c.Spec.HarvesterVersion, "v1.1") {
-		m, err = generateMetaDataV11(c.Spec.ConfigURL, c.Spec.HarvesterVersion, i.Spec.ManagementInterfaceMacAddress, mode,
+	if strings.Contains(c.Spec.HarvesterVersion, "v1.0") {
+		m, err = generateMetaDataV10(c.Spec.ConfigURL, c.Spec.HarvesterVersion, i.Spec.ManagementInterfaceMacAddress, mode,
 			i.Spec.PrimaryDisk, c.Status.ClusterAddress, c.Status.ClusterToken, i.Status.GeneratedPassword, c.Spec.ImageURL, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys)
 	} else {
-		m, err = generateMetaDataV10(c.Spec.ConfigURL, c.Spec.HarvesterVersion, i.Spec.ManagementInterfaceMacAddress, mode,
+		m, err = generateMetaDataV11(c.Spec.ConfigURL, c.Spec.HarvesterVersion, i.Spec.ManagementInterfaceMacAddress, mode,
 			i.Spec.PrimaryDisk, c.Status.ClusterAddress, c.Status.ClusterToken, i.Status.GeneratedPassword, c.Spec.ImageURL, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys)
 	}
 	if err != nil {
