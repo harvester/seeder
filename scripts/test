@@ -1,3 +1,19 @@
 set -e
 cd $(dirname $0)/..
+
+cleanup_containers() {
+for i in k3s-mock redfishmock
+do
+    if [ "$(docker ps -a -q -f name=${i})" ]; then
+        if [ "$(docker ps -aq -f status=running -f name=${i})" ]; then
+            docker stop ${i}
+        fi
+        if [ "$(docker ps -aq -f status=exited -f name=${i})" ]; then
+            docker rm -v ${i}
+        fi
+    fi
+done
+}
+
+cleanup_containers
 go test -coverprofile /tmp/cover.out -timeout=20m -p 1 -v ./...
