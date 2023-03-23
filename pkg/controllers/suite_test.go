@@ -18,11 +18,13 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"path/filepath"
 	"testing"
 	"time"
 
 	"github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest/v3/docker"
 	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
@@ -44,18 +46,23 @@ import (
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
 
 var (
-	//cfg         *rest.Config
-	k8sClient client.Client
-	testEnv   *envtest.Environment
-	scheme    = runtime.NewScheme()
-	ctx       context.Context
-	cancel    context.CancelFunc
-	//eg          *errgroup.Group
-	//egctx       context.Context
-	//setupLog    = ctrl.Log.WithName("setup")
-	pool        *dockertest.Pool
-	redfishPort string
-	redfishMock *dockertest.Resource
+	k8sClient      client.Client
+	testEnv        *envtest.Environment
+	scheme         = runtime.NewScheme()
+	ctx            context.Context
+	cancel         context.CancelFunc
+	pool           *dockertest.Pool
+	redfishMock    *dockertest.Resource
+	k3sMock        *dockertest.Resource
+	k3sNodeAddress string
+	k3sNodeGateway string
+	redfishAddress string
+)
+
+const (
+	defaultToken = "token"
+	k3sPort      = "6443"
+	redfishPort  = "8000"
 )
 
 func TestAPIs(t *testing.T) {
@@ -181,14 +188,49 @@ var _ = BeforeSuite(func() {
 
 	redfishMock, err = pool.BuildAndRunWithBuildOptions(redfishBuildOpts, redfishRunOpts)
 	Expect(err).NotTo(HaveOccurred())
+
+	k3sRunOpts := &dockertest.RunOptions{
+		Name:       "k3s-mock",
+		Repository: "rancher/k3s",
+		Tag:        "v1.24.2-k3s1",
+		Cmd:        []string{"server", "--cluster-init"},
+		Env: []string{
+			fmt.Sprintf("K3S_TOKEN=%s", defaultToken),
+		},
+		Mounts: []string{
+			"tmpfs:/run",
+			"tmpfs:/var/run",
+		},
+		Privileged: true,
+		ExposedPorts: []string{
+			"6443/tcp",
+		},
+	}
+
+	k3sMock, err = pool.RunWithOptions(k3sRunOpts, func(config *docker.HostConfig) {
+		// set AutoRemove to true so that stopped container goes away by itself
+		config.RestartPolicy = docker.RestartPolicy{
+			Name: "no",
+		}
+	})
+	Expect(err).ToNot(HaveOccurred())
+
+	networks, err := pool.NetworksByName("bridge")
+	Expect(err).ToNot(HaveOccurred())
+	Expect(len(networks)).To(Equal(1))
+
 	time.Sleep(30 * time.Second)
-	redfishPort = redfishMock.GetPort("8000/tcp")
+	k3sNodeAddress = k3sMock.GetIPInNetwork(&networks[0])
+	k3sNodeGateway = networks[0].Network.IPAM.Config[0].Gateway
+	redfishAddress = redfishMock.GetIPInNetwork(&networks[0])
 })
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
 	cancel()
 	err := pool.Purge(redfishMock)
+	Expect(err).NotTo(HaveOccurred())
+	err = pool.Purge(k3sMock)
 	Expect(err).NotTo(HaveOccurred())
 	err = testEnv.Stop()
 	Expect(err).NotTo(HaveOccurred())

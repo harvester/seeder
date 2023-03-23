@@ -36,8 +36,15 @@ func TestMain(m *testing.M) {
 		log.Fatalf("error creating redfish mock container: %v", err)
 	}
 
+	networks, err := pool.NetworksByName("bridge")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	redfishNodeAddress := redfishMock.GetIPInNetwork(&networks[0])
+
 	time.Sleep(30 * time.Second)
-	ef, err = NewEventFetcher(context.TODO(), "root", "calvin", fmt.Sprintf("http://localhost:%s", redfishMock.GetPort("8000/tcp")))
+	ef, err = NewEventFetcher(context.TODO(), "root", "calvin", fmt.Sprintf("http://%s:8000", redfishNodeAddress))
 	if err != nil {
 		panic(err)
 	}

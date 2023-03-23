@@ -3,22 +3,24 @@ package util
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+	"testing"
+	"time"
+
 	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	typedCore "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/tools/clientcmd"
-	"log"
-	"os"
-	"testing"
-	"time"
 )
 
-var port string
+var k3sNodeAddress string
 
 const (
-	token = "token"
+	token   = "token"
+	k3sPort = "6443"
 )
 
 func TestMain(t *testing.M) {
@@ -58,8 +60,14 @@ func TestMain(t *testing.M) {
 		log.Fatal(err)
 	}
 
+	networks, err := pool.NetworksByName("bridge")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	k3sNodeAddress = k3s.GetIPInNetwork(&networks[0])
 	time.Sleep(60 * time.Second)
-	port = k3s.GetPort("6443/tcp")
+
 	code := t.Run()
 	pool.Purge(k3s)
 	os.Exit(code)
@@ -68,7 +76,7 @@ func TestMain(t *testing.M) {
 
 func Test_GenerateKubeConfig(t *testing.T) {
 	assert := require.New(t)
-	c, err := GenerateKubeConfig("localhost", port, "k3s", token)
+	c, err := GenerateKubeConfig(k3sNodeAddress, k3sPort, "k3s", token)
 	assert.NoError(err, "expected no error during generation of kubeconfig")
 	assert.NoError(err)
 	k8sclient, err := clientcmd.NewClientConfigFromBytes(c)
