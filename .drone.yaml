@@ -22,7 +22,6 @@ steps:
 
 - name: build
   image: rancher/dapper:v0.6.0
-  network_mode: host
   privileged: true
   commands:
   - dapper ci

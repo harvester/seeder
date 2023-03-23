@@ -18,7 +18,6 @@ ENV DAPPER_ENV REPO TAG DRONE_TAG CROSS
 ENV DAPPER_SOURCE /go/src/github.com/harvester/seeder
 ENV DAPPER_OUTPUT ./bin ./pkg/api ./config
 ENV DAPPER_DOCKER_SOCKET true
-ENV DAPPER_RUN_ARGS "--network=host"
 WORKDIR ${DAPPER_SOURCE}
 
 ENTRYPOINT ["./scripts/entry"]

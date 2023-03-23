@@ -71,6 +71,7 @@ var _ = Describe("Inventory event controller tests", func() {
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 
 		Eventually(func() error {
+			i.Spec.BaseboardManagementSpec.Connection.Host = redfishAddress
 			return k8sClient.Create(ctx, i)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})

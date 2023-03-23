@@ -1,4 +1,5 @@
 set -e
+
 cd $(dirname $0)/..
 
 cleanup_containers() {
@@ -16,4 +17,4 @@ done
 }
 
 cleanup_containers
-go test -coverprofile /tmp/cover.out -timeout=20m -p 1 -v ./...
+go test -coverprofile /tmp/cover.out -timeout=20m -p 1 -failfast -v ./...

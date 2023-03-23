@@ -7,8 +7,6 @@ import (
 	"github.com/harvester/seeder/pkg/util"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/ory/dockertest/v3"
-	"github.com/ory/dockertest/v3/docker"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 	v1 "k8s.io/api/core/v1"
@@ -761,7 +759,6 @@ var _ = Describe("cluster running test", func() {
 	var c *seederv1alpha1.Cluster
 	var a *seederv1alpha1.AddressPool
 	var creds *v1.Secret
-	var k3sMock *dockertest.Resource
 
 	BeforeEach(func() {
 		a = &seederv1alpha1.AddressPool{
@@ -872,33 +869,12 @@ var _ = Describe("cluster running test", func() {
 				return fmt.Errorf("waiting for cluster token to be generated")
 			}
 
-			k3sRunOpts := &dockertest.RunOptions{
-				Name:       "k3s-mock",
-				Repository: "rancher/k3s",
-				Tag:        "v1.24.2-k3s1",
-				Cmd:        []string{"server", "--cluster-init"},
-				Env: []string{
-					fmt.Sprintf("K3S_TOKEN=%s", cObj.Status.ClusterToken),
-				},
-				Mounts: []string{
-					"tmpfs:/run",
-					"tmpfs:/var/run",
-				},
-				Privileged: true,
-				ExposedPorts: []string{
-					"6443/tcp",
-				},
-			}
-
-			k3sMock, err = pool.RunWithOptions(k3sRunOpts, func(config *docker.HostConfig) {
-				// set AutoRemove to true so that stopped container goes away by itself
-				config.RestartPolicy = docker.RestartPolicy{
-					Name: "no",
+			if cObj.Status.ClusterToken != defaultToken || cObj.Status.ClusterAddress != k3sNodeAddress {
+				cObj.Status.ClusterToken = defaultToken
+				cObj.Status.ClusterAddress = k3sNodeAddress
+				if err := k8sClient.Status().Update(ctx, cObj); err != nil {
+					return fmt.Errorf("error updating cluster token: %v", err)
 				}
-			})
-
-			if err != nil {
-				return err
 			}
 
 			// patch port on cluster labels
@@ -908,7 +884,7 @@ var _ = Describe("cluster running test", func() {
 
 			// since mock node is k3s, need to change prefix from rke2 to k3s
 			seederv1alpha1.DefaultAPIPrefix = "k3s"
-			cObj.Labels[seederv1alpha1.OverrideAPIPortLabel] = k3sMock.GetPort("6443/tcp")
+			cObj.Labels[seederv1alpha1.OverrideAPIPortLabel] = k3sPort
 
 			return k8sClient.Update(ctx, cObj)
 
@@ -969,10 +945,6 @@ var _ = Describe("cluster running test", func() {
 			}
 
 			return fmt.Errorf("waiting for cluster finalizers to finish")
-		}, "30s", "5s").ShouldNot(HaveOccurred())
-
-		Eventually(func() error {
-			return pool.Purge(k3sMock)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 })
