@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -125,13 +126,15 @@ func (r *ClusterEventReconciler) updateNodes(ctx context.Context, c *seederv1alp
 			}
 
 			recorder := remoteEventRecorder(typedClient, r.Scheme)
-			var update string
-			if status == "OK" {
-				update = "Normal"
-			} else {
-				update = "Warning"
+			for _, v := range status {
+				var update string
+				if strings.Contains(v, "is OK") || strings.Contains(v, "thermal") {
+					update = "Normal"
+				} else {
+					update = "Warning"
+				}
+				recorder.Event(updatedNode, update, seederv1alpha1.EventLoggerName, v)
 			}
-			recorder.Event(updatedNode, update, seederv1alpha1.EventLoggerName, fmt.Sprintf("Underlying inventory %s status is %s", i.Name, status))
 		}
 	}
 	return nil
