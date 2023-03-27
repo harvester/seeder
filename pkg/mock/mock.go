@@ -1,6 +1,8 @@
 package mock
 
 import (
+	"strings"
+
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/rancher/wrangler/pkg/yaml"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
@@ -9,7 +11,6 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
-	"strings"
 )
 
 const (
@@ -59,6 +60,128 @@ metadata:
 stringData:
   "username": "ADMIN"
   "password": "ADMIN"
+---
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: Cluster
+metadata:
+  name: test-mock-cluster-running
+  namespace: default
+spec:
+  clusterConfig:
+    nameservers:
+    - 8.8.8.8
+  imageURL: http://localhost/iso/
+  nodes:
+  - addressPoolReference:
+      name: mock-pool
+      namespace: default
+    inventoryReference:
+      name: inventory-1
+      namespace: default
+  version: v1.1.0
+  vipConfig:
+    addressPoolReference:
+      name: mock-pool
+      namespace: default
+status:
+  clusterAddress: 127.0.0.1
+  status: clusterRunning
+  token: ZgSyOCtX4TowsNjP
+---
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: Cluster
+metadata:
+  name: test-mock-cluster-not-running
+  namespace: default
+spec:
+  clusterConfig:
+    nameservers:
+    - 8.8.8.8
+  imageURL: http://localhost/iso/
+  nodes:
+  - addressPoolReference:
+      name: mock-pool
+      namespace: default
+    inventoryReference:
+      name: inventory-2
+      namespace: default
+  version: v1.1.0
+  vipConfig:
+    addressPoolReference:
+      name: mock-pool
+      namespace: default
+status:
+  clusterAddress: 127.0.0.1
+  status: clusterConfigReady
+  token: ZgSyOCtX4TowsNjP
+---
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: Inventory
+metadata:
+  name: inventory-1
+  namespace: default
+spec:
+  baseboardSpec:
+    connection:
+      authSecretRef:
+        name: hp-ilo
+        namespace: seeder
+      host: localhost
+      insecureTLS: true
+      port: 623
+  events:
+    enabled: true
+    pollingInterval: 1h
+  managementInterfaceMacAddress: 5c:b9:01:89:c6:61
+  primaryDisk: /dev/sda
+status:
+  ownerCluster:
+    name: ""
+    namespace: ""
+  pxeBootConfig: {}
+  status: inventoryNodeReady
+---
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: Inventory
+metadata:
+  name: inventory-2
+  namespace: default
+spec:
+  baseboardSpec:
+    connection:
+      authSecretRef:
+        name: hp-ilo
+        namespace: seeder
+      host: localhost
+      insecureTLS: true
+      port: 623
+  events:
+    enabled: true
+    pollingInterval: 1h
+  managementInterfaceMacAddress: 5c:b9:01:89:c6:61
+  primaryDisk: /dev/sda
+status:
+  ownerCluster:
+    name: ""
+    namespace: ""
+  pxeBootConfig: {}
+  status: ""
+---
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: AddressPool
+metadata:
+  name: mock-pool
+  namespace: default
+spec:
+  cidr: 127.0.0.1/24
+  gateway: 127.0.0.1
+  netmask: 255.255.255.0
+status:
+  availableAddresses: 255
+  lastAddress: 127.0.0.255
+  netmask: 255.255.255.0
+  startAddress: 127.0.0.1
+  status: poolReady
 `
 )
 
