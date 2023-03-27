@@ -62,6 +62,6 @@ func Test_GetInventory(t *testing.T) {
 	assert := require.New(t)
 	_, health, err := ef.GetConfig()
 	assert.NoErrorf(err, "expected no error during inventory call")
-	assert.Equal(health, "OK", "expected health to be ok")
+	assert.Contains(health, "fan System Board Fan1A is OK", "expected to find Fan1A status")
 	ef.client.HTTPClient.CloseIdleConnections()
 }

@@ -217,9 +217,8 @@ func (r *LocalNodeReconciler) cleanupJob(ctx context.Context, node *corev1.Node)
 	if err != nil {
 		if apierrors.IsNotFound(err) { // job not found. clean up node annotations
 			return r.nodeUpdateHelper(ctx, node, nil, toRemove)
-		} else {
-			return err
 		}
+		return err
 	}
 
 	// remove job and update annotations

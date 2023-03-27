@@ -155,7 +155,6 @@ func (r *InventoryEventReconciller) getInventoryInfo(ctx context.Context, i *see
 		for k, v := range labels {
 			obj.Labels[k] = v
 		}
-		obj.Labels["status"] = status
 		return r.Update(ctx, obj)
 	})
 
@@ -163,7 +162,9 @@ func (r *InventoryEventReconciller) getInventoryInfo(ctx context.Context, i *see
 		return err
 	}
 
-	r.EventRecorder.Event(i, "Normal", "RedfishStatusEvent", fmt.Sprintf("current inventory status: %s", status))
+	for _, v := range status {
+		r.EventRecorder.Event(i, "Normal", "RedfishStatusEvent", fmt.Sprintf("current inventory status: %s", v))
+	}
 	return nil
 }
 
