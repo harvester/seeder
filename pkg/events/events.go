@@ -83,7 +83,7 @@ func (ef *EventFetcher) getChassisInfo() ([]string, error) {
 }
 
 func getThermals(chassis []*redfish.Chassis) ([]string, error) {
-	var health []string
+	var fanHealth, thermalHealth, health []string
 	for _, c := range chassis {
 		if c.Name != "Computer System Chassis" {
 			continue
@@ -95,49 +95,59 @@ func getThermals(chassis []*redfish.Chassis) ([]string, error) {
 
 		if thermals != nil {
 			for _, v := range thermals.Temperatures {
-				msg := fmt.Sprintf("thermal reading from sensor %s: %vC", v.Name, v.ReadingCelsius)
-				health = append(health, msg)
+				msg := fmt.Sprintf("%s reported temp: %vC", v.Name, v.ReadingCelsius)
+				thermalHealth = append(thermalHealth, msg)
 			}
 
 			for _, fan := range thermals.Fans {
-				if fan.Status.Health == "" {
-					continue
+				if fan.Status.Health != "" && fan.Status.Health != "OK" {
+					msg := fmt.Sprintf("fan %s is %s", fan.Name, fan.Status.Health)
+					health = append(health, msg)
 				}
-				msg := fmt.Sprintf("fan %s is %s", fan.Name, fan.Status.Health)
-				health = append(health, msg)
 			}
 
 		}
+	}
+
+	if len(fanHealth) > 0 {
+		health = append(health, fmt.Sprintf("FanHealth: %s", strings.Join(fanHealth, ",")))
+	}
+
+	if len(thermalHealth) > 0 {
+		health = append(health, fmt.Sprintf("ThermalHealth: %s", strings.Join(thermalHealth, ",")))
 	}
 
 	return health, nil
 }
 
 func getDrives(chassis []*redfish.Chassis) ([]string, error) {
-	var health []string
+	var health, driveHealth []string
 	for _, c := range chassis {
 		if c.Name != "Computer System Chassis" {
 			continue
 		}
-		drives, err := c.ComputerSystems()
+		drives, err := c.Drives()
 		if err != nil {
-			return nil, fmt.Errorf("error querying drives for chassis %s: %v", c.Name, err)
+			return nil, fmt.Errorf("error getting drives for chassis %s: %v", c.Name, err)
 		}
 
 		for _, d := range drives {
 			// skip if no health check is available
-			if d.Status.Health == "" {
-				continue
+			if d.Status.Health != "" && d.Status.Health != "OK" {
+				msg := fmt.Sprintf("%s is %s", d.Name, d.Status.Health)
+				driveHealth = append(driveHealth, msg)
 			}
-			msg := fmt.Sprintf("drive %s with serial number %s is %s", d.Name, d.SerialNumber, d.Status.Health)
-			health = append(health, msg)
 		}
+	}
+
+	if len(driveHealth) > 0 {
+		health = append(health, fmt.Sprintf("DriveHealth: %s", strings.Join(driveHealth, ",")))
 	}
 	return health, nil
 }
 
 func getPower(chassis []*redfish.Chassis) ([]string, error) {
-	var health []string
+	var health, powerSupplyHealth []string
 	for _, c := range chassis {
 		if c.Name != "Computer System Chassis" {
 			continue
@@ -149,19 +159,22 @@ func getPower(chassis []*redfish.Chassis) ([]string, error) {
 
 		if power != nil {
 			for _, supply := range power.PowerSupplies {
-				if supply.Status.Health == "" {
-					continue // skip if no health is available
+				if supply.Status.Health != "" && supply.Status.Health != "OK" {
+					msg := fmt.Sprintf("%s is %s", supply.Name, supply.Status.Health)
+					powerSupplyHealth = append(powerSupplyHealth, msg)
 				}
-				msg := fmt.Sprintf("power supply %s is %s", supply.Name, supply.Status.Health)
-				health = append(health, msg)
 			}
 		}
+	}
+
+	if len(powerSupplyHealth) > 0 {
+		health = append(health, fmt.Sprintf("PowerSupplyHealth: %s", strings.Join(powerSupplyHealth, ",")))
 	}
 	return health, nil
 }
 
 func getNetworkAdapters(chassis []*redfish.Chassis) ([]string, error) {
-	var health []string
+	var health, nicHealth []string
 	for _, c := range chassis {
 		if c.Name != "Computer System Chassis" {
 			continue
@@ -172,19 +185,21 @@ func getNetworkAdapters(chassis []*redfish.Chassis) ([]string, error) {
 		}
 
 		for _, n := range nics {
-			if n.Status.Health == "" {
-				continue
+			if n.Status.Health != "" && n.Status.Health != "OK" {
+				msg := fmt.Sprintf("%s is %s", n.Name, n.Status.Health)
+				nicHealth = append(nicHealth, msg)
 			}
-			msg := fmt.Sprintf("network adapter %s is %s", n.Name, n.Status.Health)
-			health = append(health, msg)
-
 		}
+	}
+
+	if len(nicHealth) > 0 {
+		health = append(health, fmt.Sprintf("NetworkAdapterHealth: %s", strings.Join(nicHealth, ",")))
 	}
 	return health, nil
 }
 
 func getSystemComponents(chassis []*redfish.Chassis) ([]string, error) {
-	var health []string
+	var health, storageHealth, pciDeviceHealth, memHealth, cpuHealth []string
 	for _, c := range chassis {
 		if c.Name != "Computer System Chassis" {
 			continue
@@ -203,11 +218,10 @@ func getSystemComponents(chassis []*redfish.Chassis) ([]string, error) {
 			}
 
 			for _, s := range storage {
-				if s.Status.Health == "" {
-					continue
+				if s.Status.Health != "" && s.Status.Health != "OK" {
+					msg := fmt.Sprintf("%s is %s", s.Name, s.Status.Health)
+					storageHealth = append(storageHealth, msg)
 				}
-				msg := fmt.Sprintf("storage %s in computeSystem %s is %s", s.Name, v.Name, s.Status.Health)
-				health = append(health, msg)
 			}
 
 			// query pcidevice information
@@ -217,11 +231,10 @@ func getSystemComponents(chassis []*redfish.Chassis) ([]string, error) {
 			}
 
 			for _, p := range pcidevices {
-				if p.Status.Health == "" {
-					continue
+				if p.Status.Health != "" && p.Status.Health != "OK" {
+					msg := fmt.Sprintf("%s is %s", p.Name, p.Status.Health)
+					pciDeviceHealth = append(pciDeviceHealth, msg)
 				}
-				msg := fmt.Sprintf("pcidevice %s in computeSystem %s is %s", p.Name, v.Name, p.Status.Health)
-				health = append(health, msg)
 			}
 
 			// query memory information
@@ -231,11 +244,10 @@ func getSystemComponents(chassis []*redfish.Chassis) ([]string, error) {
 			}
 
 			for _, m := range memory {
-				if m.Status.Health == "" {
-					continue
+				if m.Status.Health != "" && m.Status.Health != "OK" {
+					msg := fmt.Sprintf("%s is %s", m.Name, m.Status.Health)
+					memHealth = append(memHealth, msg)
 				}
-				msg := fmt.Sprintf("memory %s in computeSystem %s is %s", m.Name, v.Name, m.Status.Health)
-				health = append(health, msg)
 			}
 
 			// query processor information
@@ -245,13 +257,29 @@ func getSystemComponents(chassis []*redfish.Chassis) ([]string, error) {
 			}
 
 			for _, p := range processors {
-				if p.Status.Health == "" {
-					continue
+				if p.Status.Health != "" && p.Status.Health != "OK" {
+					msg := fmt.Sprintf("%s is %s", p.Name, p.Status.Health)
+					cpuHealth = append(cpuHealth, msg)
 				}
-				msg := fmt.Sprintf("processor %s in computeSystem %s is %s", p.Name, v.Name, p.Status.Health)
-				health = append(health, msg)
 			}
 		}
 	}
+
+	if len(storageHealth) > 0 {
+		health = append(health, fmt.Sprintf("StorageHealth: %s", strings.Join(storageHealth, ",")))
+	}
+
+	if len(pciDeviceHealth) > 0 {
+		health = append(health, fmt.Sprintf("PCIDeviceHealth: %s", strings.Join(pciDeviceHealth, ",")))
+	}
+
+	if len(memHealth) > 0 {
+		health = append(health, fmt.Sprintf("MemoryHealth: %s", strings.Join(memHealth, ",")))
+	}
+
+	if len(cpuHealth) > 0 {
+		health = append(health, fmt.Sprintf("CPUHealth: %s", strings.Join(cpuHealth, ",")))
+	}
+
 	return health, nil
 }
