@@ -128,10 +128,10 @@ func (r *ClusterEventReconciler) updateNodes(ctx context.Context, c *seederv1alp
 			recorder := remoteEventRecorder(typedClient, r.Scheme)
 			for _, v := range status {
 				var update string
-				if strings.Contains(v, "is OK") || strings.Contains(v, "thermal") {
-					update = "Normal"
-				} else {
+				if strings.Contains(v, "is Warning") || strings.Contains(v, "is Fail") {
 					update = "Warning"
+				} else {
+					update = "Normal"
 				}
 				recorder.Event(updatedNode, update, seederv1alpha1.EventLoggerName, v)
 			}
