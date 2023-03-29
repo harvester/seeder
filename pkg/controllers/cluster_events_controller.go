@@ -3,7 +3,6 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -127,12 +126,7 @@ func (r *ClusterEventReconciler) updateNodes(ctx context.Context, c *seederv1alp
 
 			recorder := remoteEventRecorder(typedClient, r.Scheme)
 			for _, v := range status {
-				var update string
-				if strings.Contains(v, "is Warning") || strings.Contains(v, "is Fail") {
-					update = "Warning"
-				} else {
-					update = "Normal"
-				}
+				update := "Warning"
 				recorder.Event(updatedNode, update, seederv1alpha1.EventLoggerName, v)
 			}
 		}

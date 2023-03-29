@@ -199,7 +199,7 @@ func getNetworkAdapters(chassis []*redfish.Chassis) ([]string, error) {
 }
 
 func getSystemComponents(chassis []*redfish.Chassis) ([]string, error) {
-	var health, storageHealth, pciDeviceHealth, memHealth, cpuHealth []string
+	var health []string
 	for _, c := range chassis {
 		if c.Name != "Computer System Chassis" {
 			continue
@@ -209,77 +209,107 @@ func getSystemComponents(chassis []*redfish.Chassis) ([]string, error) {
 			return nil, fmt.Errorf("error querying computer systems in chassis %s: %v", c.Name, err)
 		}
 
-		for _, v := range cs {
+		type subsystemHealth func([]*redfish.ComputerSystem, *[]string) error
 
-			// query storage information
-			storage, err := v.Storage()
-			if err != nil {
-				return nil, err
+		subsystemHealthHelpers := []subsystemHealth{getStorageHealth, getPCIDevicesHealth, getCPUHealth, getMemoryHealth}
+		for _, v := range subsystemHealthHelpers {
+			if err := v(cs, &health); err != nil {
+				return health, nil
 			}
+		}
+	}
+	return health, nil
+}
 
-			for _, s := range storage {
-				if s.Status.Health != "" && s.Status.Health != "OK" {
-					msg := fmt.Sprintf("%s is %s", s.Name, s.Status.Health)
-					storageHealth = append(storageHealth, msg)
-				}
+func getPCIDevicesHealth(cs []*redfish.ComputerSystem, health *[]string) error {
+	var pciDeviceHealth []string
+	for _, v := range cs {
+		pcidevices, err := v.PCIeDevices()
+		if err != nil {
+			return fmt.Errorf("error querying pcidevices in computesystem %s: %v", v.Name, err)
+		}
+
+		for _, p := range pcidevices {
+			if p.Status.Health != "" && p.Status.Health != "OK" {
+				msg := fmt.Sprintf("%s is %s", p.Name, p.Status.Health)
+				pciDeviceHealth = append(pciDeviceHealth, msg)
 			}
+		}
+	}
 
-			// query pcidevice information
-			pcidevices, err := v.PCIeDevices()
-			if err != nil {
-				return nil, fmt.Errorf("error querying pcidevices in computesystem %s: %v", v.Name, err)
-			}
+	if len(pciDeviceHealth) > 0 {
+		*health = append(*health, fmt.Sprintf("PCIDeviceHealth: %s", strings.Join(pciDeviceHealth, ",")))
+	}
+	return nil
+}
 
-			for _, p := range pcidevices {
-				if p.Status.Health != "" && p.Status.Health != "OK" {
-					msg := fmt.Sprintf("%s is %s", p.Name, p.Status.Health)
-					pciDeviceHealth = append(pciDeviceHealth, msg)
-				}
-			}
+func getStorageHealth(cs []*redfish.ComputerSystem, health *[]string) error {
+	var storageHealth []string
+	for _, v := range cs {
 
-			// query memory information
-			memory, err := v.Memory()
-			if err != nil {
-				return nil, fmt.Errorf("error querying memory in computesystem %s in chassis %s: %v", v.Name, c.Name, err)
-			}
+		// query storage information
+		storage, err := v.Storage()
+		if err != nil {
+			return fmt.Errorf("error querying storage in computersystem %s: %v", v.Name, err)
+		}
 
-			for _, m := range memory {
-				if m.Status.Health != "" && m.Status.Health != "OK" {
-					msg := fmt.Sprintf("%s is %s", m.Name, m.Status.Health)
-					memHealth = append(memHealth, msg)
-				}
-			}
-
-			// query processor information
-			processors, err := v.Processors()
-			if err != nil {
-				return nil, fmt.Errorf("error querying processors in computesystem %s: %v", v.Name, err)
-			}
-
-			for _, p := range processors {
-				if p.Status.Health != "" && p.Status.Health != "OK" {
-					msg := fmt.Sprintf("%s is %s", p.Name, p.Status.Health)
-					cpuHealth = append(cpuHealth, msg)
-				}
+		for _, s := range storage {
+			if s.Status.Health != "" && s.Status.Health != "OK" {
+				msg := fmt.Sprintf("%s is %s", s.Name, s.Status.Health)
+				storageHealth = append(storageHealth, msg)
 			}
 		}
 	}
 
 	if len(storageHealth) > 0 {
-		health = append(health, fmt.Sprintf("StorageHealth: %s", strings.Join(storageHealth, ",")))
+		*health = append(*health, fmt.Sprintf("StorageHealth: %s", strings.Join(storageHealth, ",")))
 	}
 
-	if len(pciDeviceHealth) > 0 {
-		health = append(health, fmt.Sprintf("PCIDeviceHealth: %s", strings.Join(pciDeviceHealth, ",")))
+	return nil
+}
+
+func getMemoryHealth(cs []*redfish.ComputerSystem, health *[]string) error {
+	var memHealth []string
+	for _, v := range cs {
+		memory, err := v.Memory()
+		if err != nil {
+			return fmt.Errorf("error querying memory in computesystem %s: %v", v.Name, err)
+		}
+
+		for _, m := range memory {
+			if m.Status.Health != "" && m.Status.Health != "OK" {
+				msg := fmt.Sprintf("%s is %s", m.Name, m.Status.Health)
+				memHealth = append(memHealth, msg)
+			}
+		}
 	}
 
 	if len(memHealth) > 0 {
-		health = append(health, fmt.Sprintf("MemoryHealth: %s", strings.Join(memHealth, ",")))
+		*health = append(*health, fmt.Sprintf("MemoryHealth: %s", strings.Join(memHealth, ",")))
+	}
+
+	return nil
+}
+
+func getCPUHealth(cs []*redfish.ComputerSystem, health *[]string) error {
+	var cpuHealth []string
+	for _, v := range cs {
+		processors, err := v.Processors()
+		if err != nil {
+			return fmt.Errorf("error querying processors in computesystem %s: %v", v.Name, err)
+		}
+
+		for _, p := range processors {
+			if p.Status.Health != "" && p.Status.Health != "OK" {
+				msg := fmt.Sprintf("%s is %s", p.Name, p.Status.Health)
+				cpuHealth = append(cpuHealth, msg)
+			}
+		}
 	}
 
 	if len(cpuHealth) > 0 {
-		health = append(health, fmt.Sprintf("CPUHealth: %s", strings.Join(cpuHealth, ",")))
+		*health = append(*health, fmt.Sprintf("CPUHealth: %s", strings.Join(cpuHealth, ",")))
 	}
 
-	return health, nil
+	return nil
 }
