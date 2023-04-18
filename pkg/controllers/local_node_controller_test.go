@@ -76,116 +76,44 @@ var _ = Describe("test local node controller", func() {
 			}, "30s", "5s").ShouldNot(HaveOccurred())
 		})
 
-		By("annotate node for shutdown", func() {
+		By("creating a power action", func() {
 			Eventually(func() error {
-				nodeObj := &corev1.Node{}
-				if err := k8sClient.Get(ctx, types.NamespacedName{Name: n.Name, Namespace: n.Namespace}, nodeObj); err != nil {
+				iObj := &seederv1alpha1.Inventory{}
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: i.Name, Namespace: i.Namespace}, iObj)
+				if err != nil {
 					return err
 				}
-				if nodeObj.Annotations == nil {
-					nodeObj.Annotations = make(map[string]string)
-				}
-				nodeObj.Annotations[seederv1alpha1.NodeActionRequested] = seederv1alpha1.NodePowerActionShutdown
-				return k8sClient.Update(ctx, nodeObj)
+
+				iObj.Status.PowerAction.ActionRequested = seederv1alpha1.NodePowerActionPowerOn
+				return k8sClient.Status().Update(ctx, iObj)
 			}, "30s", "5s").ShouldNot(HaveOccurred())
 		})
 
-		By("ensuring correct annotations are updated for shutdown", func() {
+		By("checking inventory obj status got updated", func() {
 			Eventually(func() error {
-				nodeObj := &corev1.Node{}
-				if err := k8sClient.Get(ctx, types.NamespacedName{Name: n.Name, Namespace: n.Namespace}, nodeObj); err != nil {
+				iObj := &seederv1alpha1.Inventory{}
+				err := k8sClient.Get(ctx, types.NamespacedName{Name: i.Name, Namespace: i.Namespace}, iObj)
+				if err != nil {
 					return err
 				}
+				fmt.Println(iObj.Status)
 
-				_, ok := nodeObj.Annotations[seederv1alpha1.NodeActionRequested]
-				if ok {
-					return fmt.Errorf("expected NodeActionRequested annotation to be removed")
+				if iObj.Status.PowerAction.LastJobName == "" {
+					return fmt.Errorf("expected to find last job name to be populated")
 				}
 
-				_, ok = nodeObj.Annotations[seederv1alpha1.NodePowerActionJobName]
-				if !ok {
-					return fmt.Errorf("expected NoPowerActionJobName annotation to be removed")
+				powerActionJob := &rufio.Job{}
+				if err := k8sClient.Get(ctx, types.NamespacedName{
+					Namespace: iObj.Namespace, Name: iObj.Status.PowerAction.LastJobName}, powerActionJob); err != nil {
+					return fmt.Errorf("error querying power action job: %v", err)
 				}
 
-				_, ok = nodeObj.Annotations[seederv1alpha1.NodeActionStatus]
-				if !ok {
-					return fmt.Errorf("expected to find NodeActionStatus annotation")
+				if iObj.Status.PowerAction.LastActionStatus != seederv1alpha1.NodeJobComplete {
+					return fmt.Errorf("expected to find last action status to be %v", seederv1alpha1.NodeJobComplete)
 				}
 
-				v, ok := nodeObj.Annotations[seederv1alpha1.NodeLastActionRequest]
-				if !ok {
-					return fmt.Errorf("expected to find NodeLastActionRequest annotation")
-				}
-
-				if v != seederv1alpha1.NodePowerActionShutdown {
-					return fmt.Errorf("expected to find NodeLastActionRequest to be shutdwon by got %s", v)
-				}
 				return nil
-			}, "60s", "5s").ShouldNot(HaveOccurred())
-		})
-
-		By("ensure shutdown job has been removed", func() {
-			Eventually(func() error {
-				job := &rufio.Job{}
-				return k8sClient.Get(ctx, types.NamespacedName{Namespace: seederv1alpha1.DefaultLocalClusterNamespace, Name: "power-test-shutdown"}, job)
 			}, "30s", "5s").ShouldNot(HaveOccurred())
 		})
-
-		By("annotate node for poweron", func() {
-			Eventually(func() error {
-				nodeObj := &corev1.Node{}
-				if err := k8sClient.Get(ctx, types.NamespacedName{Name: n.Name, Namespace: n.Namespace}, nodeObj); err != nil {
-					return err
-				}
-				if nodeObj.Annotations == nil {
-					nodeObj.Annotations = make(map[string]string)
-				}
-				nodeObj.Annotations[seederv1alpha1.NodeActionRequested] = seederv1alpha1.NodePowerActionPowerOn
-				return k8sClient.Update(ctx, nodeObj)
-			}, "30s", "5s").ShouldNot(HaveOccurred())
-		})
-
-		By("ensuring correct annotations are updated for poweron", func() {
-			Eventually(func() error {
-				nodeObj := &corev1.Node{}
-				if err := k8sClient.Get(ctx, types.NamespacedName{Name: n.Name, Namespace: n.Namespace}, nodeObj); err != nil {
-					return err
-				}
-
-				GinkgoWriter.Println(nodeObj.Annotations)
-				_, ok := nodeObj.Annotations[seederv1alpha1.NodeActionRequested]
-				if ok {
-					return fmt.Errorf("expected NodeActionRequested annotation to be removed")
-				}
-
-				_, ok = nodeObj.Annotations[seederv1alpha1.NodePowerActionJobName]
-				if !ok {
-					return fmt.Errorf("expected NoPowerActionJobName annotation to be removed")
-				}
-
-				_, ok = nodeObj.Annotations[seederv1alpha1.NodeActionStatus]
-				if !ok {
-					return fmt.Errorf("expected to find NodeActionStatus annotation")
-				}
-
-				v, ok := nodeObj.Annotations[seederv1alpha1.NodeLastActionRequest]
-				if !ok {
-					return fmt.Errorf("expected to find NodeLastActionRequest annotation")
-				}
-
-				if v != seederv1alpha1.NodePowerActionPowerOn {
-					return fmt.Errorf("expected to find NodeLastActionRequest to be poweron but got %s", v)
-				}
-				return nil
-			}, "60s", "5s").ShouldNot(HaveOccurred())
-		})
-
-		By("ensure poweron job has been removed", func() {
-			Eventually(func() error {
-				job := &rufio.Job{}
-				return k8sClient.Get(ctx, types.NamespacedName{Namespace: seederv1alpha1.DefaultLocalClusterNamespace, Name: "power-test-poweron"}, job)
-			}, "30s", "5s").ShouldNot(HaveOccurred())
-		})
-
 	})
 })

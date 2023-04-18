@@ -181,12 +181,6 @@ func main() {
 			Logger:        log.FromContext(ctx).WithName("local-cluster-controller"),
 			EventRecorder: mgr.GetEventRecorderFor("seeder"),
 		},
-		&controllers.LocalNodeReconciler{
-			Client:        mgr.GetClient(),
-			Scheme:        mgr.GetScheme(),
-			Logger:        log.FromContext(ctx).WithName("local-node-controller"),
-			EventRecorder: mgr.GetEventRecorderFor("seeder"),
-		},
 	}
 
 	if embedMode {

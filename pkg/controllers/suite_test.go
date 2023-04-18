@@ -177,14 +177,6 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&LocalNodeReconciler{
-		Client:        mgr.GetClient(),
-		Scheme:        mgr.GetScheme(),
-		Logger:        log.Log.WithName("controller.local-node"),
-		EventRecorder: mgr.GetEventRecorderFor("seeder"),
-	}).SetupWithManager(mgr)
-	Expect(err).NotTo(HaveOccurred())
-
 	go func() {
 		defer GinkgoRecover()
 		err := mgr.Start(ctx)

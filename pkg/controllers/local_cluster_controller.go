@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/harvester/seeder/pkg/util"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -212,7 +213,8 @@ func (r *LocalClusterReconciler) ensureMachineExists(ctx context.Context, i *see
 
 // manageStatus simply reads the LocalInventoryStatusAnnotation value and tries to apply it status for inventory status
 // subresource
-func (r *LocalClusterReconciler) manageStatus(ctx context.Context, i *seederv1alpha1.Inventory) error {
+func (r *LocalClusterReconciler) manageStatus(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
+	i := iObj.DeepCopy()
 	b64statusString, ok := i.Annotations[seederv1alpha1.LocalInventoryStatusAnnotation]
 	if !ok {
 		return nil
@@ -227,7 +229,12 @@ func (r *LocalClusterReconciler) manageStatus(ctx context.Context, i *seederv1al
 	if err != nil {
 		return fmt.Errorf("error unmarshalling local inventory status: %v", err)
 	}
-	if !reflect.DeepEqual(i.Status.DeepCopy(), status) {
+
+	if !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
+		status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster, "node assigned to local cluster")
+	}
+
+	if !reflect.DeepEqual(i.Status.Status, status.Status) || !reflect.DeepEqual(i.Status.Cluster, status.Cluster) {
 		i.Status = *status
 		return r.Status().Update(ctx, i)
 	}

@@ -112,7 +112,8 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 }
 
 // generateClusterConfig will generate the clusterConfig
-func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, c *seederv1alpha1.Cluster) error {
+func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, cObj *seederv1alpha1.Cluster) error {
+	c := cObj.DeepCopy()
 	if c.Status.Status == "" {
 		vipPool := &seederv1alpha1.AddressPool{}
 		err := r.Get(ctx, types.NamespacedName{Namespace: c.Spec.VIPConfig.AddressPoolReference.Namespace,
@@ -162,7 +163,8 @@ func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, c *seeder
 
 // patchNodes will patch the node information and associate appropriate events to trigger
 // tinkerbell workflows to be generated and reboot initiated
-func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *seederv1alpha1.Cluster) error {
+func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, cObj *seederv1alpha1.Cluster) error {
+	c := cObj.DeepCopy()
 	if c.Status.Status == seederv1alpha1.ClusterConfigReady && len(c.Spec.Nodes) > 0 {
 		for n, nc := range c.Spec.Nodes {
 			pool := &seederv1alpha1.AddressPool{}
@@ -260,7 +262,8 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, c *seederv1a
 }
 
 // createTinkerbellHardware will create hardware objects for all nodes in the cluster
-func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *seederv1alpha1.Cluster) error {
+func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, cObj *seederv1alpha1.Cluster) error {
+	c := cObj.DeepCopy()
 	if c.Status.Status == seederv1alpha1.ClusterNodesPatched || c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted || c.Status.Status == seederv1alpha1.ClusterRunning {
 		for _, i := range c.Spec.Nodes {
 			var hardwareUpdated bool
@@ -323,8 +326,8 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, c *see
 
 // reconcileNodes will perform housekeeping needed when nodes are added or
 // removed from the cluster
-func (r *ClusterReconciler) reconcileNodes(ctx context.Context, c *seederv1alpha1.Cluster) error {
-
+func (r *ClusterReconciler) reconcileNodes(ctx context.Context, cObj *seederv1alpha1.Cluster) error {
+	c := cObj.DeepCopy()
 	if c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted || c.Status.Status == seederv1alpha1.ClusterRunning {
 		items, err := util.ListInventoryAllocatedtoCluster(ctx, r.Client, c)
 		if err != nil {
@@ -420,7 +423,8 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, c *seederv1alpha
 }
 
 // cleanupClusterDeps will trigger cleanup of nodes and associated infra
-func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *seederv1alpha1.Cluster) error {
+func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, cObj *seederv1alpha1.Cluster) error {
+	c := cObj.DeepCopy()
 	// clean up nodes
 	for _, nc := range c.Spec.Nodes {
 		var poolmissing, inventorymissing bool
@@ -500,7 +504,8 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, c *seederv1a
 
 // markClusterReady will use the cluster endpoint and token to try and generate a kubeconfig for target cluster
 // and will mark cluster running when the kubeconfig can be generated
-func (r *ClusterReconciler) markClusterReady(ctx context.Context, c *seederv1alpha1.Cluster) error {
+func (r *ClusterReconciler) markClusterReady(ctx context.Context, cObj *seederv1alpha1.Cluster) error {
+	c := cObj.DeepCopy()
 	// no need to reconcile until the hardware has been submitted
 	if c.Status.Status != seederv1alpha1.ClusterTinkHardwareSubmitted {
 		return nil
