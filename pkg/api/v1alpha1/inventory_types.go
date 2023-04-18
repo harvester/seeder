@@ -82,7 +82,8 @@ type InventoryStatus struct {
 	HardwareID        string                  `json:"hardwareID,omitempty"`
 	Conditions        []Conditions            `json:"conditions,omitempty"`
 	PXEBootInterface  `json:"pxeBootConfig,omitempty"`
-	Cluster           ObjectReference `json:"ownerCluster,omitempty"`
+	Cluster           ObjectReference    `json:"ownerCluster,omitempty"`
+	PowerAction       PowerActionDetails `json:"powerAction,omit"`
 }
 
 type Conditions struct {
@@ -97,6 +98,13 @@ type Events struct {
 	Enabled bool `json:"enabled"`
 	// +kubebuilder:default:="1h"
 	PollingInterval string `json:"pollingInterval,omitempty"`
+}
+
+type PowerActionDetails struct {
+	ActionRequested     string `json:"actionRequested,omitempty"`
+	LastActionStatus    string `json:"actionStatus,omitempty"`
+	LastActionRequested string `json:"lastActionRequested,omitempty"`
+	LastJobName         string `json:"LastJobName,omitempty"`
 }
 
 //+kubebuilder:object:root=true

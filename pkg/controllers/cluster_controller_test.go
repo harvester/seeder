@@ -154,9 +154,8 @@ var _ = Describe("Create cluster tests", func() {
 				return fmt.Errorf("expected tinkerbell hardware condition to exist %v", tmpInventory.Status.Conditions)
 			}
 
-			// is bmcjob completed
-			if !util.ConditionExists(tmpInventory.Status.Conditions, seederv1alpha1.BMCJobComplete) {
-				return fmt.Errorf("expected associated bmcjob completion condition to exist %v", tmpInventory.Status.Conditions)
+			if tmpInventory.Status.PowerAction.LastActionStatus != seederv1alpha1.NodeJobComplete {
+				return fmt.Errorf("expected power action to be completed but got %s", tmpInventory.Status.PowerAction.LastActionStatus)
 			}
 			return nil
 		}, "60s", "5s").ShouldNot(HaveOccurred())

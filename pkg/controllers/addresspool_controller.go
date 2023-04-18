@@ -81,8 +81,9 @@ func (r *AddressPoolReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 }
 
 // reconcilePoolCapacity will mark the pool as exhausted if all addresses are used up, and make it ready once addresses are freed up again
-func (r *AddressPoolReconciler) reconcilePoolCapacity(ctx context.Context, pool *seederv1alpha1.AddressPool) error {
+func (r *AddressPoolReconciler) reconcilePoolCapacity(ctx context.Context, poolObj *seederv1alpha1.AddressPool) error {
 
+	pool := poolObj.DeepCopy()
 	// initial reconcile
 	if pool.Status.Status == "" {
 		status, err := util.GenerateAddressPoolStatus(pool)
@@ -117,7 +118,8 @@ func (r *AddressPoolReconciler) reconcilePoolCapacity(ctx context.Context, pool 
 }
 
 // deleteAddressPool will ensure that none of the IP's is in use before removing finalizer
-func (r *AddressPoolReconciler) deleteAddressPool(ctx context.Context, pool *seederv1alpha1.AddressPool) error {
+func (r *AddressPoolReconciler) deleteAddressPool(ctx context.Context, poolObj *seederv1alpha1.AddressPool) error {
+	pool := poolObj.DeepCopy()
 	if !pool.DeletionTimestamp.IsZero() && controllerutil.ContainsFinalizer(pool, seederv1alpha1.AddressPoolFinalizer) {
 		var addressInUse bool
 		var err error
