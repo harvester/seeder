@@ -264,7 +264,7 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, iObj *seederv
 	i := iObj.DeepCopy()
 	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) {
 		j := &rufio.Job{}
-		var jobFound bool
+		var jobFound, completed bool
 		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Status.PowerAction.LastJobName}, j)
 		if err != nil {
 			if !apierrors.IsNotFound(err) {
@@ -278,6 +278,7 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, iObj *seederv
 			if j.HasCondition(rufio.JobCompleted, rufio.ConditionTrue) {
 				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobComplete, "")
 				i.Status.PowerAction.LastActionStatus = seederv1alpha1.NodeJobComplete
+				completed = true
 			}
 
 			if j.HasCondition(rufio.JobFailed, rufio.ConditionTrue) {
@@ -289,13 +290,19 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, iObj *seederv
 					i.Status.PowerAction.LastActionStatus = seederv1alpha1.NodeJobFailed
 				}
 				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobError, message)
+				completed = true
 			}
 
 		}
 
 		// new power action request, which will trigger job creation and update of status
-		util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted)
-		return r.Status().Update(ctx, i)
+		if completed {
+			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted)
+			return r.Status().Update(ctx, i)
+		} else {
+			return fmt.Errorf("bmcjob %s not yet completed, requeuing", j.Name)
+		}
+
 	}
 	return nil
 }
@@ -391,7 +398,10 @@ func (r *InventoryReconciler) triggerPowerAction(ctx context.Context, iObj *seed
 	i := iObj.DeepCopy()
 	if i.Status.Status == seederv1alpha1.InventoryReady && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) && i.Status.PowerAction.ActionRequested != "" && i.Status.PowerAction.LastJobName == "" {
 		// if job name is not present then create one
-		job := generateJob(i.Name, i.Namespace, i.Status.PowerAction.LastActionRequested)
+		job := generateJob(i.Name, i.Namespace, i.Status.PowerAction.ActionRequested)
+		if job == nil {
+			return fmt.Errorf("unable to generate job for inventory %s", i.Name)
+		}
 		err := controllerutil.SetOwnerReference(i, job, r.Scheme)
 		if err != nil {
 			return fmt.Errorf("error setting owner reference on job %s: %v", job.Name, err)
@@ -404,6 +414,8 @@ func (r *InventoryReconciler) triggerPowerAction(ctx context.Context, iObj *seed
 		i.Status.PowerAction.LastActionStatus = ""
 		i.Status.PowerAction.LastJobName = job.Name
 		i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted, "BMCJob Submitted")
+		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobError)
+		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobComplete)
 	}
 
 	if !reflect.DeepEqual(iObj.Status, i.Status) {

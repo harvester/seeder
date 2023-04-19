@@ -2,8 +2,6 @@ package controllers
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"reflect"
 
@@ -215,21 +213,27 @@ func (r *LocalClusterReconciler) ensureMachineExists(ctx context.Context, i *see
 // subresource
 func (r *LocalClusterReconciler) manageStatus(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
 	i := iObj.DeepCopy()
-	b64statusString, ok := i.Annotations[seederv1alpha1.LocalInventoryStatusAnnotation]
+	nodeName, ok := i.Annotations[seederv1alpha1.LocalInventoryNodeName]
 	if !ok {
-		return nil
+		return fmt.Errorf("missing annotation %s on inventory %s", seederv1alpha1.LocalInventoryNodeName, i.Name)
 	}
 
-	statusString, err := base64.StdEncoding.DecodeString(b64statusString)
+	nodeObj := &corev1.Node{}
+
+	err := r.Get(ctx, types.NamespacedName{Name: nodeName}, nodeObj)
 	if err != nil {
-		return fmt.Errorf("error decoding b64 local inventory annotation for %s: %v", i.Name, err)
+		return fmt.Errorf("error querying node %s: %v", nodeName, err)
 	}
+
 	status := &seederv1alpha1.InventoryStatus{}
-	err = json.Unmarshal(statusString, status)
-	if err != nil {
-		return fmt.Errorf("error unmarshalling local inventory status: %v", err)
+
+	for _, v := range nodeObj.Status.Addresses {
+		if v.Type == corev1.NodeInternalIP {
+			status.PXEBootInterface.Address = v.Address
+		}
 	}
 
+	status.Status = seederv1alpha1.InventoryReady
 	if !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
 		status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster, "node assigned to local cluster")
 	}

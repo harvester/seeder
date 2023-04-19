@@ -15,10 +15,6 @@ var (
 )
 
 const (
-	NodeActionRequested     = "metal.harvesterhci.io/actionRequested"
-	NodeActionStatus        = "metal.harvesterhci.io/actionStatus"
-	NodeLastActionRequest   = "metal.harvesterhci.io/lastActionRequested"
-	NodePowerActionJobName  = "metal.harvesterhci.io/rufioJobName"
 	NodePowerActionShutdown = "shutdown"
 	NodePowerActionPowerOn  = "poweron"
 	NodePowerActionReboot   = "reboot"

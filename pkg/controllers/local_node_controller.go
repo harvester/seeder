@@ -7,7 +7,6 @@ import (
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/util"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -27,6 +26,8 @@ func generateJob(name, namespace, powerAction string) *rufio.Job {
 		tasks = append(tasks, powerOffTask)
 	case seederv1alpha1.NodePowerActionReboot:
 		tasks = append(tasks, powerOffTask, powerOnTask)
+	default:
+		return nil
 	}
 
 	return &rufio.Job{
@@ -45,9 +46,4 @@ func generateJob(name, namespace, powerAction string) *rufio.Job {
 			Tasks: tasks,
 		},
 	}
-}
-
-func generateJobName(node corev1.Node) string {
-	powerAction := node.Annotations[seederv1alpha1.NodeActionRequested]
-	return fmt.Sprintf("%s-%s", node.Name, powerAction)
 }

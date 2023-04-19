@@ -25,6 +25,14 @@ var _ = Describe("test local node controller", func() {
 				Name: "power-test",
 			},
 			Spec: corev1.NodeSpec{},
+			Status: corev1.NodeStatus{
+				Addresses: []corev1.NodeAddress{
+					{
+						Type:    corev1.NodeInternalIP,
+						Address: "127.0.0.1",
+					},
+				},
+			},
 		}
 
 		i = &seederv1alpha1.Inventory{
@@ -32,8 +40,8 @@ var _ = Describe("test local node controller", func() {
 				Name:      n.Name,
 				Namespace: seederv1alpha1.DefaultLocalClusterNamespace,
 				Annotations: map[string]string{
-					seederv1alpha1.LocalInventoryAnnotation:       "true",
-					seederv1alpha1.LocalInventoryStatusAnnotation: "eyJvd25lckNsdXN0ZXIiOiB7Im5hbWUiOiAibG9jYWwiLCJuYW1lc3BhY2UiOiAiaGFydmVzdGVyLXN5c3RlbSJ9LCJweGVCb290Q29uZmlnIjogeyJhZGRyZXNzIjogIjE3Mi4xOS4xMDguNCIsICJnYXRld2F5IjoiIiwgIm5ldG1hc2siOiIifSwic3RhdHVzIjogImludmVudG9yeU5vZGVSZWFkeSIsICJnZW5lcmF0ZWRQYXNzd29yZCI6IiIsICJoYXJkd2FyZUlEIjoiIn0K",
+					seederv1alpha1.LocalInventoryAnnotation: "true",
+					seederv1alpha1.LocalInventoryNodeName:   n.Name,
 				},
 			},
 			Spec: seederv1alpha1.InventorySpec{},
@@ -52,7 +60,16 @@ var _ = Describe("test local node controller", func() {
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 
 		Eventually(func() error {
-			return k8sClient.Create(ctx, n)
+			if err := k8sClient.Create(ctx, n); err != nil {
+				return err
+			}
+
+			nObj := &corev1.Node{}
+			if err := k8sClient.Get(ctx, types.NamespacedName{Name: i.Name}, nObj); err != nil {
+				return err
+			}
+			nObj.Status.Addresses = n.Status.Addresses
+			return k8sClient.Status().Update(ctx, nObj)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 
 	})
@@ -112,6 +129,10 @@ var _ = Describe("test local node controller", func() {
 					return fmt.Errorf("expected to find last action status to be %v", seederv1alpha1.NodeJobComplete)
 				}
 
+				fmt.Println(iObj.Status.Conditions)
+				if util.ConditionExists(iObj.Status.Conditions, seederv1alpha1.BMCJobSubmitted) {
+					return fmt.Errorf("expected BMCJobSubmitted condition to be removed")
+				}
 				return nil
 			}, "30s", "5s").ShouldNot(HaveOccurred())
 		})
