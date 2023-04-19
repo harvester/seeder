@@ -37,6 +37,7 @@ const (
 	InventoryFinalizer             = "finalizer.inventory.harvesterhci.io"
 	LocalInventoryAnnotation       = "metal.harvesterhci.io/localInventory"
 	LocalInventoryStatusAnnotation = "metal.harvesterhci.io/localInventoryStatus"
+	LocalInventoryNodeName         = "metal.harvesterhci.io/localNodeName"
 )
 
 const (
@@ -104,7 +105,7 @@ type PowerActionDetails struct {
 	ActionRequested     string `json:"actionRequested,omitempty"`
 	LastActionStatus    string `json:"actionStatus,omitempty"`
 	LastActionRequested string `json:"lastActionRequested,omitempty"`
-	LastJobName         string `json:"LastJobName,omitempty"`
+	LastJobName         string `json:"lastJobName,omitempty"`
 }
 
 //+kubebuilder:object:root=true

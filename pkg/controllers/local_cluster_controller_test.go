@@ -2,8 +2,6 @@ package controllers
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"reflect"
 
@@ -24,6 +22,7 @@ import (
 
 var _ = Describe("Create and run local cluster tests", func() {
 	var i1, i2, i3 *seederv1alpha1.Inventory
+	var n1, n2 *corev1.Node
 	var expectedArray []*seederv1alpha1.Inventory
 
 	BeforeEach(func() {
@@ -33,6 +32,7 @@ var _ = Describe("Create and run local cluster tests", func() {
 				Namespace: seederv1alpha1.DefaultLocalClusterNamespace,
 				Annotations: map[string]string{
 					seederv1alpha1.LocalInventoryAnnotation: "true",
+					seederv1alpha1.LocalInventoryNodeName:   "local-one",
 				},
 			},
 			Spec: seederv1alpha1.InventorySpec{},
@@ -44,6 +44,7 @@ var _ = Describe("Create and run local cluster tests", func() {
 				Namespace: seederv1alpha1.DefaultLocalClusterNamespace,
 				Annotations: map[string]string{
 					seederv1alpha1.LocalInventoryAnnotation: "true",
+					seederv1alpha1.LocalInventoryNodeName:   "local-two",
 				},
 			},
 			Spec: seederv1alpha1.InventorySpec{},
@@ -55,6 +56,36 @@ var _ = Describe("Create and run local cluster tests", func() {
 				Namespace: seederv1alpha1.DefaultLocalClusterNamespace,
 			},
 			Spec: seederv1alpha1.InventorySpec{},
+		}
+
+		n1 = &corev1.Node{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: i1.Name,
+			},
+			Spec: corev1.NodeSpec{},
+			Status: corev1.NodeStatus{
+				Addresses: []corev1.NodeAddress{
+					{
+						Type:    corev1.NodeInternalIP,
+						Address: "127.0.0.1",
+					},
+				},
+			},
+		}
+
+		n2 = &corev1.Node{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: i2.Name,
+			},
+			Spec: corev1.NodeSpec{},
+			Status: corev1.NodeStatus{
+				Addresses: []corev1.NodeAddress{
+					{
+						Type:    corev1.NodeInternalIP,
+						Address: "127.0.0.1",
+					},
+				},
+			},
 		}
 
 		Eventually(func() error {
@@ -77,6 +108,24 @@ var _ = Describe("Create and run local cluster tests", func() {
 			return k8sClient.Create(ctx, i3)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 		expectedArray = append(expectedArray, i1, i2)
+
+		Eventually(func() error {
+			for _, v := range []*corev1.Node{n1, n2} {
+				if err := k8sClient.Create(ctx, v); err != nil {
+					return err
+				}
+
+				vObj := &corev1.Node{}
+				if err := k8sClient.Get(ctx, types.NamespacedName{Name: v.Name}, vObj); err != nil {
+					return err
+				}
+
+				vObj.Status.Addresses = v.Status.Addresses
+				return k8sClient.Status().Update(ctx, vObj)
+			}
+
+			return nil
+		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 
 	It("run local cluster tests", func() {
@@ -205,21 +254,6 @@ var _ = Describe("Create and run local cluster tests", func() {
 			})
 		})
 
-		By("update status of inventory", func() {
-			Eventually(func() error {
-				inventoryObj := &seederv1alpha1.Inventory{}
-				err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i2.Namespace, Name: i2.Name}, inventoryObj)
-				if err != nil {
-					return err
-				}
-
-				statusString := `{"ownerCluster": {"name": "local","namespace": "harvester-system"},"pxeBootConfig": {"address": "172.19.108.4", "gateway":"", "netmask":""},"status": "inventoryNodeReady", "generatedPassword":"", "hardwareID":""}`
-				b64statusString := base64.StdEncoding.EncodeToString([]byte(statusString))
-				inventoryObj.Annotations[seederv1alpha1.LocalInventoryStatusAnnotation] = b64statusString
-				return k8sClient.Update(ctx, inventoryObj)
-			})
-		})
-
 		By("reconcile status of inventory", func() {
 			Eventually(func() error {
 				inventoryObj := &seederv1alpha1.Inventory{}
@@ -228,22 +262,13 @@ var _ = Describe("Create and run local cluster tests", func() {
 					return err
 				}
 
-				b64statusString, ok := inventoryObj.Annotations[seederv1alpha1.LocalInventoryStatusAnnotation]
-				if !ok {
-					return fmt.Errorf("expected to find inventorystatusannotation")
+				iStatus := &seederv1alpha1.InventoryStatus{
+					Status: seederv1alpha1.InventoryReady,
+					PXEBootInterface: seederv1alpha1.PXEBootInterface{
+						Address: n2.Status.Addresses[0].Address,
+					},
 				}
-
-				statusString, err := base64.StdEncoding.DecodeString(b64statusString)
-				if err != nil {
-					return err
-				}
-				annotationStatus := &seederv1alpha1.InventoryStatus{}
-				err = json.Unmarshal(statusString, annotationStatus)
-				if err != nil {
-					return fmt.Errorf("error unmarshalling inventory status from string: %v", err)
-				}
-
-				if !reflect.DeepEqual(annotationStatus, inventoryObj.Status) {
+				if !reflect.DeepEqual(iStatus, inventoryObj.Status) {
 					return fmt.Errorf("inventory status doesnt not match embedded json")
 				}
 				return nil
