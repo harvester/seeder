@@ -44,7 +44,21 @@ var _ = Describe("test local node controller", func() {
 					seederv1alpha1.LocalInventoryNodeName:   n.Name,
 				},
 			},
-			Spec: seederv1alpha1.InventorySpec{},
+			Spec: seederv1alpha1.InventorySpec{
+				PrimaryDisk:                   "/dev/sda",
+				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
+				BaseboardManagementSpec: rufio.MachineSpec{
+					Connection: rufio.Connection{
+						Host:        "localhost",
+						Port:        623,
+						InsecureTLS: true,
+						AuthSecretRef: corev1.SecretReference{
+							Name:      "sample",
+							Namespace: "default",
+						},
+					},
+				},
+			},
 		}
 
 		Eventually(func() error {
