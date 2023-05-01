@@ -35,7 +35,21 @@ var _ = Describe("Create and run local cluster tests", func() {
 					seederv1alpha1.LocalInventoryNodeName:   "local-one",
 				},
 			},
-			Spec: seederv1alpha1.InventorySpec{},
+			Spec: seederv1alpha1.InventorySpec{
+				PrimaryDisk:                   "/dev/sda",
+				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
+				BaseboardManagementSpec: rufio.MachineSpec{
+					Connection: rufio.Connection{
+						Host:        "localhost",
+						Port:        623,
+						InsecureTLS: true,
+						AuthSecretRef: corev1.SecretReference{
+							Name:      "sample",
+							Namespace: "default",
+						},
+					},
+				},
+			},
 		}
 
 		i2 = &seederv1alpha1.Inventory{
@@ -47,7 +61,21 @@ var _ = Describe("Create and run local cluster tests", func() {
 					seederv1alpha1.LocalInventoryNodeName:   "local-two",
 				},
 			},
-			Spec: seederv1alpha1.InventorySpec{},
+			Spec: seederv1alpha1.InventorySpec{
+				PrimaryDisk:                   "/dev/sda",
+				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
+				BaseboardManagementSpec: rufio.MachineSpec{
+					Connection: rufio.Connection{
+						Host:        "localhost",
+						Port:        623,
+						InsecureTLS: true,
+						AuthSecretRef: corev1.SecretReference{
+							Name:      "sample",
+							Namespace: "default",
+						},
+					},
+				},
+			},
 		}
 
 		i3 = &seederv1alpha1.Inventory{
@@ -55,7 +83,21 @@ var _ = Describe("Create and run local cluster tests", func() {
 				Name:      "local-three",
 				Namespace: seederv1alpha1.DefaultLocalClusterNamespace,
 			},
-			Spec: seederv1alpha1.InventorySpec{},
+			Spec: seederv1alpha1.InventorySpec{
+				PrimaryDisk:                   "/dev/sda",
+				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
+				BaseboardManagementSpec: rufio.MachineSpec{
+					Connection: rufio.Connection{
+						Host:        "localhost",
+						Port:        623,
+						InsecureTLS: true,
+						AuthSecretRef: corev1.SecretReference{
+							Name:      "sample",
+							Namespace: "default",
+						},
+					},
+				},
+			},
 		}
 
 		n1 = &corev1.Node{

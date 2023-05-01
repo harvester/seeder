@@ -34,7 +34,7 @@ type AddressPool struct {
 type AddressSpec struct {
 	CIDR    string `json:"cidr"`
 	Netmask string `json:"netmask,omitempty"`
-	Gateway string `json:"gateway"`
+	Gateway string `json:"gatewayg"`
 }
 
 type AddressStatus struct {

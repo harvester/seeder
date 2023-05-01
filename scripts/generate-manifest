@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e
+
+# The root of the project directory
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -P)"
+
+out_dir="${ROOT_DIR}/chart/seeder-crd/templates"
+mkdir -p "${out_dir}"
+
+# Clean up stable CRD manifest YAMLs
+rm -rf "${out_dir}/*.yaml"
+
+# Generate CRD manifest YAMLs
+controller-gen crd \
+	paths="${ROOT_DIR}/pkg/api/..." \
+	output:crd:dir="${out_dir}"
+
+# Remove controller-gen version info
+while read -r target_file; do
+	if [[ ! -f ${target_file} ]]; then
+		continue
+	fi
+	if ! sed -i 's/controller-gen\.kubebuilder\.io\/version:.*/{}/g' "${target_file}" >/dev/null 2>&1; then
+		# back off none GNU sed
+		sed -i '' 's/controller-gen\.kubebuilder\.io\/version:.*/{}/g' "${target_file}"
+	fi
+done <<<"$(grep -rl "controller-gen.kubebuilder.io/version:" "${out_dir}")"
+

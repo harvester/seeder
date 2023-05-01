@@ -1,9 +1,10 @@
+
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.8.0
+    {}
   creationTimestamp: null
   name: inventories.metal.harvesterhci.io
 spec:
@@ -46,17 +47,16 @@ spec:
             description: InventorySpec defines the desired state of Inventory
             properties:
               baseboardSpec:
-                description: BaseboardManagementSpec defines the desired state of
-                  BaseboardManagement
+                description: MachineSpec defines desired machine state
                 properties:
                   connection:
-                    description: Connection represents the BaseboardManagement connectivity
-                      information.
+                    description: Connection contains connection data for a Baseboard
+                      Management Controller.
                     properties:
                       authSecretRef:
                         description: AuthSecretRef is the SecretReference that contains
-                          authentication information of the BaseboardManagement. The
-                          Secret must contain username and password keys.
+                          authentication information of the Machine. The Secret must
+                          contain username and password keys.
                         properties:
                           name:
                             description: name is unique within a namespace to reference
@@ -69,7 +69,7 @@ spec:
                         type: object
                       host:
                         description: Host is the host IP address or hostname of the
-                          BaseboardManagement.
+                          Machine.
                         minLength: 1
                         type: string
                       insecureTLS:
@@ -78,7 +78,7 @@ spec:
                       port:
                         default: 623
                         description: Port is the port number for connecting with the
-                          BaseboardManagement.
+                          Machine.
                         type: integer
                     required:
                     - authSecretRef
@@ -92,6 +92,7 @@ spec:
               events:
                 properties:
                   enabled:
+                    default: false
                     type: boolean
                   pollingInterval:
                     default: 1h
@@ -144,6 +145,17 @@ spec:
                 - name
                 - namespace
                 type: object
+              powerAction:
+                properties:
+                  actionRequested:
+                    type: string
+                  actionStatus:
+                    type: string
+                  lastActionRequested:
+                    type: string
+                  lastJobName:
+                    type: string
+                type: object
               pxeBootConfig:
                 properties:
                   address:
@@ -159,6 +171,8 @@ spec:
                 type: object
               status:
                 type: string
+            required:
+            - powerAction
             type: object
         type: object
     served: true

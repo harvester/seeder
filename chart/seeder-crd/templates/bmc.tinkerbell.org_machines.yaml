@@ -5,25 +5,22 @@ metadata:
   annotations:
     {}
   creationTimestamp: null
-  name: baseboardmanagements.bmc.tinkerbell.org
+  name: machines.bmc.tinkerbell.org
 spec:
   group: bmc.tinkerbell.org
   names:
     categories:
       - tinkerbell
-    kind: BaseboardManagement
-    listKind: BaseboardManagementList
-    plural: baseboardmanagements
-    shortNames:
-      - bm
-    singular: baseboardmanagement
+    kind: Machine
+    listKind: MachineList
+    plural: machines
+    singular: machine
   scope: Namespaced
   versions:
     - name: v1alpha1
       schema:
         openAPIV3Schema:
-          description: BaseboardManagement is the Schema for the baseboardmanagements
-            API
+          description: Machine is the Schema for the machines API
           properties:
             apiVersion:
               description: 'APIVersion defines the versioned schema of this representation
@@ -38,16 +35,16 @@ spec:
             metadata:
               type: object
             spec:
-              description: BaseboardManagementSpec defines the desired state of BaseboardManagement
+              description: MachineSpec defines desired machine state
               properties:
                 connection:
-                  description: Connection represents the BaseboardManagement connectivity
-                    information.
+                  description: Connection contains connection data for a Baseboard Management
+                    Controller.
                   properties:
                     authSecretRef:
                       description: AuthSecretRef is the SecretReference that contains
-                        authentication information of the BaseboardManagement. The Secret
-                        must contain username and password keys.
+                        authentication information of the Machine. The Secret must contain
+                        username and password keys.
                       properties:
                         name:
                           description: Name is unique within a namespace to reference
@@ -59,7 +56,7 @@ spec:
                           type: string
                       type: object
                     host:
-                      description: Host is the host IP address or hostname of the BaseboardManagement.
+                      description: Host is the host IP address or hostname of the Machine.
                       minLength: 1
                       type: string
                     insecureTLS:
@@ -67,7 +64,7 @@ spec:
                       type: boolean
                     port:
                       default: 623
-                      description: Port is the port number for connecting with the BaseboardManagement.
+                      description: Port is the port number for connecting with the Machine.
                       type: integer
                   required:
                     - authSecretRef
@@ -79,28 +76,28 @@ spec:
                 - connection
               type: object
             status:
-              description: BaseboardManagementStatus defines the observed state of BaseboardManagement
+              description: MachineStatus defines the observed state of Machine
               properties:
                 conditions:
                   description: Conditions represents the latest available observations
                     of an object's current state.
                   items:
+                    description: MachineCondition defines an observed condition of a
+                      Machine.
                     properties:
                       lastUpdateTime:
-                        description: Last time the BaseboardManagement condition was
-                          updated.
+                        description: LastUpdateTime of the condition.
                         format: date-time
                         type: string
                       message:
-                        description: Message represents human readable message indicating
-                          details about last transition.
+                        description: Message is a human readable message indicating
+                          with details of the last transition.
                         type: string
                       status:
-                        description: Status is the status of the BaseboardManagement
-                          condition. Can be True or False.
+                        description: Status of the condition.
                         type: string
                       type:
-                        description: Type of the BaseboardManagement condition.
+                        description: Type of the Machine condition.
                         type: string
                     required:
                       - status
@@ -108,7 +105,7 @@ spec:
                     type: object
                   type: array
                 powerState:
-                  description: Power is the current power state of the BaseboardManagement.
+                  description: Power is the current power state of the Machine.
                   enum:
                     - "on"
                     - "off"
