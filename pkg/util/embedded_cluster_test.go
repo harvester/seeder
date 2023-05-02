@@ -3,8 +3,9 @@ package util
 import (
 	"testing"
 
-	"github.com/harvester/seeder/pkg/mock"
 	"github.com/stretchr/testify/require"
+
+	"github.com/harvester/seeder/pkg/mock"
 )
 
 func Test_setupEmbeddedCluster(t *testing.T) {

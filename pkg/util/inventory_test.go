@@ -4,13 +4,14 @@ import (
 	"context"
 	"testing"
 
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
-	"github.com/harvester/seeder/pkg/mock"
 	"github.com/stretchr/testify/require"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/mock"
 )
 
 var (

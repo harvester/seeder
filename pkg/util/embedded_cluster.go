@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
 // createLocalCluster is invoked when seeder is run in embedded mode

@@ -2,12 +2,11 @@ package controllers
 
 import (
 	"fmt"
-	"strings"
 
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
-	"github.com/harvester/seeder/pkg/util"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
 func generateJob(name, namespace, powerAction string) *rufio.Job {
@@ -32,10 +31,10 @@ func generateJob(name, namespace, powerAction string) *rufio.Job {
 
 	return &rufio.Job{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      fmt.Sprintf("%s-%s-%s", name, powerAction, strings.ToLower(util.GenerateRandCustomLength(6))),
-			Namespace: namespace,
+			GenerateName: fmt.Sprintf("%s-%s", name, powerAction),
+			Namespace:    namespace,
 			Labels: map[string]string{
-				"inventory": name,
+				"inventory.metal.harvesterhci.io": name,
 			},
 		},
 		Spec: rufio.JobSpec{

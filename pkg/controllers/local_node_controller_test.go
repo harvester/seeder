@@ -3,16 +3,15 @@ package controllers
 import (
 	"fmt"
 
-	"github.com/harvester/seeder/pkg/util"
-
-	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
-
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/util"
 )
 
 var _ = Describe("test local node controller", func() {

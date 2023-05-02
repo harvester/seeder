@@ -2,11 +2,13 @@ package controllers
 
 import (
 	"fmt"
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
 var _ = Describe("AddressPool controller tests", func() {

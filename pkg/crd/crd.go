@@ -5,11 +5,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/harvester/seeder/pkg/data"
 	"github.com/rancher/wrangler/pkg/apply"
 	"github.com/rancher/wrangler/pkg/yaml"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
+
+	"github.com/harvester/seeder/pkg/data"
 )
 
 func Create(ctx context.Context, cfg *rest.Config) error {

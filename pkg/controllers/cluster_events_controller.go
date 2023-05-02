@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
-	"github.com/harvester/seeder/pkg/events"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,6 +15,9 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/events"
 )
 
 type ClusterEventReconciler struct {

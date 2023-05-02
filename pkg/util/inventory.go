@@ -2,8 +2,9 @@ package util
 
 import (
 	"fmt"
+	"reflect"
+
 	"github.com/go-logr/logr"
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	"golang.org/x/net/context"
 	v1 "k8s.io/api/core/v1"
@@ -11,9 +12,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
-	"reflect"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
 // CheckSecretExists looks up the BMC reference secret to ensure it exists before submitting an object

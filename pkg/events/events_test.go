@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/dockertest/v3"
+	dockertest "github.com/ory/dockertest/v3"
 	"github.com/stretchr/testify/require"
 )
 
