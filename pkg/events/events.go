@@ -60,6 +60,7 @@ func (ef *EventFetcher) GetConfig() (map[string]string, []string, error) {
 func trimString(input string) string {
 	return strings.ReplaceAll(strings.ReplaceAll(input, " ", ""), ".", "")
 }
+
 func (ef *EventFetcher) getChassisInfo() ([]string, error) {
 	var health []string
 	var err error

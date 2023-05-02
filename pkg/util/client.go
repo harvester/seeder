@@ -7,7 +7,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -15,6 +14,8 @@ import (
 	certutil "github.com/rancher/dynamiclistener/cert"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
 // Config is an internal place holder to hold bootstrap config from server

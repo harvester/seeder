@@ -33,11 +33,11 @@ const (
 	KindCluster   string = "cluster"
 	KindInventory string = "inventory"
 )
+
 const (
-	InventoryFinalizer             = "finalizer.inventory.harvesterhci.io"
-	LocalInventoryAnnotation       = "metal.harvesterhci.io/localInventory"
-	LocalInventoryStatusAnnotation = "metal.harvesterhci.io/localInventoryStatus"
-	LocalInventoryNodeName         = "metal.harvesterhci.io/localNodeName"
+	InventoryFinalizer       = "finalizer.inventory.metal.harvesterhci.io"
+	LocalInventoryAnnotation = "metal.harvesterhci.io/local-inventory"
+	LocalInventoryNodeName   = "metal.harvesterhci.io/local-node-name"
 )
 
 const (

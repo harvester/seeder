@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bmc-toolbox/bmclib/v2"
+	bmclib "github.com/bmc-toolbox/bmclib/v2"
 	rufiocontrollers "github.com/tinkerbell/rufio/controllers"
 )
 

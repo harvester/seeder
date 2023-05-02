@@ -21,24 +21,23 @@ import (
 	"fmt"
 	"reflect"
 
-	"k8s.io/apimachinery/pkg/labels"
-
 	"github.com/go-logr/logr"
 	"github.com/google/uuid"
-	"github.com/harvester/seeder/pkg/util"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime"
-	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+	"github.com/harvester/seeder/pkg/util"
 )
 
 // InventoryReconciler reconciles a Inventory object
@@ -264,45 +263,36 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, iObj *seederv
 	i := iObj.DeepCopy()
 	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) {
 		j := &rufio.Job{}
-		var jobFound, completed bool
+		var completed bool
 		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Status.PowerAction.LastJobName}, j)
 		if err != nil {
-			if !apierrors.IsNotFound(err) {
-				return err
-			}
-		} else {
-			jobFound = true
+			return err
 		}
 
-		if jobFound {
-			if j.HasCondition(rufio.JobCompleted, rufio.ConditionTrue) {
-				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobComplete, "")
-				i.Status.PowerAction.LastActionStatus = seederv1alpha1.NodeJobComplete
-				completed = true
-			}
+		if j.HasCondition(rufio.JobCompleted, rufio.ConditionTrue) {
+			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobComplete, "")
+			i.Status.PowerAction.LastActionStatus = seederv1alpha1.NodeJobComplete
+			completed = true
+		}
 
-			if j.HasCondition(rufio.JobFailed, rufio.ConditionTrue) {
-				var message string
-				for _, c := range j.Status.Conditions {
-					if c.Type == rufio.JobFailed && c.Status == rufio.ConditionTrue {
-						message = c.Message
-					}
-					i.Status.PowerAction.LastActionStatus = seederv1alpha1.NodeJobFailed
+		if j.HasCondition(rufio.JobFailed, rufio.ConditionTrue) {
+			var message string
+			for _, c := range j.Status.Conditions {
+				if c.Type == rufio.JobFailed && c.Status == rufio.ConditionTrue {
+					message = c.Message
 				}
-				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobError, message)
-				completed = true
+				i.Status.PowerAction.LastActionStatus = seederv1alpha1.NodeJobFailed
 			}
-
+			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobError, message)
+			completed = true
 		}
 
 		// new power action request, which will trigger job creation and update of status
 		if completed {
 			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted)
 			return r.Status().Update(ctx, i)
-		} else {
-			return fmt.Errorf("bmcjob %s not yet completed, requeuing", j.Name)
 		}
-
+		return fmt.Errorf("bmcjob %s not yet completed, requeuing", j.Name)
 	}
 	return nil
 }
@@ -363,7 +353,7 @@ func (r *InventoryReconciler) housekeepingBMCJob(ctx context.Context, iObj *seed
 	i := iObj.DeepCopy()
 	if !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryFreed) {
 		bmcjoblist := &rufio.JobList{}
-		l, err := labels.Parse(fmt.Sprintf("inventory=%s", i.Name))
+		l, err := labels.Parse(fmt.Sprintf("inventory.metal.harvesterhci.io=%s", i.Name))
 		if err != nil {
 			return err
 		}
@@ -400,7 +390,7 @@ func (r *InventoryReconciler) triggerPowerAction(ctx context.Context, iObj *seed
 		// if job name is not present then create one
 		job := generateJob(i.Name, i.Namespace, i.Status.PowerAction.ActionRequested)
 		if job == nil {
-			return fmt.Errorf("unable to generate job for inventory %s", i.Name)
+			return fmt.Errorf("unsupported action, can not generate job for inventory %s", i.Name)
 		}
 		err := controllerutil.SetOwnerReference(i, job, r.Scheme)
 		if err != nil {

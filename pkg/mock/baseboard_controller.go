@@ -2,6 +2,7 @@ package mock
 
 import (
 	"context"
+
 	"github.com/go-logr/logr"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"

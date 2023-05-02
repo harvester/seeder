@@ -3,9 +3,11 @@ package util
 import (
 	"context"
 	"fmt"
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+
 	"inet.af/netaddr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
 // GenerateAddressPoolStatus will generate a IP address for the node

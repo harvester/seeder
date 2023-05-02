@@ -3,7 +3,6 @@ package mock
 import (
 	"strings"
 
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/rancher/wrangler/pkg/yaml"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -11,6 +10,8 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
 const (

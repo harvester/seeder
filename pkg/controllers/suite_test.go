@@ -23,25 +23,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/harvester/seeder/pkg/crd"
-
-	"github.com/ory/dockertest/v3"
-	"github.com/ory/dockertest/v3/docker"
-	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
-
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
-	"github.com/harvester/seeder/pkg/mock"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	dockertest "github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest/v3/docker"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
-	"k8s.io/apimachinery/pkg/runtime"
+	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	log "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-	//+kubebuilder:scaffold:imports
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/crd"
+	"github.com/harvester/seeder/pkg/mock"
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
@@ -50,7 +47,6 @@ import (
 var (
 	k8sClient      client.Client
 	testEnv        *envtest.Environment
-	scheme         = runtime.NewScheme()
 	ctx            context.Context
 	cancel         context.CancelFunc
 	pool           *dockertest.Pool
