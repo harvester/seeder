@@ -114,8 +114,8 @@ var _ = Describe("test local node controller", func() {
 					return err
 				}
 
-				iObj.Status.PowerAction.ActionRequested = seederv1alpha1.NodePowerActionPowerOn
-				return k8sClient.Status().Update(ctx, iObj)
+				iObj.Spec.PowerActionRequested = seederv1alpha1.NodePowerActionPowerOn
+				return k8sClient.Update(ctx, iObj)
 			}, "30s", "5s").ShouldNot(HaveOccurred())
 		})
 

@@ -102,6 +102,8 @@ spec:
                 type: object
               managementInterfaceMacAddress:
                 type: string
+              powerActionRequested:
+                type: string
               primaryDisk:
                 type: string
             required:
@@ -147,8 +149,6 @@ spec:
                 type: object
               powerAction:
                 properties:
-                  actionRequested:
-                    type: string
                   actionStatus:
                     type: string
                   lastActionRequested:
