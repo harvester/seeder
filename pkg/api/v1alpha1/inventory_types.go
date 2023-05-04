@@ -62,6 +62,7 @@ type InventorySpec struct {
 	ManagementInterfaceMacAddress string            `json:"managementInterfaceMacAddress"`
 	BaseboardManagementSpec       rufio.MachineSpec `json:"baseboardSpec"`
 	Events                        `json:"events"`
+	PowerActionRequested          string `json:"powerActionRequested,omitempty"`
 }
 
 type BMCSecretReference struct {
@@ -102,7 +103,6 @@ type Events struct {
 }
 
 type PowerActionDetails struct {
-	ActionRequested     string `json:"actionRequested,omitempty"`
 	LastActionStatus    string `json:"actionStatus,omitempty"`
 	LastActionRequested string `json:"lastActionRequested,omitempty"`
 	LastJobName         string `json:"lastJobName,omitempty"`

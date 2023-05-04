@@ -251,8 +251,8 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, iObj *seederv1a
 	i := iObj.DeepCopy()
 	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i.Status.Conditions, seederv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) {
 		// submit BMC task
-		i.Status.PowerAction.ActionRequested = seederv1alpha1.NodePowerActionReboot
-		return r.Status().Update(ctx, i)
+		i.Spec.PowerActionRequested = seederv1alpha1.NodePowerActionReboot
+		return r.Update(ctx, i)
 	}
 
 	return nil
@@ -386,9 +386,9 @@ func (r *InventoryReconciler) housekeepingBMCJob(ctx context.Context, iObj *seed
 
 func (r *InventoryReconciler) triggerPowerAction(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
 	i := iObj.DeepCopy()
-	if i.Status.Status == seederv1alpha1.InventoryReady && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) && i.Status.PowerAction.ActionRequested != "" && i.Status.PowerAction.LastJobName == "" {
+	if i.Status.Status == seederv1alpha1.InventoryReady && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) && i.Spec.PowerActionRequested != "" && i.Status.PowerAction.LastJobName == "" {
 		// if job name is not present then create one
-		job := generateJob(i.Name, i.Namespace, i.Status.PowerAction.ActionRequested)
+		job := generateJob(i.Name, i.Namespace, i.Spec.PowerActionRequested)
 		if job == nil {
 			return fmt.Errorf("unsupported action, can not generate job for inventory %s", i.Name)
 		}
