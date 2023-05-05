@@ -130,7 +130,7 @@ rules:
 - apiGroups:
   - tinkerbell.org
   resources:
-  - hardwares
+  - hardware
   verbs:
   - create
   - delete
