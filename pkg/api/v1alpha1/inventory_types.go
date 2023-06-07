@@ -85,7 +85,7 @@ type InventoryStatus struct {
 	Conditions        []Conditions            `json:"conditions,omitempty"`
 	PXEBootInterface  `json:"pxeBootConfig,omitempty"`
 	Cluster           ObjectReference    `json:"ownerCluster,omitempty"`
-	PowerAction       PowerActionDetails `json:"powerAction,omit"`
+	PowerAction       PowerActionDetails `json:"powerAction,omitempty"`
 }
 
 type Conditions struct {

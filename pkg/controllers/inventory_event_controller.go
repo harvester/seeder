@@ -19,8 +19,8 @@ import (
 	"github.com/harvester/seeder/pkg/events"
 )
 
-// ClusterReconciler reconciles a Cluster object
-type InventoryEventReconciller struct {
+// InventoryEventReconciler reconciles events for an inventory object
+type InventoryEventReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 	logr.Logger
@@ -31,7 +31,7 @@ const (
 	NextCheckTime = "nextCheckTime"
 )
 
-type inventoryEventReconciller func(context.Context, *seederv1alpha1.Inventory) error
+type inventoryEventReconciler func(context.Context, *seederv1alpha1.Inventory) error
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -42,7 +42,7 @@ type inventoryEventReconciller func(context.Context, *seederv1alpha1.Inventory) 
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
-func (r *InventoryEventReconciller) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+func (r *InventoryEventReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	r.Info("Reconcilling inventory objects for events", req.Name, req.Namespace)
 	// TODO(user): your logic here
 	i := &seederv1alpha1.Inventory{}
@@ -81,7 +81,7 @@ func (r *InventoryEventReconciller) Reconcile(ctx context.Context, req ctrl.Requ
 
 	}
 
-	reconcileList := []inventoryEventReconciller{
+	reconcileList := []inventoryEventReconciler{
 		r.getInventoryInfo,
 	}
 
@@ -97,7 +97,7 @@ func (r *InventoryEventReconciller) Reconcile(ctx context.Context, req ctrl.Requ
 }
 
 // getInventoryInfo will leverage Redfish to query inventory information
-func (r *InventoryEventReconciller) getInventoryInfo(ctx context.Context, i *seederv1alpha1.Inventory) error {
+func (r *InventoryEventReconciler) getInventoryInfo(ctx context.Context, i *seederv1alpha1.Inventory) error {
 
 	// next reconcile duration
 	duration, err := time.ParseDuration(i.Spec.Events.PollingInterval)
@@ -170,7 +170,7 @@ func (r *InventoryEventReconciller) getInventoryInfo(ctx context.Context, i *see
 }
 
 // SetupWithManager sets up the controller with the Manager.
-func (r *InventoryEventReconciller) SetupWithManager(mgr ctrl.Manager) error {
+func (r *InventoryEventReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&seederv1alpha1.Inventory{}).
 		Complete(r)

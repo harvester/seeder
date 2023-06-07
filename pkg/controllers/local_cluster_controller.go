@@ -21,7 +21,7 @@ import (
 	"github.com/harvester/seeder/pkg/util"
 )
 
-type localClusterReconciller func(context.Context, *seederv1alpha1.Inventory) error
+type localClusterReconciler func(context.Context, *seederv1alpha1.Inventory) error
 
 type LocalClusterReconciler struct {
 	client.Client
@@ -58,7 +58,7 @@ func (r *LocalClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request
 		return ctrl.Result{}, nil
 	}
 
-	reconcileList := []localClusterReconciller{
+	reconcileList := []localClusterReconciler{
 		r.addToLocalCluster,
 		r.ensureMachineExists,
 		r.manageStatus,

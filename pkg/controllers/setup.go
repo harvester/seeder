@@ -109,7 +109,7 @@ func (s *Server) Start(ctx context.Context) error {
 			Scheme: mgr.GetScheme(),
 			Logger: s.logger.WithName("addresspool-controller"),
 		},
-		&InventoryEventReconciller{
+		&InventoryEventReconciler{
 			Client:        mgr.GetClient(),
 			Scheme:        mgr.GetScheme(),
 			Logger:        s.logger.WithName("inventory-event-controller"),

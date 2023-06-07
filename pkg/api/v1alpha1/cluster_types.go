@@ -18,7 +18,6 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 const (
@@ -27,8 +26,6 @@ const (
 	DefaultLocalClusterNamespace = "harvester-system"
 	DefaultLocalClusterAddress   = "10.53.0.1"
 )
-
-var DefaultLocalCluster = types.NamespacedName{Name: DefaultLocalClusterName, Namespace: DefaultLocalClusterName}
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
