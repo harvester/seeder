@@ -150,7 +150,7 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	err = (&InventoryEventReconciller{
+	err = (&InventoryEventReconciler{
 		Client:        mgr.GetClient(),
 		Scheme:        mgr.GetScheme(),
 		Logger:        log.Log.WithName("controller.invenory-event"),

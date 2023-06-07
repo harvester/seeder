@@ -25,7 +25,6 @@ import (
 	"github.com/google/uuid"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -281,13 +280,14 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, iObj *seederv
 				if c.Type == rufio.JobFailed && c.Status == rufio.ConditionTrue {
 					message = c.Message
 				}
-				i.Status.PowerAction.LastActionStatus = seederv1alpha1.NodeJobFailed
 			}
+			i.Status.PowerAction.LastActionStatus = seederv1alpha1.NodeJobFailed
 			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobError, message)
 			completed = true
 		}
 
-		// new power action request, which will trigger job creation and update of status
+		// job has completed, BMCJobSubmitted condition can be removed to avoid
+		// further reconciles by reconcileBMCJob handler
 		if completed {
 			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted)
 			return r.Status().Update(ctx, i)
@@ -302,8 +302,10 @@ func (r *InventoryReconciler) inventoryFreed(ctx context.Context, iObj *seederv1
 	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryFreed) {
 		// check and submit a power off job
 		var notFound bool
-		j := &rufio.Job{}
-		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: fmt.Sprintf("%s-poweroff", i.Name)}, j)
+
+		j := util.GenerateJob(i.Name, i.Namespace, "shutdown")
+		jobObj := &rufio.Job{}
+		err := r.Get(ctx, types.NamespacedName{Namespace: j.Namespace, Name: j.Name}, jobObj)
 		if err != nil {
 			if apierrors.IsNotFound(err) {
 				notFound = true
@@ -313,31 +315,10 @@ func (r *InventoryReconciler) inventoryFreed(ctx context.Context, iObj *seederv1
 		}
 
 		if notFound {
-			off := rufio.PowerHardOff
-			job := &rufio.Job{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      fmt.Sprintf("%s-poweroff", i.Name),
-					Namespace: i.Namespace,
-					Labels: map[string]string{
-						"inventory": i.Name,
-					},
-				},
-				Spec: rufio.JobSpec{
-					MachineRef: rufio.MachineRef{
-						Name:      i.Name,
-						Namespace: i.Namespace,
-					},
-					Tasks: []rufio.Action{
-						{
-							PowerAction: &off,
-						},
-					},
-				},
-			}
-			if err := controllerutil.SetOwnerReference(i, job, r.Scheme); err != nil {
+			if err := controllerutil.SetOwnerReference(i, j, r.Scheme); err != nil {
 				return err
 			}
-			if err := r.Create(ctx, job); err != nil {
+			if err := r.Create(ctx, j); err != nil {
 				return err
 			}
 		}
@@ -388,7 +369,7 @@ func (r *InventoryReconciler) triggerPowerAction(ctx context.Context, iObj *seed
 	i := iObj.DeepCopy()
 	if i.Status.Status == seederv1alpha1.InventoryReady && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) && i.Spec.PowerActionRequested != "" && i.Status.PowerAction.LastJobName == "" {
 		// if job name is not present then create one
-		job := generateJob(i.Name, i.Namespace, i.Spec.PowerActionRequested)
+		job := util.GenerateJob(i.Name, i.Namespace, i.Spec.PowerActionRequested)
 		if job == nil {
 			return fmt.Errorf("unsupported action, can not generate job for inventory %s", i.Name)
 		}

@@ -46,7 +46,7 @@ func main() {
 	var s controllers.Server
 
 	app := cli.NewApp()
-	app.Name = "harvester-seederr"
+	app.Name = "harvester-seeder"
 	app.Version = VERSION
 	app.Usage = "Harvester Seeder, to help provision and watch harvester cluster hardware"
 	app.Flags = []cli.Flag{

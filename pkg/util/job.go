@@ -1,15 +1,15 @@
-package controllers
+package util
 
 import (
 	"fmt"
 
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
-func generateJob(name, namespace, powerAction string) *rufio.Job {
+// GenerateJob will generate a power action rufio job for an inventory object
+func GenerateJob(name, namespace, powerAction string) *rufio.Job {
 	var tasks []rufio.Action
 	powerOffTask := rufio.Action{
 		PowerAction: rufio.PowerHardOff.Ptr(),
