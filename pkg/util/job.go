@@ -3,9 +3,10 @@ package util
 import (
 	"fmt"
 
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
 // GenerateJob will generate a power action rufio job for an inventory object
@@ -31,7 +32,7 @@ func GenerateJob(name, namespace, powerAction string) *rufio.Job {
 
 	return &rufio.Job{
 		ObjectMeta: metav1.ObjectMeta{
-			GenerateName: fmt.Sprintf("%s-%s", name, powerAction),
+			GenerateName: fmt.Sprintf("%s-%s-", name, powerAction),
 			Namespace:    namespace,
 			Labels: map[string]string{
 				"inventory.metal.harvesterhci.io": name,
