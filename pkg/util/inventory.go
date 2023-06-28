@@ -83,6 +83,21 @@ func IsBaseboardReady(b *rufio.Machine) bool {
 	return ready
 }
 
+// IsMachineNotContactable checks if machine is not contactable
+func IsMachineNotContactable(b *rufio.Machine) (bool, string) {
+	if IsBaseboardReady(b) {
+		return false, ""
+	}
+
+	for _, c := range b.Status.Conditions {
+		if c.Type == rufio.Contactable && c.Status == rufio.ConditionFalse {
+			return true, c.Message
+		}
+	}
+
+	return false, ""
+}
+
 // ListInventory generates a list of inventory across all namespaces
 func ListInventory(ctx context.Context, c client.Client) ([]seederv1alpha1.Inventory, error) {
 	list := &seederv1alpha1.InventoryList{}

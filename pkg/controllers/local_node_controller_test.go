@@ -17,7 +17,7 @@ import (
 var _ = Describe("test local node controller", func() {
 	var n *corev1.Node
 	var i *seederv1alpha1.Inventory
-
+	var creds *corev1.Secret
 	BeforeEach(func() {
 		n = &corev1.Node{
 			ObjectMeta: metav1.ObjectMeta{
@@ -36,7 +36,7 @@ var _ = Describe("test local node controller", func() {
 
 		i = &seederv1alpha1.Inventory{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      n.Name,
+				Name:      "power-test",
 				Namespace: seederv1alpha1.DefaultLocalClusterNamespace,
 				Annotations: map[string]string{
 					seederv1alpha1.LocalInventoryAnnotation: "true",
@@ -60,6 +60,17 @@ var _ = Describe("test local node controller", func() {
 			},
 		}
 
+		creds = &corev1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "sample",
+				Namespace: "default",
+			},
+			StringData: map[string]string{
+				"username": "admin",
+				"password": "password",
+			},
+		}
+
 		Eventually(func() error {
 			return createHarvesterNamespace(ctx, k8sClient)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
@@ -70,6 +81,10 @@ var _ = Describe("test local node controller", func() {
 
 		Eventually(func() error {
 			return k8sClient.Create(ctx, i)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, creds)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 
 		Eventually(func() error {
@@ -95,6 +110,11 @@ var _ = Describe("test local node controller", func() {
 		Eventually(func() error {
 			return k8sClient.Delete(ctx, n)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, creds)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
 	})
 
 	It("run node power tests", func() {
@@ -103,6 +123,36 @@ var _ = Describe("test local node controller", func() {
 			Eventually(func() error {
 				machine := &rufio.Machine{}
 				return k8sClient.Get(ctx, types.NamespacedName{Name: n.Name, Namespace: seederv1alpha1.DefaultLocalClusterNamespace}, machine)
+			}, "30s", "5s").ShouldNot(HaveOccurred())
+		})
+
+		By("checking inventory is ready", func() {
+			Eventually(func() error {
+				iObj := &seederv1alpha1.Inventory{}
+				err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj)
+				if err != nil {
+					return err
+				}
+
+				if iObj.Status.Status != seederv1alpha1.InventoryReady {
+					return fmt.Errorf("waiting for baseboard object to be created. Current status %v", iObj)
+				}
+				return nil
+			}, "30s", "5s").ShouldNot(HaveOccurred())
+		})
+
+		By("checking inventory is allocated to cluster", func() {
+			Eventually(func() error {
+				iObj := &seederv1alpha1.Inventory{}
+				err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj)
+				if err != nil {
+					return err
+				}
+
+				if !util.ConditionExists(iObj.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
+					return fmt.Errorf("waiting for inventory to be allocated to cluster")
+				}
+				return nil
 			}, "30s", "5s").ShouldNot(HaveOccurred())
 		})
 
