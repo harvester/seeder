@@ -218,6 +218,10 @@ func (r *LocalClusterReconciler) manageStatus(ctx context.Context, iObj *seederv
 		return fmt.Errorf("missing annotation %s on inventory %s", seederv1alpha1.LocalInventoryNodeName, i.Name)
 	}
 
+	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
+		return nil
+	}
+
 	nodeObj := &corev1.Node{}
 
 	err := r.Get(ctx, types.NamespacedName{Name: nodeName}, nodeObj)
@@ -233,8 +237,7 @@ func (r *LocalClusterReconciler) manageStatus(ctx context.Context, iObj *seederv
 		}
 	}
 
-	status.Status = seederv1alpha1.InventoryReady
-	if !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
+	if i.Status.Status == seederv1alpha1.InventoryReady && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
 		status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster, "node assigned to local cluster")
 	}
 

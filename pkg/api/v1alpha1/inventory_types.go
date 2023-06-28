@@ -54,6 +54,7 @@ const (
 	InventoryFreed              ConditionType = "inventoryFreed"
 	HarvesterCreateNode         ConditionType = "harvesterCreateNode"
 	HarvesterJoinNode           ConditionType = "harvesterJoinNode"
+	MachineNotContactable       ConditionType = "machineNotContactable"
 )
 
 // InventorySpec defines the desired state of Inventory

@@ -79,11 +79,11 @@ func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	}
 
-	reconcileList := []inventoryReconciler{r.triggerPowerAction, r.reconcileBMCJob, r.housekeepingBMCJob}
+	reconcileList := []inventoryReconciler{r.triggerPowerAction, r.manageBaseboardObject, r.checkAndMarkNodeReady,
+		r.handleBaseboardDeletion, r.reconcileBMCJob, r.housekeepingBMCJob}
 	// if inventory object has LocalInventoryAnnotation then skip reconcile as this will be handled by the local_cluster_controller
 	if _, ok := inventoryObj.Annotations[seederv1alpha1.LocalInventoryAnnotation]; !ok {
-		reconcileList = append(reconcileList, r.manageBaseboardObject, r.checkAndMarkNodeReady,
-			r.handleBaseboardDeletion, r.triggerReboot, r.inventoryFreed)
+		reconcileList = append(reconcileList, r.triggerReboot, r.inventoryFreed)
 	}
 
 	deletionReconcileList := []inventoryReconciler{
@@ -152,6 +152,7 @@ func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, iObj *s
 
 		// check if condition bmcv1alpha1.Contactable exists and is bmcv1alpha1.ConditionTrue
 		if util.IsBaseboardReady(b) {
+			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.MachineNotContactable)
 			i.Status.Status = seederv1alpha1.InventoryReady
 			err = r.Status().Update(ctx, i)
 			if err != nil {
@@ -162,6 +163,11 @@ func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, iObj *s
 				controllerutil.AddFinalizer(i, seederv1alpha1.InventoryFinalizer)
 				return r.Update(ctx, i)
 			}
+		}
+
+		if ok, msg := util.IsMachineNotContactable(b); ok {
+			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.MachineNotContactable, msg)
+			return r.Status().Update(ctx, i)
 		}
 	}
 	return nil
