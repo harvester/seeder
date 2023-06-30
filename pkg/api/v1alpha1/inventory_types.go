@@ -17,7 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/rancher/wrangler/pkg/condition"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -27,7 +29,7 @@ type TinkWorkflowStatus string
 
 type TaskWorkflowStatus string
 
-type ConditionType string
+type ConditionType condition.Cond
 
 const (
 	KindCluster   string = "cluster"
@@ -45,16 +47,16 @@ const (
 )
 
 const (
-	BMCObjectCreated            ConditionType = "bmcObjectCreated"
-	BMCJobSubmitted             ConditionType = "bmcJobSubmitted"
-	BMCJobComplete              ConditionType = "bmcJobCompleted"
-	BMCJobError                 ConditionType = "bmcJobErrorr"
-	TinkWorkflowCreated         ConditionType = "tinkWorkflowCreated"
-	InventoryAllocatedToCluster ConditionType = "inventoryAllocatedToCluster"
-	InventoryFreed              ConditionType = "inventoryFreed"
-	HarvesterCreateNode         ConditionType = "harvesterCreateNode"
-	HarvesterJoinNode           ConditionType = "harvesterJoinNode"
-	MachineNotContactable       ConditionType = "machineNotContactable"
+	BMCObjectCreated            condition.Cond = "bmcObjectCreated"
+	BMCJobSubmitted             condition.Cond = "bmcJobSubmitted"
+	BMCJobComplete              condition.Cond = "bmcJobCompleted"
+	BMCJobError                 condition.Cond = "bmcJobErrorr"
+	TinkWorkflowCreated         condition.Cond = "tinkWorkflowCreated"
+	InventoryAllocatedToCluster condition.Cond = "inventoryAllocatedToCluster"
+	InventoryFreed              condition.Cond = "inventoryFreed"
+	HarvesterCreateNode         condition.Cond = "harvesterCreateNode"
+	HarvesterJoinNode           condition.Cond = "harvesterJoinNode"
+	MachineNotContactable       condition.Cond = "machineNotContactable"
 )
 
 // InventorySpec defines the desired state of Inventory
@@ -90,10 +92,12 @@ type InventoryStatus struct {
 }
 
 type Conditions struct {
-	Type           ConditionType `json:"type"`
-	StartTime      metav1.Time   `json:"startTime"`
-	LastUpdateTime metav1.Time   `json:"lastUpdateTime,omitempty"`
-	Message        string        `json:"message,omitempty"`
+	Type               condition.Cond         `json:"type"`
+	Status             corev1.ConditionStatus `json:"status"`
+	LastUpdateTime     string                 `json:"lastUpdateTime,omitempty"`
+	LastTransitionTime string                 `json:"lastTransitionTime,omitempty"`
+	Reason             string                 `json:"reason,omitempty"`
+	Message            string                 `json:"message,omitempty"`
 }
 
 type Events struct {

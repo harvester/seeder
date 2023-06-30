@@ -187,7 +187,7 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, cObj *seeder
 				return fmt.Errorf("waiting for inventory %s in namespace %s to be ready", i.Name, i.Namespace)
 			}
 
-			if util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
+			if util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) {
 				continue
 			}
 
@@ -230,14 +230,14 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, cObj *seeder
 			i.Status.GeneratedPassword = util.GenerateRand()
 			i.Status.Cluster.Namespace = c.Namespace
 			i.Status.Cluster.Name = c.Name
-			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster,
+			util.CreateOrUpdateCondition(i, seederv1alpha1.InventoryAllocatedToCluster,
 				fmt.Sprintf("node assigned to cluster %s", c.Name))
-			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.InventoryFreed)
+			util.RemoveCondition(i, seederv1alpha1.InventoryFreed)
 
 			if n == 0 {
-				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.HarvesterCreateNode, "Create Mode")
+				util.CreateOrUpdateCondition(i, seederv1alpha1.HarvesterCreateNode, "Create Mode")
 			} else {
-				i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.HarvesterJoinNode, "Join Mode")
+				util.CreateOrUpdateCondition(i, seederv1alpha1.HarvesterJoinNode, "Join Mode")
 			}
 
 			err = r.Status().Update(ctx, i)
@@ -277,7 +277,7 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, cObj *
 			// if node is missing inventory allocation to cluster
 			// then skip the HW generation, as this node doesnt yet have any addresses
 			// allocated
-			if !util.ConditionExists(inventory.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
+			if !util.ConditionExists(inventory, seederv1alpha1.InventoryAllocatedToCluster) {
 				r.Info("skipping node from hardware generation as it has not yet been processed for allocation to cluster", inventory.Name, inventory.Namespace)
 				continue
 			}
@@ -308,7 +308,7 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, cObj *
 			}
 
 			if hardwareUpdated {
-				inventory.Status.Conditions = util.CreateOrUpdateCondition(inventory.Status.Conditions, seederv1alpha1.TinkWorkflowCreated, "tink workflow created")
+				util.CreateOrUpdateCondition(inventory, seederv1alpha1.TinkWorkflowCreated, "tink workflow created")
 				if err := r.Status().Update(ctx, inventory); err != nil {
 					return err
 				}
@@ -378,10 +378,10 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, cObj *seederv1al
 			iObj.Status.PXEBootInterface = seederv1alpha1.PXEBootInterface{}
 			iObj.Status.Cluster = seederv1alpha1.ObjectReference{}
 			iObj.Status.GeneratedPassword = ""
-			iObj.Status.Conditions = util.RemoveCondition(iObj.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster)
-			iObj.Status.Conditions = util.RemoveCondition(iObj.Status.Conditions, seederv1alpha1.TinkWorkflowCreated)
-			iObj.Status.Conditions = util.RemoveCondition(iObj.Status.Conditions, seederv1alpha1.HarvesterJoinNode)
-			iObj.Status.Conditions = util.CreateOrUpdateCondition(iObj.Status.Conditions, seederv1alpha1.InventoryFreed, "")
+			util.RemoveCondition(iObj, seederv1alpha1.InventoryAllocatedToCluster)
+			util.RemoveCondition(iObj, seederv1alpha1.TinkWorkflowCreated)
+			util.RemoveCondition(iObj, seederv1alpha1.HarvesterJoinNode)
+			util.CreateOrUpdateCondition(iObj, seederv1alpha1.InventoryFreed, "")
 			if err := r.Status().Update(ctx, iObj); err != nil {
 				return err
 			}
@@ -408,7 +408,7 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, cObj *seederv1al
 				Name: i.InventoryReference.Name}, iObj); err != nil {
 				return err
 			}
-			if !util.ConditionExists(iObj.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) || iObj.Status.Cluster.Namespace != c.Namespace || iObj.Status.Cluster.Name != c.Name {
+			if !util.ConditionExists(iObj, seederv1alpha1.InventoryAllocatedToCluster) || iObj.Status.Cluster.Namespace != c.Namespace || iObj.Status.Cluster.Name != c.Name {
 				nodesAdded = true
 			}
 		}
@@ -462,10 +462,10 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, cObj *seeder
 			i.Status.PXEBootInterface = seederv1alpha1.PXEBootInterface{}
 			i.Status.Cluster = seederv1alpha1.ObjectReference{}
 			i.Status.GeneratedPassword = ""
-			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster)
-			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.HarvesterJoinNode)
-			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.HarvesterCreateNode)
-			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.InventoryFreed, "")
+			util.RemoveCondition(i, seederv1alpha1.InventoryAllocatedToCluster)
+			util.RemoveCondition(i, seederv1alpha1.HarvesterJoinNode)
+			util.RemoveCondition(i, seederv1alpha1.HarvesterCreateNode)
+			util.CreateOrUpdateCondition(i, seederv1alpha1.InventoryFreed, "")
 			err = r.Status().Update(ctx, i)
 			if err != nil {
 				return err

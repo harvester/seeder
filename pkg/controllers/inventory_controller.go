@@ -111,7 +111,7 @@ func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 func (r *InventoryReconciler) manageBaseboardObject(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
 	i := iObj.DeepCopy()
 	// already in desired state. No further action needed
-	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCObjectCreated) {
+	if util.ConditionExists(i, seederv1alpha1.BMCObjectCreated) {
 		return nil
 	}
 
@@ -130,14 +130,14 @@ func (r *InventoryReconciler) manageBaseboardObject(ctx context.Context, iObj *s
 		return err
 	}
 	i.Status.HardwareID = id.String()
-	i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCObjectCreated, "bmc object created")
+	util.CreateOrUpdateCondition(i, seederv1alpha1.BMCObjectCreated, "bmc object created")
 	return r.Client.Status().Update(ctx, i)
 }
 
 // checkAndMarkNodeReady will check the power status of the BaseboardManagement Object and Mark the node ready
 func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
 	i := iObj.DeepCopy()
-	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCObjectCreated) {
+	if util.ConditionExists(i, seederv1alpha1.BMCObjectCreated) {
 		if i.Status.Status == seederv1alpha1.InventoryReady {
 			return nil
 		}
@@ -152,8 +152,10 @@ func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, iObj *s
 
 		// check if condition bmcv1alpha1.Contactable exists and is bmcv1alpha1.ConditionTrue
 		if util.IsBaseboardReady(b) {
-			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.MachineNotContactable)
 			i.Status.Status = seederv1alpha1.InventoryReady
+			if util.ConditionExists(i, seederv1alpha1.MachineNotContactable) {
+				util.RemoveCondition(i, seederv1alpha1.MachineNotContactable)
+			}
 			err = r.Status().Update(ctx, i)
 			if err != nil {
 				return err
@@ -166,8 +168,10 @@ func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, iObj *s
 		}
 
 		if ok, msg := util.IsMachineNotContactable(b); ok {
-			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.MachineNotContactable, msg)
-			return r.Status().Update(ctx, i)
+			if !util.ConditionExists(i, seederv1alpha1.MachineNotContactable) {
+				util.SetErrorCondition(i, seederv1alpha1.MachineNotContactable, msg)
+				return r.Status().Update(ctx, i)
+			}
 		}
 	}
 	return nil
@@ -193,7 +197,7 @@ func (r *InventoryReconciler) handleBaseboardDeletion(ctx context.Context, iObj 
 			}
 			// reset status to re-trigger recreation of baseboard objects
 			i.Status.Status = ""
-			util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCObjectCreated)
+			util.RemoveCondition(i, seederv1alpha1.BMCObjectCreated)
 			return r.Status().Update(ctx, i)
 		}
 	}
@@ -254,7 +258,7 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, iObj *seederv1a
 	// if tink hardware has been created and inventory is allocated to a cluster
 	// then reboot the hardware using BMC tasks
 	i := iObj.DeepCopy()
-	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i.Status.Conditions, seederv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) {
+	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i, seederv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) {
 		// submit BMC task
 		i.Spec.PowerActionRequested = seederv1alpha1.NodePowerActionReboot
 		return r.Update(ctx, i)
@@ -266,7 +270,7 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, iObj *seederv1a
 // reconcileBMCJob will update the BMCJob conditions to reflect current state of the job for specific inventory
 func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
 	i := iObj.DeepCopy()
-	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) {
+	if util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) {
 		j := &rufio.Job{}
 		var completed bool
 		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Status.PowerAction.LastJobName}, j)
@@ -275,7 +279,7 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, iObj *seederv
 		}
 
 		if j.HasCondition(rufio.JobCompleted, rufio.ConditionTrue) {
-			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobComplete, "")
+			util.CreateOrUpdateCondition(i, seederv1alpha1.BMCJobComplete, "")
 			i.Status.PowerAction.LastActionStatus = seederv1alpha1.NodeJobComplete
 			completed = true
 		}
@@ -288,14 +292,14 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, iObj *seederv
 				}
 			}
 			i.Status.PowerAction.LastActionStatus = seederv1alpha1.NodeJobFailed
-			i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobError, message)
+			util.CreateOrUpdateCondition(i, seederv1alpha1.BMCJobError, message)
 			completed = true
 		}
 
 		// job has completed, BMCJobSubmitted condition can be removed to avoid
 		// further reconciles by reconcileBMCJob handler
 		if completed {
-			i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted)
+			util.RemoveCondition(i, seederv1alpha1.BMCJobSubmitted)
 			return r.Status().Update(ctx, i)
 		}
 		return fmt.Errorf("bmcjob %s not yet completed, requeuing", j.Name)
@@ -305,7 +309,7 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, iObj *seederv
 
 func (r *InventoryReconciler) inventoryFreed(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
 	i := iObj.DeepCopy()
-	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryFreed) {
+	if util.ConditionExists(i, seederv1alpha1.InventoryFreed) {
 		// check and submit a power off job
 		var notFound bool
 
@@ -330,7 +334,7 @@ func (r *InventoryReconciler) inventoryFreed(ctx context.Context, iObj *seederv1
 		}
 
 		// trigger status update
-		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.InventoryFreed)
+		util.RemoveCondition(i, seederv1alpha1.InventoryFreed)
 		return r.Status().Update(ctx, i)
 	}
 	return nil
@@ -338,7 +342,7 @@ func (r *InventoryReconciler) inventoryFreed(ctx context.Context, iObj *seederv1
 
 func (r *InventoryReconciler) housekeepingBMCJob(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
 	i := iObj.DeepCopy()
-	if !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryFreed) {
+	if !util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i, seederv1alpha1.InventoryFreed) {
 		bmcjoblist := &rufio.JobList{}
 		l, err := labels.Parse(fmt.Sprintf("inventory.metal.harvesterhci.io=%s", i.Name))
 		if err != nil {
@@ -363,8 +367,8 @@ func (r *InventoryReconciler) housekeepingBMCJob(ctx context.Context, iObj *seed
 
 		}
 
-		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted)
-		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobComplete)
+		util.RemoveCondition(i, seederv1alpha1.BMCJobSubmitted)
+		util.RemoveCondition(i, seederv1alpha1.BMCJobComplete)
 		return r.Status().Update(ctx, i)
 	}
 
@@ -373,7 +377,7 @@ func (r *InventoryReconciler) housekeepingBMCJob(ctx context.Context, iObj *seed
 
 func (r *InventoryReconciler) triggerPowerAction(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
 	i := iObj.DeepCopy()
-	if i.Status.Status == seederv1alpha1.InventoryReady && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted) && i.Spec.PowerActionRequested != "" && i.Status.PowerAction.LastJobName == "" {
+	if i.Status.Status == seederv1alpha1.InventoryReady && !util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) && i.Spec.PowerActionRequested != "" && i.Status.PowerAction.LastJobName == "" {
 		// if job name is not present then create one
 		job := util.GenerateJob(i.Name, i.Namespace, i.Spec.PowerActionRequested)
 		if job == nil {
@@ -390,9 +394,9 @@ func (r *InventoryReconciler) triggerPowerAction(ctx context.Context, iObj *seed
 		}
 		i.Status.PowerAction.LastActionStatus = ""
 		i.Status.PowerAction.LastJobName = job.Name
-		i.Status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.BMCJobSubmitted, "BMCJob Submitted")
-		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobError)
-		i.Status.Conditions = util.RemoveCondition(i.Status.Conditions, seederv1alpha1.BMCJobComplete)
+		util.CreateOrUpdateCondition(i, seederv1alpha1.BMCJobSubmitted, "BMCJob Submitted")
+		util.RemoveCondition(i, seederv1alpha1.BMCJobError)
+		util.RemoveCondition(i, seederv1alpha1.BMCJobComplete)
 	}
 
 	if !reflect.DeepEqual(iObj.Status, i.Status) {

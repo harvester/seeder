@@ -218,7 +218,7 @@ func (r *LocalClusterReconciler) manageStatus(ctx context.Context, iObj *seederv
 		return fmt.Errorf("missing annotation %s on inventory %s", seederv1alpha1.LocalInventoryNodeName, i.Name)
 	}
 
-	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
+	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) {
 		return nil
 	}
 
@@ -229,20 +229,18 @@ func (r *LocalClusterReconciler) manageStatus(ctx context.Context, iObj *seederv
 		return fmt.Errorf("error querying node %s: %v", nodeName, err)
 	}
 
-	status := &seederv1alpha1.InventoryStatus{}
 
 	for _, v := range nodeObj.Status.Addresses {
 		if v.Type == corev1.NodeInternalIP {
-			status.PXEBootInterface.Address = v.Address
+			i.Status.PXEBootInterface.Address = v.Address
 		}
 	}
 
-	if i.Status.Status == seederv1alpha1.InventoryReady && !util.ConditionExists(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
-		status.Conditions = util.CreateOrUpdateCondition(i.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster, "node assigned to local cluster")
+	if i.Status.Status == seederv1alpha1.InventoryReady && !util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) {
+		util.CreateOrUpdateCondition(i, seederv1alpha1.InventoryAllocatedToCluster, "node assigned to local cluster")
 	}
 
-	if !reflect.DeepEqual(i.Status.Status, status.Status) || !reflect.DeepEqual(i.Status.Cluster, status.Cluster) {
-		i.Status = *status
+	if !reflect.DeepEqual(iObj, i) {
 		return r.Status().Update(ctx, i)
 	}
 	return nil

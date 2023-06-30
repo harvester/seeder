@@ -149,7 +149,7 @@ var _ = Describe("test local node controller", func() {
 					return err
 				}
 
-				if !util.ConditionExists(iObj.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
+				if !util.ConditionExists(iObj, seederv1alpha1.InventoryAllocatedToCluster) {
 					return fmt.Errorf("waiting for inventory to be allocated to cluster")
 				}
 				return nil
@@ -193,7 +193,7 @@ var _ = Describe("test local node controller", func() {
 				}
 
 				fmt.Println(iObj.Status.Conditions)
-				if util.ConditionExists(iObj.Status.Conditions, seederv1alpha1.BMCJobSubmitted) {
+				if util.ConditionExists(iObj, seederv1alpha1.BMCJobSubmitted) {
 					return fmt.Errorf("expected BMCJobSubmitted condition to be removed")
 				}
 				return nil

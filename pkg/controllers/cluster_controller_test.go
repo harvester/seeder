@@ -147,11 +147,11 @@ var _ = Describe("Create cluster tests", func() {
 				return fmt.Errorf("expected inventory to be ready, but current state is %v", tmpInventory)
 			}
 
-			if !util.ConditionExists(tmpInventory.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
+			if !util.ConditionExists(tmpInventory, seederv1alpha1.InventoryAllocatedToCluster) {
 				return fmt.Errorf("expected inventory to be allocated to cluster %v", tmpInventory.Status)
 			}
 			// is tinkerbell workflow condition present
-			if !util.ConditionExists(tmpInventory.Status.Conditions, seederv1alpha1.TinkWorkflowCreated) {
+			if !util.ConditionExists(tmpInventory, seederv1alpha1.TinkWorkflowCreated) {
 				return fmt.Errorf("expected tinkerbell hardware condition to exist %v", tmpInventory.Status.Conditions)
 			}
 
@@ -159,7 +159,7 @@ var _ = Describe("Create cluster tests", func() {
 				return fmt.Errorf("expected power action to be completed but got %s", tmpInventory.Status.PowerAction.LastActionStatus)
 			}
 			return nil
-		}, "60s", "5s").ShouldNot(HaveOccurred())
+		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 
 	It("reconcile hardware workflow in cluster controller reconcile", func() {
@@ -430,7 +430,7 @@ var _ = Describe("add inventory to cluster tests", func() {
 				return err
 			}
 
-			if util.ConditionExists(iObj.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
+			if util.ConditionExists(iObj, seederv1alpha1.InventoryAllocatedToCluster) {
 				return nil
 			}
 			fmt.Println(iObj.Status.Conditions)
@@ -679,7 +679,7 @@ var _ = Describe("delete inventory from cluster tests", func() {
 				return err
 			}
 
-			if !util.ConditionExists(iObj.Status.Conditions, seederv1alpha1.InventoryFreed) || util.ConditionExists(iObj.Status.Conditions, seederv1alpha1.InventoryAllocatedToCluster) {
+			if !util.ConditionExists(iObj, seederv1alpha1.InventoryFreed) || util.ConditionExists(iObj, seederv1alpha1.InventoryAllocatedToCluster) {
 				return nil
 			}
 			return fmt.Errorf("waiting for inventory to be freed")

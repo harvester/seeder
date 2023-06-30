@@ -27,7 +27,7 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 
 	// generate metadata
 	mode := "join"
-	if util.ConditionExists(i.Status.Conditions, seederv1alpha1.HarvesterCreateNode) {
+	if util.ConditionExists(i, seederv1alpha1.HarvesterCreateNode) {
 		mode = "create"
 	}
 
