@@ -118,18 +118,20 @@ spec:
               conditions:
                 items:
                   properties:
+                    lastTransitionTime:
+                      type: string
                     lastUpdateTime:
-                      format: date-time
                       type: string
                     message:
                       type: string
-                    startTime:
-                      format: date-time
+                    reason:
+                      type: string
+                    status:
                       type: string
                     type:
                       type: string
                   required:
-                  - startTime
+                  - status
                   - type
                   type: object
                 type: array
@@ -171,8 +173,6 @@ spec:
                 type: object
               status:
                 type: string
-            required:
-            - powerAction
             type: object
         type: object
     served: true
