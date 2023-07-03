@@ -14,7 +14,6 @@ import (
 )
 
 func Create(ctx context.Context, cfg *rest.Config) error {
-	//scf, err := generic.NewFactoryFromConfigWithOptions(res)
 	applyClient, err := apply.NewForConfig(cfg)
 	objs, err := generateObjects()
 	if err != nil {

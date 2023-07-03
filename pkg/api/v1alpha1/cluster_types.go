@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	ClusterFinalizer             = "finalizer.cluster.harvesterhci.io"
+	ClusterFinalizer             = "finalizer.metal.cluster.harvesterhci.io"
 	DefaultLocalClusterName      = "local"
 	DefaultLocalClusterNamespace = "harvester-system"
 	DefaultLocalClusterAddress   = "10.53.0.1"
