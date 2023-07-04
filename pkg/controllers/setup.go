@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/bmc-toolbox/bmclib/v2"
@@ -186,10 +187,12 @@ func NewCustomBMCClientFactoryFunc(ctx context.Context) rufiocontrollers.BMCClie
 	// Returns a BMCClient
 	return func(ctx context.Context, hostIP, port, username, password string) (rufiocontrollers.BMCClient, error) {
 
-		ctxWithTimeout, cancelFunc := context.WithTimeout(ctx, 30*time.Second)
+		ctxWithTimeout, cancelFunc := context.WithTimeout(ctx, 60*time.Second)
 		defer cancelFunc()
 
-		client := bmclib.NewClient(hostIP, port, username, password)
+		httpClient := http.DefaultClient
+		httpClient.Timeout = 30 * time.Second
+		client := bmclib.NewClient(hostIP, port, username, password, bmclib.WithHTTPClient(httpClient))
 		client.Registry.Drivers = client.Registry.PreferDriver("gofish")
 		if err := client.Open(ctxWithTimeout); err != nil {
 			return nil, fmt.Errorf("failed to open connection to BMC: %v", err)
