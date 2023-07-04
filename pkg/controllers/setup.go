@@ -3,7 +3,10 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"net"
+	"time"
 
+	"github.com/bmc-toolbox/bmclib/v2"
 	"github.com/go-logr/logr"
 	"github.com/sirupsen/logrus"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
@@ -89,7 +92,7 @@ func (s *Server) Start(ctx context.Context) error {
 		rufiocontrollers.NewMachineReconciler(
 			mgr.GetClient(),
 			mgr.GetEventRecorderFor("machine-controller"),
-			rufiocontrollers.NewBMCClientFactoryFunc(ctx),
+			NewCustomBMCClientFactoryFunc(ctx),
 			s.logger.WithName("controller").WithName("Machine"),
 		),
 		rufiojobwrapper.NewRufioWrapper(ctx,
@@ -173,4 +176,26 @@ func (s *Server) Start(ctx context.Context) error {
 
 func (s *Server) initLogs() {
 	s.logger = zap.New(zap.UseDevMode(s.Debug))
+}
+
+// NewBMCClientFactoryFunc returns a new BMCClientFactoryFunc
+// which uses a custom http timeout allowing the connection tests
+// to fail fast
+func NewCustomBMCClientFactoryFunc(ctx context.Context) rufiocontrollers.BMCClientFactoryFunc {
+	// Initializes a bmclib client based on input host and credentials
+	// Establishes a connection with the bmc with client.Open
+	// Returns a BMCClient
+	return func(ctx context.Context, hostIP, port, username, password string) (rufiocontrollers.BMCClient, error) {
+
+		if _, err := net.DialTimeout("udp", fmt.Sprintf("%s:%s", hostIP, port), 30*time.Second); err != nil {
+			return nil, fmt.Errorf("failed to open connection to BMC: %v", err)
+		}
+
+		client := bmclib.NewClient(hostIP, port, username, password)
+		client.Registry.Drivers = client.Registry.PreferDriver("gofish")
+		if err := client.Open(ctx); err != nil {
+			return nil, fmt.Errorf("failed to open connection to BMC: %v", err)
+		}
+		return client, nil
+	}
 }
