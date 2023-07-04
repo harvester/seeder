@@ -16,6 +16,8 @@ func ConditionExists(i *seederv1alpha1.Inventory, cond condition.Cond) bool {
 // RemoveCondition removes the named condition
 func RemoveCondition(i *seederv1alpha1.Inventory, cond condition.Cond) {
 	cond.False(i)
+	cond.Message(i, "")
+	cond.Reason(i, "")
 }
 
 // CreateOrUpdateCondition creates or updates the status of an existing condition
