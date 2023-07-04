@@ -126,3 +126,27 @@ func ListInventoryAllocatedtoCluster(ctx context.Context, c client.Client, clust
 
 	return retItems, nil
 }
+
+// FetchAndUpdateBaseBoard will fetch existing baseboard and trigger an update if needed
+func FetchAndUpdateBaseBoard(ctx context.Context, c client.Client, log logr.Logger, i *seederv1alpha1.Inventory, schema *runtime.Scheme) (*rufio.Machine, error) {
+	// check status of boseboard object
+	b := &rufio.Machine{}
+	err := c.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
+	if err != nil {
+		log.Error(err, "error fetching associated baseboard object in checkAndMarkNodeReady")
+		return nil, err
+	}
+
+	// baseboardmanagementspec matches machine spec. nothing more needed
+	if reflect.DeepEqual(b.Spec, i.Spec.BaseboardManagementSpec) {
+		return b, nil
+	}
+
+	if err := CheckAndCreateBaseBoardObject(ctx, c, log, i, schema); err != nil {
+		return nil, err
+	}
+	b = &rufio.Machine{}
+	err = c.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
+
+	return b, err
+}

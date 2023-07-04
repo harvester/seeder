@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/google/uuid"
@@ -45,6 +46,10 @@ type InventoryReconciler struct {
 	Scheme *runtime.Scheme
 	logr.Logger
 }
+
+const (
+	baseboardCheckRequeueInterval = 120 * time.Second
+)
 
 type inventoryReconciler func(context.Context, *seederv1alpha1.Inventory) error
 
@@ -142,12 +147,9 @@ func (r *InventoryReconciler) checkAndMarkNodeReady(ctx context.Context, iObj *s
 			return nil
 		}
 
-		// check status of boseboard object
-		b := &rufio.Machine{}
-		err := r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
+		b, err := util.FetchAndUpdateBaseBoard(ctx, r.Client, r.Logger, i, r.Scheme)
 		if err != nil {
-			r.Error(err, "error fetching associated baseboard object in checkAndMarkNodeReady")
-			return err
+			return fmt.Errorf("error during FetchAndUpdateBaseBoard: %v", err)
 		}
 
 		// check if condition bmcv1alpha1.Contactable exists and is bmcv1alpha1.ConditionTrue
