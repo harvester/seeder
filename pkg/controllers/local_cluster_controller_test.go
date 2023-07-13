@@ -162,7 +162,9 @@ var _ = Describe("Create and run local cluster tests", func() {
 				}
 
 				vObj.Status.Addresses = v.Status.Addresses
-				return k8sClient.Status().Update(ctx, vObj)
+				if err := k8sClient.Status().Update(ctx, vObj); err != nil {
+					return err
+				}
 			}
 
 			return nil

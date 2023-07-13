@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/google/uuid"
@@ -46,10 +45,6 @@ type InventoryReconciler struct {
 	Scheme *runtime.Scheme
 	logr.Logger
 }
-
-const (
-	baseboardCheckRequeueInterval = 120 * time.Second
-)
 
 type inventoryReconciler func(context.Context, *seederv1alpha1.Inventory) error
 
@@ -85,7 +80,7 @@ func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 
 	reconcileList := []inventoryReconciler{r.triggerPowerAction, r.manageBaseboardObject, r.checkAndMarkNodeReady,
-		r.handleBaseboardDeletion, r.reconcileBMCJob, r.housekeepingBMCJob}
+		r.handleBaseboardDeletion, r.reconcileBMCJob, r.housekeepingBMCJob, r.hasMachineSpecChanged}
 	// if inventory object has LocalInventoryAnnotation then skip reconcile as this will be handled by the local_cluster_controller
 	if _, ok := inventoryObj.Annotations[seederv1alpha1.LocalInventoryAnnotation]; !ok {
 		reconcileList = append(reconcileList, r.triggerReboot, r.inventoryFreed)
@@ -115,11 +110,11 @@ func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 // and sets the appropriate ownership
 func (r *InventoryReconciler) manageBaseboardObject(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
 	i := iObj.DeepCopy()
-	// already in desired state. No further action needed
+
+	// inventory already in desired state. No further action needed
 	if util.ConditionExists(i, seederv1alpha1.BMCObjectCreated) {
 		return nil
 	}
-
 	err := util.CheckSecretExists(ctx, r.Client, r.Logger, i.Spec.BaseboardManagementSpec.Connection.AuthSecretRef)
 	if err != nil {
 		return err
@@ -404,5 +399,22 @@ func (r *InventoryReconciler) triggerPowerAction(ctx context.Context, iObj *seed
 	if !reflect.DeepEqual(iObj.Status, i.Status) {
 		return r.Status().Update(ctx, i)
 	}
+	return nil
+}
+
+func (r *InventoryReconciler) hasMachineSpecChanged(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
+	i := iObj.DeepCopy()
+	existingObj := &rufio.Machine{}
+	err := r.Get(ctx, types.NamespacedName{Name: i.Name, Namespace: i.Namespace}, existingObj)
+	if err != nil {
+		return err
+	}
+
+	if !reflect.DeepEqual(existingObj.Spec, i.Spec.BaseboardManagementSpec) && seederv1alpha1.BMCObjectCreated.IsTrue(i) {
+		seederv1alpha1.BMCObjectCreated.False(i)
+		i.Status.Status = ""
+		return r.Status().Update(ctx, i)
+	}
+
 	return nil
 }

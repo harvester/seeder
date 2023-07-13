@@ -7,10 +7,11 @@ require (
 	github.com/go-bindata/go-bindata/v3 v3.1.3
 	github.com/go-logr/logr v1.2.3
 	github.com/google/uuid v1.3.0
+	github.com/harvester/webhook v0.1.3
 	github.com/onsi/ginkgo/v2 v2.6.0
 	github.com/onsi/gomega v1.24.1
 	github.com/pkg/errors v0.9.1
-	github.com/rancher/dynamiclistener v0.3.3
+	github.com/rancher/dynamiclistener v0.3.5
 	github.com/rancher/wrangler v1.1.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stmcginnis/gofish v0.13.1-0.20221107140645-5cc43fad050f
@@ -19,10 +20,11 @@ require (
 	github.com/tinkerbell/tink v0.6.0
 	github.com/urfave/cli/v2 v2.25.3
 	golang.org/x/net v0.7.0
+	golang.org/x/sync v0.1.0
 	inet.af/netaddr v0.0.0-20211027220019-c74959edd3b6
 	k8s.io/api v0.26.1
-	k8s.io/apimachinery v0.26.1
-	k8s.io/client-go v0.26.1
+	k8s.io/apimachinery v0.26.3
+	k8s.io/client-go v12.0.0+incompatible
 	sigs.k8s.io/controller-runtime v0.14.4
 
 )
@@ -46,7 +48,9 @@ require (
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.20.0 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
+	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
+	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/jacobweinstock/go-amt v0.0.0-20221125040441-53475f4ae023 // indirect
@@ -68,11 +72,13 @@ require (
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
+	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/exp v0.0.0-20230127130021-4ca2cb1a16b7 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/mod v0.8.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/tools v0.6.0 // indirect
+	k8s.io/klog v1.0.0 // indirect
+	k8s.io/kube-aggregator v0.25.4 // indirect
 	sigs.k8s.io/json v0.0.0-20220713155537-f223a00ba0e2 // indirect
 )
 
@@ -87,7 +93,6 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/gnostic v0.6.9 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
@@ -131,4 +136,9 @@ require (
 replace (
 	github.com/tinkerbell/tink v0.6.0 => github.com/tinkerbell/tink v0.6.1-0.20220524234633-0a800a4b5e25
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20211027215541-db492cf91b37 => go4.org/unsafe/assume-no-moving-gc v0.0.0-20220617031537-928513b29760
+	k8s.io/api => k8s.io/api v0.26.3
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.23.7
+	k8s.io/apimachinery => k8s.io/apimachinery v0.26.1
+	k8s.io/client-go => k8s.io/client-go v0.26.1
+	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.23.7
 )

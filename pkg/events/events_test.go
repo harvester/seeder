@@ -63,5 +63,6 @@ func Test_GetInventory(t *testing.T) {
 	_, health, err := ef.GetConfig()
 	assert.NoErrorf(err, "expected no error during inventory call")
 	assert.Len(health, 1, "expected to find Thermal Health")
-	ef.client.HTTPClient.CloseIdleConnections()
+	ef.Close()
+
 }

@@ -6,12 +6,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/bmc-toolbox/bmclib/v2"
+	bmclib "github.com/bmc-toolbox/bmclib/v2"
 	"github.com/go-logr/logr"
 	"github.com/sirupsen/logrus"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	rufiocontrollers "github.com/tinkerbell/rufio/controllers"
 	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
+	"golang.org/x/sync/errgroup"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -24,6 +25,7 @@ import (
 	"github.com/harvester/seeder/pkg/crd"
 	"github.com/harvester/seeder/pkg/rufiojobwrapper"
 	"github.com/harvester/seeder/pkg/util"
+	"github.com/harvester/seeder/pkg/webhook"
 )
 
 var (
@@ -166,12 +168,18 @@ func (s *Server) Start(ctx context.Context) error {
 		return fmt.Errorf("unable to setup readiness check: %v", err)
 	}
 
-	s.logger.Info("starting manager")
-	if err := mgr.Start(ctx); err != nil {
-		return fmt.Errorf("error starting manager: %v", err)
-	}
+	eg, egCtx := errgroup.WithContext(ctx)
+	eg.Go(func() error {
+		s.logger.Info("starting manager")
+		return mgr.Start(egCtx)
+	})
 
-	return nil
+	eg.Go(func() error {
+		s.logger.Info("starting webhook")
+		return webhook.SetupWebhookServer(egCtx, mgr, s.LeaderElectionNamespace)
+	})
+
+	return eg.Wait()
 }
 
 func (s *Server) initLogs() {

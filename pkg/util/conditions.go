@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/rancher/wrangler/pkg/condition"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
 // ConditionExists checks if a condition exists.
