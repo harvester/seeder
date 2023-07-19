@@ -34,14 +34,6 @@ var (
 	VERSION = "v0.0.0-dev"
 )
 
-type controller interface {
-	SetupWithManager(ctrl.Manager) error
-}
-
-const (
-	defaultNamespace = "default"
-)
-
 func main() {
 	var s controllers.Server
 

@@ -131,6 +131,7 @@ func (r *InventoryEventReconciler) getInventoryInfo(ctx context.Context, i *seed
 		return err
 	}
 
+	defer rc.Close()
 	labels, status, err := rc.GetConfig()
 	if err != nil {
 		return err

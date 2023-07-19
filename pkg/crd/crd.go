@@ -15,6 +15,9 @@ import (
 
 func Create(ctx context.Context, cfg *rest.Config) error {
 	applyClient, err := apply.NewForConfig(cfg)
+	if err != nil {
+		return err
+	}
 	objs, err := generateObjects()
 	if err != nil {
 		return fmt.Errorf("error generating objects: %v", err)

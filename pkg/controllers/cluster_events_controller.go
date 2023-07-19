@@ -108,6 +108,7 @@ func (r *ClusterEventReconciler) updateNodes(ctx context.Context, c *seederv1alp
 			if err != nil {
 				return err
 			}
+			defer e.Close()
 			labels, status, err := e.GetConfig()
 			if err != nil {
 				return err

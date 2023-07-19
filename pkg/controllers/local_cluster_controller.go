@@ -158,27 +158,6 @@ func (r *LocalClusterReconciler) removeFromLocalCluster(ctx context.Context, i *
 	return nil
 }
 
-// TODO: Remove as likely to be handled via node ownership
-func (r *LocalClusterReconciler) reconcileNodes(ctx context.Context, i *seederv1alpha1.Inventory) error {
-	node := &corev1.Node{}
-	err := r.Get(ctx, types.NamespacedName{Name: i.Name, Namespace: ""}, node)
-	var deleteInventory bool
-	if err != nil {
-		if apierrors.IsNotFound(err) {
-			deleteInventory = true
-		} else {
-			return err
-		}
-	}
-
-	if deleteInventory || node.DeletionTimestamp != nil {
-		// trigger delete of associated inventory object
-		return r.Delete(ctx, i)
-	}
-
-	return nil
-}
-
 func (r *LocalClusterReconciler) ensureMachineExists(ctx context.Context, i *seederv1alpha1.Inventory) error {
 	machine := &rufio.Machine{
 		ObjectMeta: metav1.ObjectMeta{
@@ -228,7 +207,6 @@ func (r *LocalClusterReconciler) manageStatus(ctx context.Context, iObj *seederv
 	if err != nil {
 		return fmt.Errorf("error querying node %s: %v", nodeName, err)
 	}
-
 
 	for _, v := range nodeObj.Status.Addresses {
 		if v.Type == corev1.NodeInternalIP {

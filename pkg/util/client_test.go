@@ -69,7 +69,7 @@ func TestMain(t *testing.M) {
 	time.Sleep(60 * time.Second)
 
 	code := t.Run()
-	pool.Purge(k3s)
+	_ = pool.Purge(k3s)
 	os.Exit(code)
 
 }

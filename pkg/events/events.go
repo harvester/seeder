@@ -314,3 +314,7 @@ func getCPUHealth(cs []*redfish.ComputerSystem, health *[]string) error {
 
 	return nil
 }
+
+func (ef *EventFetcher) Close() {
+	ef.client.Logout()
+}
