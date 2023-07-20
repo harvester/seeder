@@ -96,6 +96,7 @@ spec:
                     type: boolean
                   pollingInterval:
                     default: 1h
+                    format: duration
                     type: string
                 required:
                 - enabled
