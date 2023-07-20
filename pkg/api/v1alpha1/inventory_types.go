@@ -104,6 +104,7 @@ type Events struct {
 	// +kubebuilder:default=false
 	Enabled bool `json:"enabled"`
 	// +kubebuilder:default:="1h"
+	// +kubebuilder:validation:Format:=duration
 	PollingInterval string `json:"pollingInterval,omitempty"`
 }
 
