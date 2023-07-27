@@ -407,14 +407,30 @@ func (r *InventoryReconciler) hasMachineSpecChanged(ctx context.Context, iObj *s
 	existingObj := &rufio.Machine{}
 	err := r.Get(ctx, types.NamespacedName{Name: i.Name, Namespace: i.Namespace}, existingObj)
 	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return r.checkAndResetInventory(ctx, i)
+		}
 		return err
 	}
 
 	if !reflect.DeepEqual(existingObj.Spec, i.Spec.BaseboardManagementSpec) && seederv1alpha1.BMCObjectCreated.IsTrue(i) {
-		seederv1alpha1.BMCObjectCreated.False(i)
+		err := r.Delete(ctx, existingObj)
+		if err != nil {
+			return err
+		}
+		return r.checkAndResetInventory(ctx, i)
+	}
+
+	return nil
+}
+
+func (r *InventoryReconciler) checkAndResetInventory(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
+	i := iObj.DeepCopy()
+	if i.Status.Status == seederv1alpha1.InventoryReady || util.ConditionExists(i, seederv1alpha1.BMCObjectCreated) || util.ConditionExists(i, seederv1alpha1.MachineNotContactable) {
+		util.RemoveCondition(i, seederv1alpha1.BMCObjectCreated)
+		util.RemoveCondition(i, seederv1alpha1.MachineNotContactable)
 		i.Status.Status = ""
 		return r.Status().Update(ctx, i)
 	}
-
 	return nil
 }
