@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
-	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
+	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -97,7 +97,7 @@ var _ = Describe("Create cluster tests", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}
@@ -150,16 +150,26 @@ var _ = Describe("Create cluster tests", func() {
 			if !util.ConditionExists(tmpInventory, seederv1alpha1.InventoryAllocatedToCluster) {
 				return fmt.Errorf("expected inventory to be allocated to cluster %v", tmpInventory.Status)
 			}
+			// is tinkerbell hardware condition present
+			if !util.ConditionExists(tmpInventory, seederv1alpha1.TinkHardwareCreated) {
+				return fmt.Errorf("expected tinkerbell hardware condition to exist %v", tmpInventory.Status.Conditions)
+			}
+
+			// is tinkerbell template condition present
+			if !util.ConditionExists(tmpInventory, seederv1alpha1.TinkTemplateCreated) {
+				return fmt.Errorf("expected tinkerbell template condition to exist %v", tmpInventory.Status.Conditions)
+			}
+
 			// is tinkerbell workflow condition present
 			if !util.ConditionExists(tmpInventory, seederv1alpha1.TinkWorkflowCreated) {
-				return fmt.Errorf("expected tinkerbell hardware condition to exist %v", tmpInventory.Status.Conditions)
+				return fmt.Errorf("expected tinkerbell workflow condition to exist %v", tmpInventory.Status.Conditions)
 			}
 
 			if tmpInventory.Status.PowerAction.LastActionStatus != seederv1alpha1.NodeJobComplete {
 				return fmt.Errorf("expected power action to be completed but got %s", tmpInventory.Status.PowerAction.LastActionStatus)
 			}
 			return nil
-		}, "30s", "5s").ShouldNot(HaveOccurred())
+		}, "60s", "5s").ShouldNot(HaveOccurred())
 	})
 
 	It("reconcile hardware workflow in cluster controller reconcile", func() {
@@ -188,6 +198,70 @@ var _ = Describe("Create cluster tests", func() {
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 
+	It("reconcile tinkerbell template in cluster controller reconcile", func() {
+		Eventually(func() error {
+			tmpCluster := &seederv1alpha1.Cluster{}
+			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, tmpCluster); err != nil {
+				return err
+			}
+
+			if tmpCluster.Status.Status != seederv1alpha1.ClusterTinkHardwareSubmitted {
+				return fmt.Errorf("expected status to be tink hardware submitted")
+			}
+
+			templateList := &tinkv1alpha1.TemplateList{}
+			if err := k8sClient.List(ctx, templateList, &client.ListOptions{Namespace: "default"}); err != nil {
+				return err
+			}
+
+			for _, v := range templateList.Items {
+				if v.Name == i.Name && v.Namespace == i.Namespace {
+					return nil
+				}
+			}
+
+			return fmt.Errorf("did not find workflow matching the inventory %s", i.Name)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
+
+	It("reconcile tinkerbell workflow in cluster controller reconcile", func() {
+		Eventually(func() error {
+			tmpCluster := &seederv1alpha1.Cluster{}
+			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, tmpCluster); err != nil {
+				return err
+			}
+
+			if tmpCluster.Status.Status != seederv1alpha1.ClusterTinkHardwareSubmitted {
+				return fmt.Errorf("expected status to be tink hardware submitted")
+			}
+
+			workflowList := &tinkv1alpha1.WorkflowList{}
+			if err := k8sClient.List(ctx, workflowList, &client.ListOptions{Namespace: "default"}); err != nil {
+				return err
+			}
+
+			for _, v := range workflowList.Items {
+				if v.Name == i.Name && v.Namespace == i.Namespace {
+					return nil
+				}
+			}
+
+			return fmt.Errorf("did not find workflow matching the inventory %s", i.Name)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
+
+	It("ensure vlanID is set on cluster", func() {
+		Eventually(func() error {
+			tmpCluster := &seederv1alpha1.Cluster{}
+			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, tmpCluster); err != nil {
+				return err
+			}
+			if tmpCluster.Spec.VlanID != 1 {
+				return fmt.Errorf("expected vlanID to be set to 1: %v", tmpCluster)
+			}
+			return nil
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
 	// check cluster deletion and reconcilliation of hardware and inventory objects
 	// Test is flaky when using TestEnv. Disabling for now
 	It("delete cluster and check cleanup of inventory objects", func() {
@@ -365,7 +439,7 @@ var _ = Describe("add inventory to cluster tests", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}
@@ -611,7 +685,7 @@ var _ = Describe("delete inventory from cluster tests", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}
@@ -835,7 +909,7 @@ var _ = Describe("cluster running test", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}
@@ -1094,7 +1168,7 @@ var _ = Describe("multi-node cluster provisioning test", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}

@@ -1,0 +1,87 @@
+{{- if .Values.deploy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: {{ .Values.name }}-nginx
+  name: {{ .Values.name }}-nginx
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}-nginx
+      stack: tinkerbell
+      {{- with .Values.selector }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+  strategy:
+    type: {{ .Values.deployment.strategy.type }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}-nginx
+        stack: tinkerbell
+        {{- with .Values.selector }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ .Values.name }}
+      containers:
+      - name: {{ .Values.name }}-nginx
+        image: {{ .Values.nginxImage }}
+        command: ["/bin/bash", "-xeuc"]
+        args:
+        - |
+          POD_NAMESERVER=$(awk '/nameserver/ {print $2}' /etc/resolv.conf) \
+            envsubst '$POD_NAMESERVER' \
+            </tmp/nginx.conf.template \
+            >/etc/nginx/nginx.conf
+          exec nginx -g 'daemon off;'
+        ports:
+        - containerPort: 50061
+          hostPort: 50061
+          protocol: TCP
+          name: hegel-port
+        - containerPort: 42113
+          hostPort: 42113
+          protocol: TCP
+          name: tink-server
+        - containerPort: 8080
+          hostPort: 8080
+          protocol: TCP
+          name: hook-http
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /tmp
+          readOnly: true
+          name: nginx-conf
+        - mountPath: /usr/share/nginx/html
+          name: hook-artifacts
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: nginx-conf
+          items:
+            - key: nginx.conf
+              path: nginx.conf.template
+      - name: hook-artifacts
+        hostPath:
+          path: /opt/hook
+          type: DirectoryOrCreate            
+      serviceAccountName: {{ .Values.name }}
+{{- end }}

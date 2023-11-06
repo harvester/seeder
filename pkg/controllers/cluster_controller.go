@@ -21,7 +21,9 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
+	"github.com/rancher/wrangler/pkg/condition"
+	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -265,8 +267,22 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, cObj *seeder
 func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, cObj *seederv1alpha1.Cluster) error {
 	c := cObj.DeepCopy()
 	if c.Status.Status == seederv1alpha1.ClusterNodesPatched || c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted || c.Status.Status == seederv1alpha1.ClusterRunning {
+
+		// check to see if the service for tink-stack is ready
+		tinkStackService := &corev1.Service{}
+		err := r.Get(ctx, types.NamespacedName{Name: seederv1alpha1.DefaultTinkStackService, Namespace: deploymentNamespace}, tinkStackService)
+		if err != nil {
+			return fmt.Errorf("error fetching svc %s in ns %s: %v", seederv1alpha1.DefaultTinkStackService, seederv1alpha1.DefaultLocalClusterNamespace, err)
+		}
+
+		seederDeploymentService := &corev1.Service{}
+		err = r.Get(ctx, types.NamespacedName{Name: seederv1alpha1.DefaultSeederDeploymentService, Namespace: deploymentNamespace}, seederDeploymentService)
+
+		if err != nil {
+			return fmt.Errorf("error fetching svc %s in ns %s: %v", seederv1alpha1.DefaultSeederDeploymentService, seederv1alpha1.DefaultLocalClusterNamespace, err)
+		}
+
 		for _, i := range c.Spec.Nodes {
-			var hardwareUpdated bool
 			inventory := &seederv1alpha1.Inventory{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: i.InventoryReference.Namespace, Name: i.InventoryReference.Name}, inventory)
 			if err != nil {
@@ -281,7 +297,9 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, cObj *
 				continue
 			}
 
-			hw, err := tink.GenerateHWRequest(inventory, c)
+			// tinkStack Service exposes Hegel endpoint
+			// seederDeploymentService exposes the api endpoint to update hardware objects
+			hw, err := tink.GenerateHWRequest(inventory, c, seederDeploymentService, tinkStackService)
 			if err != nil {
 				return err
 			}
@@ -292,33 +310,12 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, cObj *
 			}
 
 			// create / update hardware object if one already exists
-			lookupHw := &tinkv1alpha1.Hardware{}
-			err = r.Get(ctx, types.NamespacedName{Namespace: hw.Namespace, Name: hw.Name}, lookupHw)
-
+			err = r.createOrUpdateHardware(ctx, hw, inventory)
 			if err != nil {
-				if apierrors.IsNotFound(err) {
-					if err := r.Create(ctx, hw); err != nil {
-						return err
-					}
-					hardwareUpdated = true
-				} else {
-					return err
-				}
-			}
-
-			if hardwareUpdated {
-				util.CreateOrUpdateCondition(inventory, seederv1alpha1.TinkWorkflowCreated, "tink workflow created")
-				if err := r.Status().Update(ctx, inventory); err != nil {
-					return err
-				}
+				return err
 			}
 		}
 
-	}
-
-	if c.Status.Status == seederv1alpha1.ClusterNodesPatched {
-		c.Status.Status = seederv1alpha1.ClusterTinkHardwareSubmitted
-		return r.Status().Update(ctx, c)
 	}
 
 	return nil
@@ -378,24 +375,62 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, cObj *seederv1al
 			iObj.Status.Cluster = seederv1alpha1.ObjectReference{}
 			iObj.Status.GeneratedPassword = ""
 			util.RemoveCondition(iObj, seederv1alpha1.InventoryAllocatedToCluster)
-			util.RemoveCondition(iObj, seederv1alpha1.TinkWorkflowCreated)
+			util.RemoveCondition(iObj, seederv1alpha1.TinkHardwareCreated)
 			util.RemoveCondition(iObj, seederv1alpha1.HarvesterJoinNode)
+			util.RemoveCondition(iObj, seederv1alpha1.TinkWorkflowCreated)
+			util.RemoveCondition(iObj, seederv1alpha1.TinkTemplateCreated)
 			util.CreateOrUpdateCondition(iObj, seederv1alpha1.InventoryFreed, "")
 			if err := r.Status().Update(ctx, iObj); err != nil {
 				return err
 			}
 
+			var notFound bool
 			// find and clean up hardware object
 			hw := &tinkv1alpha1.Hardware{}
 			if err := r.Get(ctx, types.NamespacedName{Namespace: iObj.Namespace, Name: iObj.Name}, hw); err != nil {
 				if apierrors.IsNotFound(err) {
-					continue
+					notFound = true
 				} else {
 					return err
 				}
 			}
-			if err := r.Delete(ctx, hw); err != nil {
-				return err
+
+			if !notFound {
+				if err := r.Delete(ctx, hw); err != nil {
+					return err
+				}
+			}
+
+			// find and clean up template object
+			template := &tinkv1alpha1.Template{}
+			if err := r.Get(ctx, types.NamespacedName{Namespace: iObj.Namespace, Name: iObj.Name}, template); err != nil {
+				if apierrors.IsNotFound(err) {
+					notFound = true
+				} else {
+					return err
+				}
+			}
+
+			if !notFound {
+				if err := r.Delete(ctx, template); err != nil {
+					return err
+				}
+			}
+
+			// find and clean up workflow object
+			workflow := &tinkv1alpha1.Workflow{}
+			if err := r.Get(ctx, types.NamespacedName{Namespace: iObj.Namespace, Name: iObj.Name}, workflow); err != nil {
+				if apierrors.IsNotFound(err) {
+					notFound = true
+				} else {
+					return err
+				}
+			}
+
+			if !notFound {
+				if err := r.Delete(ctx, workflow); err != nil {
+					return err
+				}
 			}
 		}
 
@@ -458,9 +493,13 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, cObj *seeder
 		}
 
 		if !inventorymissing {
+			if util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) {
+				return fmt.Errorf("waiting for condition BMCJobSubmitted to be removed from inventory %s before triggering cleanup", i.Name)
+			}
 			i.Status.PXEBootInterface = seederv1alpha1.PXEBootInterface{}
 			i.Status.Cluster = seederv1alpha1.ObjectReference{}
 			i.Status.GeneratedPassword = ""
+			i.Status.PowerAction = seederv1alpha1.PowerActionDetails{}
 			util.RemoveCondition(i, seederv1alpha1.InventoryAllocatedToCluster)
 			util.RemoveCondition(i, seederv1alpha1.HarvesterJoinNode)
 			util.RemoveCondition(i, seederv1alpha1.HarvesterCreateNode)
@@ -521,8 +560,8 @@ func (r *ClusterReconciler) markClusterReady(ctx context.Context, cObj *seederv1
 		return err
 	}
 
-	if len(nl.Items) < 1 {
-		return fmt.Errorf("api server is running but waiting for one of the nodes to be available")
+	if len(nl.Items) != len(c.Spec.Nodes) {
+		return fmt.Errorf("api server is running, expected to find %d nodes but only found %d nodes", len(nl.Items), len(c.Spec.Nodes))
 	}
 
 	c.Status.Status = seederv1alpha1.ClusterRunning
@@ -588,4 +627,35 @@ func genCoreTypedClient(ctx context.Context, c *seederv1alpha1.Cluster) (*typedC
 	}
 
 	return typedCore.NewForConfig(restConfig)
+}
+
+func createOrUpdateInventoryConditions(ctx context.Context, inventory *seederv1alpha1.Inventory, cond condition.Cond, msg string, client client.Client) error {
+	iObj := &seederv1alpha1.Inventory{}
+	if err := client.Get(ctx, types.NamespacedName{Name: inventory.Name, Namespace: inventory.Namespace}, iObj); err != nil {
+		return err
+	}
+
+	if !util.ConditionExists(iObj, cond) {
+		util.CreateOrUpdateCondition(iObj, cond, msg)
+		if err := client.Status().Update(ctx, iObj); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *ClusterReconciler) createOrUpdateHardware(ctx context.Context, hardware *tinkv1alpha1.Hardware, inventory *seederv1alpha1.Inventory) error {
+	hardwareObj := &tinkv1alpha1.Hardware{}
+	err := r.Get(ctx, types.NamespacedName{Name: hardware.Name, Namespace: hardware.Namespace}, hardwareObj)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			if createErr := r.Create(ctx, hardware); createErr != nil {
+				return createErr
+			}
+		}
+		return err
+	}
+
+	return createOrUpdateInventoryConditions(ctx, inventory, seederv1alpha1.TinkHardwareCreated, "tink hardware created", r.Client)
 }

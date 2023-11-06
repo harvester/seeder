@@ -102,6 +102,24 @@ func (r *AddressPoolReconciler) reconcilePoolCapacity(ctx context.Context, poolO
 			return r.Client.Update(ctx, pool)
 		}
 	}
+	// reconcile reserved addresses
+	if len(pool.Spec.ReservedAddresses) != 0 {
+		for _, reservedAddress := range pool.Spec.ReservedAddresses {
+			if _, ok := pool.Status.AddressAllocation[reservedAddress]; !ok {
+				pool.Status.AddressAllocation[reservedAddress] = seederv1alpha1.ObjectReferenceWithKind{
+					Kind: "reserved",
+					ObjectReference: seederv1alpha1.ObjectReference{
+						Name:      "reservedAddress",
+						Namespace: "reserved",
+					},
+				}
+			}
+		}
+		if !reflect.DeepEqual(pool.Status.AddressAllocation, poolObj.Status.AddressAllocation) {
+			return r.Client.Status().Update(ctx, pool)
+		}
+
+	}
 
 	// reconcile capacity and update status for pool
 
