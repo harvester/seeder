@@ -113,7 +113,7 @@ var _ = Describe("cluster events test", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}

@@ -1,0 +1,6 @@
+dependencies:
+- name: stack
+  repository: file://dependency_charts/stack
+  version: 0.4.2
+digest: sha256:b6ffbeb6ddfd1c0c5ba12899dfae5d83bde1e07d89ac3e0189131a06ed348d53
+generated: "2024-03-20T16:37:55.441272+11:00"

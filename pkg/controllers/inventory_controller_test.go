@@ -37,6 +37,11 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 							Name:      "sample",
 							Namespace: "default",
 						},
+						ProviderOptions: &rufio.ProviderOptions{
+							IntelAMT: &rufio.IntelAMTOptions{
+								Port: 80,
+							},
+						},
 					},
 				},
 			},
@@ -60,6 +65,24 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 			}
 			err = k8sClient.Create(ctx, i)
 			return err
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
+
+	It("check provider options are set", func() {
+		Eventually(func() error {
+			b := &rufio.Machine{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, b)
+			if err != nil {
+				return fmt.Errorf("error looking up baseboard object: %v", err)
+			}
+			if b.Spec.Connection.ProviderOptions == nil {
+				return fmt.Errorf("expected provider options to be set: %v", b)
+			}
+
+			if b.Spec.Connection.ProviderOptions.IntelAMT.Port != 80 {
+				return fmt.Errorf("expected intelAMT port to be 80 in provider options: %v", b)
+			}
+			return nil
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 

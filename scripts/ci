@@ -6,3 +6,4 @@ cd $(dirname $0)
 ./validate
 ./test
 ./build
+./package

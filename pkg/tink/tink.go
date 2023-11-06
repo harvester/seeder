@@ -3,12 +3,15 @@ package tink
 import (
 	"bytes"
 	"fmt"
-	"html/template"
-	"strings"
+	"io"
+	"net/http"
+	"text/template"
 
-	"github.com/pkg/errors"
-	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
+	"github.com/harvester/harvester-installer/pkg/config"
+	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/yaml"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/util"
@@ -16,14 +19,15 @@ import (
 
 const (
 	defaultLeaseTime    = 86400
-	defaultArch         = "x86_64"
 	defaultFacilityCode = "on_prem"
 	defaultDistro       = "harvester"
 	defaultISOURL       = "https://releases.rancher.com/harvester/"
+	defaultEvent        = "SUCCEEDED"
+	defaultMethod       = "PUT"
 )
 
 // GenerateHWRequest will generate the tinkerbell Hardware type object
-func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (hw *tinkv1alpha1.Hardware, err error) {
+func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster, seederDeploymentService *corev1.Service, tinkStackService *corev1.Service) (hw *tinkv1alpha1.Hardware, err error) {
 
 	// generate metadata
 	mode := "join"
@@ -31,16 +35,27 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 		mode = "create"
 	}
 
-	var m string
-	if strings.Contains(c.Spec.HarvesterVersion, "v1.0") {
-		m, err = generateMetaDataV10(c.Spec.ConfigURL, c.Spec.HarvesterVersion, i.Spec.ManagementInterfaceMacAddress, mode,
-			i.Spec.PrimaryDisk, c.Status.ClusterAddress, c.Status.ClusterToken, i.Status.GeneratedPassword, c.Spec.ImageURL, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys)
-	} else {
-		m, err = generateMetaDataV11(c.Spec.ConfigURL, c.Spec.HarvesterVersion, i.Spec.ManagementInterfaceMacAddress, mode,
-			i.Spec.PrimaryDisk, c.Status.ClusterAddress, c.Status.ClusterToken, i.Status.GeneratedPassword, c.Spec.ImageURL, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys)
+	if len(seederDeploymentService.Status.LoadBalancer.Ingress) == 0 {
+		return nil, fmt.Errorf("waiting for ingress to be populated on svc: %s", seederDeploymentService.Name)
 	}
+	bondOptions := make(map[string]string)
+	if c.Spec.BondOptions == nil {
+		bondOptions["mode"] = "balance-tlb"
+		bondOptions["miimon"] = "100"
+	}
+	userdata, err := generateCloudConfig(c.Spec.ConfigURL, i.Spec.ManagementInterfaceMacAddress, mode, c.Status.ClusterAddress,
+		c.Status.ClusterToken, i.Status.GeneratedPassword, i.Status.Address, i.Status.Netmask, i.Status.Gateway, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys, bondOptions, c.Spec.ImageURL, c.Spec.HarvesterVersion, seederDeploymentService.Status.LoadBalancer.Ingress[0].IP, i.Name, i.Namespace, c.Spec.StreamImageMode, c.Spec.WipeDisks, c.Spec.VlanID, i.Spec.Arch, i.Spec.PrimaryDisk, fmt.Sprintf("%s-%s", i.Name, i.Namespace))
+
 	if err != nil {
-		return nil, errors.Wrap(err, "error during metadata generation")
+		return nil, fmt.Errorf("error during HW generation: %v", err)
+	}
+
+	// work around needed since boots represents amd64 arch as x86_64
+	var hwArch string
+	if i.Spec.Arch == "amd64" {
+		hwArch = "x86_64"
+	} else {
+		hwArch = "aarch64"
 	}
 
 	hw = &tinkv1alpha1.Hardware{
@@ -49,19 +64,18 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 			Namespace: i.Namespace,
 		},
 		Spec: tinkv1alpha1.HardwareSpec{
+			UserData: &userdata,
 			Interfaces: []tinkv1alpha1.Interface{
 				{
 					Netboot: &tinkv1alpha1.Netboot{
-						AllowPXE: &[]bool{true}[0],
-						OSIE: &tinkv1alpha1.OSIE{
-							BaseURL: c.Spec.ImageURL,
-						},
+						AllowPXE:      &[]bool{true}[0],
+						AllowWorkflow: &[]bool{true}[0],
 					},
 					DHCP: &tinkv1alpha1.DHCP{
 						MAC:       i.Spec.ManagementInterfaceMacAddress,
 						Hostname:  fmt.Sprintf("%s-%s", i.Name, i.Namespace),
 						LeaseTime: defaultLeaseTime,
-						Arch:      defaultArch,
+						Arch:      hwArch,
 						UEFI:      true,
 						IP: &tinkv1alpha1.IP{
 							Address: i.Status.Address,
@@ -81,7 +95,6 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 					FacilityCode: defaultFacilityCode,
 				},
 				Instance: &tinkv1alpha1.MetadataInstance{
-					Userdata: m,
 					OperatingSystem: &tinkv1alpha1.MetadataInstanceOperatingSystem{
 						Version: c.Spec.HarvesterVersion,
 						Distro:  defaultDistro,
@@ -91,96 +104,167 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 		},
 	}
 
+	// if not using StreamImage mode then define a custom ipxe url with info needed to provision harvester
+	if !c.Spec.StreamImageMode {
+		customIPXEScript, err := generateIPXEScript(c.Spec.HarvesterVersion, c.Spec.ImageURL, fmt.Sprintf("http://%s:%s/2009-04-04/user-data",
+			tinkStackService.Status.LoadBalancer.Ingress[0].IP, HegelDefaultPort), i.Spec.ManagementInterfaceMacAddress, i.Spec.Arch, c.Spec.ClusterConfig.VlanID)
+		if err != nil {
+			return nil, fmt.Errorf("error generating custom ipxe script for inventory %s: %v", i.Name, err)
+		}
+		for i := range hw.Spec.Interfaces {
+			hw.Spec.Interfaces[i].Netboot.IPXE = &tinkv1alpha1.IPXE{
+				Contents: customIPXEScript,
+			}
+		}
+	}
 	return hw, nil
 }
 
-// generateMetaDataV10 is a wrapper to generate metadata for nodes to create or join a cluster
-func generateMetaDataV10(configURL, version, hwAddress, mode, disk, vip, token, password, imageurl string, Nameservers, SSHKeys []string) (metadata string, err error) {
-
-	var tmpStruct struct {
-		ConfigURL   string
-		HWAddress   string
-		Mode        string
-		Disk        string
-		VIP         string
-		Token       string
-		SSHKeys     []string
-		Nameservers []string
-		Password    string
-		IsoURL      string
-	}
-	var output bytes.Buffer
-	tmpStruct.ConfigURL = configURL
-	tmpStruct.HWAddress = hwAddress
-	tmpStruct.Mode = mode
-	tmpStruct.Disk = disk
-	tmpStruct.VIP = vip
-	tmpStruct.Token = token
-	tmpStruct.Password = password
-	tmpStruct.SSHKeys = SSHKeys
-	tmpStruct.Nameservers = Nameservers
-	tmpStruct.Password = password
-	endpoint := defaultISOURL
-	if imageurl != "" {
-		endpoint = imageurl
-	}
-	tmpStruct.IsoURL = fmt.Sprintf("%s/%s/harvester-%s-amd64.iso", endpoint, version, version)
-
-	var metaDataStruct = `{{ if ne .ConfigURL ""}}harvester.install.config_url={{ .ConfigURL }}{{end}} harvester.install.networks.harvester-mgmt.interfaces="hwAddr:{{ .HWAddress }}" ip=dhcp harvester.install.networks.harvester-mgmt.method=dhcp harvester.install.networks.harvester-mgmt.bond_options.mode=balance-tlb harvester.install.networks.harvester-mgmt.bond_options.miimon=100 console=ttyS1,115200  harvester.install.mode={{ .Mode }} harvester.token={{ .Token }} harvester.os.password={{ .Password }} {{ range $v := .SSHKeys}}harvester.os.ssh_authorized_keys=\"- {{ $v }} \ "{{ end }}{{range $v := .Nameservers}}harvester.os.dns_nameservers={{ $v }} {{end}} harvester.install.vip={{ .VIP }} harvester.install.vip_mode=static harvester.install.iso_url={{ .IsoURL }} harvester.install.device={{ .Disk }} {{if eq .Mode "join"}}harvester.server_url={{ printf "https://%s:8443" .VIP }}{{end}}`
-
-	metadataTmpl := template.Must(template.New("MetaData").Parse(metaDataStruct))
-
-	err = metadataTmpl.Execute(&output, tmpStruct)
-
-	if err != nil {
-		return metadata, err
+// GenerateWorkflow binds the template associated with inventory to the workflow
+// this needs to be done before the ipxe boot is performed to ensure correct workflow is executed on reboot
+func GenerateWorkflow(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (workflow *tinkv1alpha1.Workflow) {
+	workflow = &tinkv1alpha1.Workflow{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      i.Name,
+			Namespace: i.Namespace,
+		},
+		Spec: tinkv1alpha1.WorkflowSpec{
+			TemplateRef: i.Name,
+			HardwareRef: i.Name,
+			HardwareMap: map[string]string{
+				"device_1": i.Spec.ManagementInterfaceMacAddress,
+			},
+		},
 	}
 
-	metadata = output.String()
-	return metadata, nil
+	if c.Spec.ClusterConfig.CustomProvisioningTemplate != "" {
+		workflow.Spec.TemplateRef = c.Spec.ClusterConfig.CustomProvisioningTemplate
+	}
+
+	return workflow
 }
 
-func generateMetaDataV11(configURL, version, hwAddress, mode, disk, vip, token, password, imageurl string, Nameservers, SSHKeys []string) (metadata string, err error) {
-
-	var tmpStruct struct {
-		ConfigURL   string
-		HWAddress   string
-		Mode        string
-		Disk        string
-		VIP         string
-		Token       string
-		SSHKeys     []string
-		Nameservers []string
-		Password    string
-		IsoURL      string
+func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, subnetMask, gateway string, Nameservers, SSHKeys []string, bondOptions map[string]string, imageURL string, harvesterVersion string, webhookURL string, hwName string, hwNamespace string, streamImage bool, wipeDisks bool, vlanID int, arch string, disk string, hostname string) (string, error) {
+	hc := config.NewHarvesterConfig()
+	if configURL != "" {
+		if err := readConfigURL(hc, configURL); err != nil {
+			return "", err
+		}
 	}
-	var output bytes.Buffer
-	tmpStruct.ConfigURL = configURL
-	tmpStruct.HWAddress = hwAddress
-	tmpStruct.Mode = mode
-	tmpStruct.Disk = disk
-	tmpStruct.VIP = vip
-	tmpStruct.Token = token
-	tmpStruct.Password = password
-	tmpStruct.SSHKeys = SSHKeys
-	tmpStruct.Nameservers = Nameservers
-	tmpStruct.Password = password
-	endpoint := defaultISOURL
-	if imageurl != "" {
-		endpoint = imageurl
+	hc.SchemeVersion = 1
+	hc.Token = token
+	if mode == "join" {
+		hc.ServerURL = fmt.Sprintf("https://%s:443", vip)
+	} else {
+		hc.Install.Vip = vip
+		hc.Install.VipMode = "static"
 	}
-	tmpStruct.IsoURL = fmt.Sprintf("%s/%s/harvester-%s-amd64.iso", endpoint, version, version)
-
-	var metaDataStruct = `{{ if ne .ConfigURL ""}}harvester.install.config_url={{ .ConfigURL }}{{end}} harvester.install.management_interface.interfaces="hwAddr:{{ .HWAddress }}" ip=dhcp harvester.install.management_interface.method=dhcp harvester.management_interface.bond_options.mode=balance-tlb harvester.install.management_interface.bond_options.miimon=100 console=ttyS1,115200  harvester.install.mode={{ .Mode }} harvester.token={{ .Token }} harvester.os.password={{ .Password }} {{ range $v := .SSHKeys}}harvester.os.ssh_authorized_keys=\"- {{ $v }} \ "{{ end }}{{range $v := .Nameservers}}harvester.os.dns_nameservers={{ $v }} {{end}} harvester.install.vip={{ .VIP }} harvester.install.vip_mode=static harvester.install.iso_url={{ .IsoURL }} harvester.install.device={{ .Disk }} {{if eq .Mode "join"}}harvester.server_url={{ printf "https://%s:443" .VIP }}{{end}} harvester.scheme_version=1`
-
-	metadataTmpl := template.Must(template.New("MetaData").Parse(metaDataStruct))
-
-	err = metadataTmpl.Execute(&output, tmpStruct)
-
+	hc.Install.Mode = mode
+	hc.Install.ManagementInterface = config.Network{
+		Method:       "static",
+		IP:           ip,
+		SubnetMask:   subnetMask,
+		Gateway:      gateway,
+		DefaultRoute: true,
+		Interfaces: []config.NetworkInterface{
+			{
+				HwAddr: hwAddress,
+			},
+		},
+	}
+	if vlanID > 0 {
+		hc.Install.ManagementInterface.VlanID = vlanID
+	}
+	hc.Install.Automatic = true
+	hc.OS.Password = password
+	hc.OS.DNSNameservers = append(hc.OS.DNSNameservers, Nameservers...)
+	hc.OS.SSHAuthorizedKeys = append(hc.OS.SSHAuthorizedKeys, SSHKeys...)
+	hc.OS.Hostname = hostname
+	if vlanID > 1 {
+		hc.OS.AfterInstallChrootCommands = []string{fmt.Sprintf("grub2-editenv /oem/grubenv set extra_cmdline=\"ifname=netboot:%s\"", hwAddress)}
+	}
+	hc.Install.ManagementInterface.BondOptions = bondOptions
+	hc.Install.WipeDisks = wipeDisks
+	hc.Install.Device = disk
+	hc.Install.SkipChecks = true
+	// for versions older than v1.2.x where streaming image mode is not available
+	// we need to provide ISO URL
+	if !streamImage {
+		//hc.Install.ConfigURL = "" // reset the config url
+		hc.Install.ISOURL = fmt.Sprintf("%s/%s/harvester-%s-%s.iso", imageURL, harvesterVersion, harvesterVersion, arch)
+		hc.Install.Webhooks = []config.Webhook{
+			{
+				Event:  defaultEvent,
+				Method: defaultMethod,
+				URL:    fmt.Sprintf("http://%s:%d/disable/%s/%s", webhookURL, seederv1alpha1.DefaultEndpointPort, hwNamespace, hwName),
+			},
+		}
+	}
+	hcBytes, err := yaml.Marshal(hc)
 	if err != nil {
-		return metadata, err
+		return "", fmt.Errorf("error marshalling yaml: %v", err)
+	}
+	return string(hcBytes), nil
+}
+
+// generateIPXEScript will generate an inline ipxe script similar to https://github.com/harvester/ipxe-examples/blob/main/general/ipxe-create
+// and uses the same for create / join of node
+func generateIPXEScript(harvesterVersion, isoURL, hegelEndpoint, macAddress, arch string, vlanID int) (string, error) {
+
+	ipxeTemplateStruct := struct {
+		Version       string
+		ISOURL        string
+		HegelEndpoint string
+		MacAddress    string
+		Arch          string
+		VlanID        int
+	}{
+		Version:       harvesterVersion,
+		ISOURL:        isoURL,
+		HegelEndpoint: hegelEndpoint,
+		MacAddress:    macAddress,
+		Arch:          arch,
+		VlanID:        vlanID,
 	}
 
-	metadata = output.String()
-	return metadata, nil
+	var output bytes.Buffer
+
+	ipxeTemplate := `#!ipxe
+set version {{ .Version }}
+set base {{ .ISOURL}}/{{ .Version }}
+set arch {{ .Arch }}
+dhcp
+iflinkwait -t 5000
+kernel ${base}/harvester-${version}-vmlinuz-${arch} initrd=harvester-${version}-initrd-${arch} ip=dhcp net.ifnames=1 rd.cos.disable rd.noverifyssl BOOTIF={{ .MacAddress }} root=live:${base}/harvester-${version}-rootfs-${arch}.squashfs console=tty1 harvester.install.automatic=true boot_cmd='echo include_ping_test=yes >> /etc/conf.d/net-online' harvester.install.config_url={{ .HegelEndpoint }} {{if gt .VlanID 1}}ifname=netboot:{{ .MacAddress }}  vlan=vlan{{ .VlanID }}:netboot {{end}}
+initrd ${base}/harvester-${version}-initrd-${arch}
+boot
+`
+	ipxeTmpl := template.Must(template.New("IPXE").Parse(ipxeTemplate))
+	err := ipxeTmpl.Execute(&output, ipxeTemplateStruct)
+	if err != nil {
+		return "", fmt.Errorf("error generating ipxe template: %v", err)
+	}
+	return output.String(), nil
+}
+
+func readConfigURL(hc *config.HarvesterConfig, url string) error {
+	// FileTransport is needed to make it easier to run unit tests
+	t := &http.Transport{}
+	t.RegisterProtocol("file", http.NewFileTransport(http.Dir(".")))
+	c := &http.Client{Transport: t}
+	resp, err := c.Get(url)
+	if err != nil {
+		return fmt.Errorf("error fetching config url %s: %v", url, err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("error during http call, status code: %v", resp.Status)
+	}
+
+	content, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("error reading url response body: %v", err)
+	}
+	err = yaml.Unmarshal(content, hc)
+	return err
 }

@@ -1,0 +1,16 @@
+deploy: true
+name: rufio
+image: quay.io/tinkerbell/rufio:v0.3.2
+imagePullPolicy: IfNotPresent
+resources:
+  requests:
+    cpu: 10m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 128Mi
+serviceAccountName: rufio-controller-manager
+rufioLeaderElectionRoleName: rufio-leader-election-role
+managerRoleName: rufio-manager-role
+rufioLeaderElectionRoleBindingName: rufio-leader-election-rolebinding
+managerRoleBindingName: rufio-manager-rolebinding

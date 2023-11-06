@@ -3,7 +3,6 @@ package rufiojobwrapper
 import (
 	"context"
 
-	"github.com/go-logr/logr"
 	rufiocontrollers "github.com/tinkerbell/rufio/controller"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -18,7 +17,7 @@ type RufioJobWrapper struct {
 	context.Context
 }
 
-func NewRufioWrapper(ctx context.Context, client client.Client, logr logr.Logger) *RufioJobWrapper {
+func NewRufioWrapper(ctx context.Context, client client.Client) *RufioJobWrapper {
 	return &RufioJobWrapper{
 		rufiocontrollers.NewJobReconciler(client),
 		ctx,

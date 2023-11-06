@@ -1,10 +1,14 @@
 package tink
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/harvester/harvester-installer/pkg/config"
+	"github.com/rancher/wrangler/pkg/yaml"
 	"github.com/stretchr/testify/require"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
+	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -12,24 +16,48 @@ import (
 	"github.com/harvester/seeder/pkg/util"
 )
 
-func Test_generateMetaDataV10(t *testing.T) {
+func Test_createModeCloudConfig(t *testing.T) {
 	assert := require.New(t)
-	m, err := generateMetaDataV10("http://localhost", "v1.0.1", "xx:xx:xx:xx:xx", "create",
-		"/dev/sda", "192.168.1.100", "token", "password", "v1.0.2", []string{"8.8.8.8"}, []string{"abc"})
-	assert.NoError(err, "no error should have occured")
-	assert.Contains(m, "harvester.install.mode=create", "expected to find create mode in metadata")
-	assert.Contains(m, "hwAddr:xx:xx:xx:xx:xx", "expected to find mac address in metadata")
-	assert.NotContains(m, "scheme_version", "expected to not find scheme_version")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
+	assert.NoError(err)
+	hc := config.NewHarvesterConfig()
+	err = yaml.Unmarshal([]byte(cloudConfig), hc)
+	assert.NoError(err)
+	assert.True(hc.Install.Automatic, "expected automatic installation to be set")
+	assert.Empty(hc.ServerURL, "expected serverURL to be empty")
+	assert.NotEmpty(hc.Install.Vip, "expected VIP to be set")
+	assert.Equal(hc.Install.VipMode, "static", "expected vip mode to be static")
+	assert.Equal(hc.Install.Mode, "create", "expected install mode to be create")
+	assert.Len(hc.Install.ManagementInterface.Interfaces, 1, "expected to find 1 interface defined")
+	assert.Empty(hc.Install.ConfigURL, "expected configURL to be set")
+	assert.NotEmpty(hc.OS.Password, "expected password to be set")
+	assert.Len(hc.OS.DNSNameservers, 1, "expected to find 1 dns server")
+	assert.Len(hc.OS.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
+	assert.NotEmpty(hc.Install.ManagementInterface.IP, "expected IP to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.Gateway, "expected gateway to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.SubnetMask, "expected subnet mask to be set")
+	assert.True(hc.Install.WipeDisks, "expected wipe disks to be set")
 }
 
-func Test_generateMetaDataV11(t *testing.T) {
+func Test_joinModeCloudConfig(t *testing.T) {
 	assert := require.New(t)
-	m, err := generateMetaDataV11("http://localhost", "v1.0.1", "xx:xx:xx:xx:xx", "create",
-		"/dev/sda", "192.168.1.100", "token", "password", "v1.0.2", []string{"8.8.8.8"}, []string{"abc"})
-	assert.NoError(err, "no error should have occured")
-	assert.Contains(m, "harvester.install.mode=create", "expected to find create mode in metadata")
-	assert.Contains(m, "hwAddr:xx:xx:xx:xx:xx", "expected to find mac address in metadata")
-	assert.Contains(m, "scheme_version", "expected to find scheme_version")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
+	assert.NoError(err)
+	hc := config.NewHarvesterConfig()
+	err = yaml.Unmarshal([]byte(cloudConfig), hc)
+	assert.NoError(err)
+	assert.True(hc.Install.Automatic, "expected automatic installation to be set")
+	assert.NotEmpty(hc.ServerURL, "expected serverURL to be empty")
+	assert.Equal(hc.Install.Mode, "join", "expected install mode to be create")
+	assert.Len(hc.Install.ManagementInterface.Interfaces, 1, "expected to find 1 interface defined")
+	assert.Empty(hc.Install.ConfigURL, "expected configURL to be set")
+	assert.NotEmpty(hc.OS.Password, "expected password to be set")
+	assert.Len(hc.OS.DNSNameservers, 1, "expected to find 1 dns server")
+	assert.Len(hc.OS.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
+	assert.NotEmpty(hc.Install.ManagementInterface.IP, "expected IP to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.Gateway, "expected gateway to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.SubnetMask, "expected subnet mask to be set")
+	assert.True(hc.Install.WipeDisks, "expected wipe disks to be set")
 }
 
 var (
@@ -76,7 +104,7 @@ var (
 			Namespace: "default",
 		},
 		Spec: seederv1alpha1.ClusterSpec{
-			HarvesterVersion: "v1.0.1",
+			HarvesterVersion: "v1.2.0",
 			VIPConfig: seederv1alpha1.VIPConfig{
 				AddressPoolReference: seederv1alpha1.ObjectReference{
 					Name:      "management-pool",
@@ -105,7 +133,7 @@ var (
 					"8.8.8.8",
 					"8.8.4.4",
 				},
-				ConfigURL: "http://endpoint",
+				ConfigURL: "file:///testdata/create.yaml",
 			},
 		},
 		Status: seederv1alpha1.ClusterStatus{
@@ -113,69 +141,193 @@ var (
 			ClusterAddress: "192.168.1.100",
 		},
 	}
+
+	svc = &v1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "test-svc",
+			Namespace: "harvester-system",
+		},
+		Spec: v1.ServiceSpec{},
+		Status: v1.ServiceStatus{
+			LoadBalancer: v1.LoadBalancerStatus{
+				Ingress: []v1.LoadBalancerIngress{
+					{
+						IP: "127.0.0.1",
+					},
+				},
+			},
+		},
+	}
+
+	hegelSvc = &v1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "hegel-svc",
+			Namespace: "harvester-system",
+		},
+		Spec: v1.ServiceSpec{},
+		Status: v1.ServiceStatus{
+			LoadBalancer: v1.LoadBalancerStatus{
+				Ingress: []v1.LoadBalancerIngress{
+					{
+						IP: "127.0.0.1",
+					},
+				},
+			},
+		},
+	}
 )
 
-func Test_GenerateHWRequestV10(t *testing.T) {
+func Test_GenerateHWRequest(t *testing.T) {
 	assert := require.New(t)
 	util.CreateOrUpdateCondition(i, seederv1alpha1.HarvesterCreateNode, "")
-	hw, err := GenerateHWRequest(i, c)
-	t.Log(i.Status)
-	assert.NoError(err, "no error should occur during hardware generation")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.mode=create", "expected to find create mode in metadata")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "hwAddr:xx:xx:xx:xx:xx", "expected to find mac address in metadata")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "dns_nameservers=8.8.8.8", "expected to find correct nameserver")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "ssh_authorized_keys=\\\"- abc ", "expected to find ssh_keys")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "token=token", "expected to find token")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "password=password", "expected to find password")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.vip=192.168.1.100", "expected to find a vip")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.vip_mode=static", "expected to find vipMode static")
-	assert.Equal(hw.Spec.Interfaces[0].DHCP.MAC, i.Spec.ManagementInterfaceMacAddress, "expected to find correct hardware address")
-	assert.Equal(hw.Spec.Interfaces[0].DHCP.IP.Gateway, i.Status.Gateway, "expected to find correct gateway")
-	assert.Equal(hw.Spec.Interfaces[0].DHCP.IP.Address, i.Status.Address, "expected to find correct address")
-	assert.Equal(hw.Spec.Interfaces[0].DHCP.IP.Netmask, i.Status.Netmask, "expected to find correct netmask")
-	assert.NotContains(hw.Spec.Metadata.Instance.Userdata, "scheme_version")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.networks.harvester-mgmt", "expected to find harvester-mgmt in interfaces")
-	assert.NotContains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.management_interface", "expected to not find management_interface")
+	hw, err := GenerateHWRequest(i, c, svc, hegelSvc)
+	assert.NoError(err, "expected no error during hardware generation")
+	assert.NotNil(hw.Spec.UserData, "expected user data to be set")
 }
 
-func Test_GenerateHWRequestV11(t *testing.T) {
+func Test_GenerateWorkflow(t *testing.T) {
 	assert := require.New(t)
-	clusterCopy := c.DeepCopy()
-	clusterCopy.Spec.HarvesterVersion = "v1.1.0"
-	util.CreateOrUpdateCondition(i, seederv1alpha1.HarvesterCreateNode, "")
-	hw, err := GenerateHWRequest(i, clusterCopy)
-	assert.NoError(err, "no error should occur during hardware generation")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.mode=create", "expected to find create mode in metadata")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "hwAddr:xx:xx:xx:xx:xx", "expected to find mac address in metadata")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "dns_nameservers=8.8.8.8", "expected to find correct nameserver")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "ssh_authorized_keys=\\\"- abc ", "expected to find ssh_keys")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "token=token", "expected to find token")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "password=password", "expected to find password")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.vip=192.168.1.100", "expected to find a vip")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.vip_mode=static", "expected to find vipMode static")
-	assert.Equal(hw.Spec.Interfaces[0].DHCP.MAC, i.Spec.ManagementInterfaceMacAddress, "expected to find correct hardware address")
-	assert.Equal(hw.Spec.Interfaces[0].DHCP.IP.Gateway, i.Status.Gateway, "expected to find correct gateway")
-	assert.Equal(hw.Spec.Interfaces[0].DHCP.IP.Address, i.Status.Address, "expected to find correct address")
-	assert.Equal(hw.Spec.Interfaces[0].DHCP.IP.Netmask, i.Status.Netmask, "expected to find correct netmask")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "scheme_version")
-	assert.NotContains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.networks.harvester-mgmt", "expected to find harvester-mgmt in interfaces")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.install.management_interface", "expected to not find management_interface")
+	var testCases = []struct {
+		name             string
+		i                *seederv1alpha1.Inventory
+		c                *seederv1alpha1.Cluster
+		expectedWorkflow *tinkv1alpha1.Workflow
+	}{
+		{
+			name: "default workflow",
+			i: &seederv1alpha1.Inventory{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test-node",
+					Namespace: "harvester-system",
+				},
+				Spec: seederv1alpha1.InventorySpec{
+					ManagementInterfaceMacAddress: "xx:xx",
+				},
+			},
+			c: &seederv1alpha1.Cluster{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test-cluster",
+					Namespace: "harvester-system",
+				},
+			},
+			expectedWorkflow: &tinkv1alpha1.Workflow{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test-node",
+					Namespace: "harvester-system",
+				},
+				Spec: tinkv1alpha1.WorkflowSpec{
+					TemplateRef: "test-node",
+					HardwareRef: "test-node",
+					HardwareMap: map[string]string{
+						"device_1": "xx:xx",
+					},
+				},
+			},
+		}, {
+			name: "custom workflow",
+			i: &seederv1alpha1.Inventory{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test-node",
+					Namespace: "harvester-system",
+				},
+				Spec: seederv1alpha1.InventorySpec{
+					ManagementInterfaceMacAddress: "xx:xx",
+				},
+			},
+			c: &seederv1alpha1.Cluster{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test-cluster",
+					Namespace: "harvester-system",
+				},
+				Spec: seederv1alpha1.ClusterSpec{
+					ClusterConfig: seederv1alpha1.ClusterConfig{
+						CustomProvisioningTemplate: "override-template",
+					},
+				},
+			},
+			expectedWorkflow: &tinkv1alpha1.Workflow{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test-node",
+					Namespace: "harvester-system",
+				},
+				Spec: tinkv1alpha1.WorkflowSpec{
+					TemplateRef: "override-template",
+					HardwareRef: "test-node",
+					HardwareMap: map[string]string{
+						"device_1": "xx:xx",
+					},
+				},
+			},
+		},
+	}
+
+	for _, v := range testCases {
+		generatedWorkflow := GenerateWorkflow(v.i, v.c)
+		assert.Equal(v.expectedWorkflow, generatedWorkflow, fmt.Sprintf("expected generatedWorkflow to match expected workflow for case %s", v.name))
+	}
 }
 
-func Test_GenerateHWRequestWithJoinV10(t *testing.T) {
+func Test_generateIPXEScript(t *testing.T) {
 	assert := require.New(t)
-	util.RemoveCondition(i, seederv1alpha1.HarvesterCreateNode)
-	hw, err := GenerateHWRequest(i, c)
-	assert.NoError(err, "no error should occur during hardware generation")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.server_url=https://192.168.1.100:8443", "expected to find join url")
+	_, err := generateIPXEScript("v1.1.3", "http://imagestore/iso", "hegelEndpoint", "ab:cd:ef:gh:ij", "amd64", 1)
+	assert.NoError(err, "expect no error during generation of ipxe script")
 }
 
-func Test_GenerateHWRequestWithJoinV11(t *testing.T) {
+func Test_GenerateHardwareRequestV11(t *testing.T) {
 	assert := require.New(t)
-	util.RemoveCondition(i, seederv1alpha1.HarvesterCreateNode)
-	clusterCopy := c.DeepCopy()
-	clusterCopy.Spec.HarvesterVersion = "v1.1.0"
-	hw, err := GenerateHWRequest(i, clusterCopy)
-	assert.NoError(err, "no error should occur during hardware generation")
-	assert.Contains(hw.Spec.Metadata.Instance.Userdata, "harvester.server_url=https://192.168.1.100", "expected to find join url")
+	cObj := c.DeepCopy()
+	cObj.Spec.HarvesterVersion = "v1.1.2"
+	hw, err := GenerateHWRequest(i, cObj, svc, hegelSvc)
+	assert.NoError(err, "expected no error during hardware generation")
+	assert.NotNil(hw.Spec.UserData, "expected user data to be set")
+	for _, v := range hw.Spec.Interfaces {
+		assert.NotNil(v.Netboot.IPXE, "expect ipxe definition to exist")
+		assert.NotEmpty(v.Netboot.IPXE.Contents, "expected content script to be defined")
+	}
+}
+
+func Test_createModeCloudConfigV11(t *testing.T) {
+	assert := require.New(t)
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
+	assert.NoError(err)
+	hc := config.NewHarvesterConfig()
+	err = yaml.Unmarshal([]byte(cloudConfig), hc)
+	assert.NoError(err)
+	assert.True(hc.Install.Automatic, "expected automatic installation to be set")
+	assert.Empty(hc.ServerURL, "expected serverURL to be empty")
+	assert.NotEmpty(hc.Install.Vip, "expected VIP to be set")
+	assert.Equal(hc.Install.VipMode, "static", "expected vip mode to be static")
+	assert.Equal(hc.Install.Mode, "create", "expected install mode to be create")
+	assert.Len(hc.Install.ManagementInterface.Interfaces, 1, "expected to find 1 interface defined")
+	assert.Empty(hc.Install.ConfigURL, "expected configURL to be empty")
+	assert.NotEmpty(hc.OS.Password, "expected password to be set")
+	assert.Len(hc.OS.DNSNameservers, 1, "expected to find 1 dns server")
+	assert.Len(hc.OS.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
+	assert.Len(hc.Install.Webhooks, 1, "expected to find atleast 1 webhook definition")
+	assert.NotEmpty(hc.Install.ManagementInterface.IP, "expected IP to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.Gateway, "expected gateway to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.SubnetMask, "expected subnet mask to be set")
+	assert.True(hc.Install.WipeDisks, "expected wipe disks to be set")
+}
+
+func Test_joinModeCloudConfigV11(t *testing.T) {
+	assert := require.New(t)
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
+	assert.NoError(err)
+	hc := config.NewHarvesterConfig()
+	err = yaml.Unmarshal([]byte(cloudConfig), hc)
+	assert.NoError(err)
+	assert.True(hc.Install.Automatic, "expected automatic installation to be set")
+	assert.NotEmpty(hc.ServerURL, "expected serverURL to be empty")
+	assert.Equal(hc.Install.Mode, "join", "expected install mode to be create")
+	assert.Len(hc.Install.ManagementInterface.Interfaces, 1, "expected to find 1 interface defined")
+	assert.Empty(hc.Install.ConfigURL, "expected configURL to be empty")
+	assert.NotEmpty(hc.OS.Password, "expected password to be set")
+	assert.Len(hc.OS.DNSNameservers, 1, "expected to find 1 dns server")
+	assert.Len(hc.OS.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
+	assert.Len(hc.Install.Webhooks, 1, "expected to find atleast 1 webhook definition")
+	assert.NotEmpty(hc.Install.ManagementInterface.IP, "expected IP to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.Gateway, "expected gateway to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.SubnetMask, "expected subnet mask to be set")
+	assert.True(hc.Install.WipeDisks, "expected wipe disks to be set")
 }

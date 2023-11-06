@@ -72,10 +72,6 @@ var _ = Describe("test local node controller", func() {
 		}
 
 		Eventually(func() error {
-			return createHarvesterNamespace(ctx, k8sClient)
-		}, "30s", "5s").ShouldNot(HaveOccurred())
-
-		Eventually(func() error {
 			return util.SetupLocalCluster(ctx, k8sClient)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 
