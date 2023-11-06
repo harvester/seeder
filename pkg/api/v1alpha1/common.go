@@ -8,6 +8,7 @@ const (
 	OverrideAPIPortLabel     = "clusterPort.harvesterhci.io"
 	OverrideRedfishPortLabel = "redfishPort.harvesterhci.io"
 	EventLoggerName          = "HarvesterHardwareDiscovery"
+	WorkflowLoggerName       = "WorkflowEvent"
 )
 
 var (
@@ -15,9 +16,15 @@ var (
 )
 
 const (
-	NodePowerActionShutdown = "shutdown"
-	NodePowerActionPowerOn  = "poweron"
-	NodePowerActionReboot   = "reboot"
-	NodeJobComplete         = "complete"
-	NodeJobFailed           = "failed"
+	NodePowerActionShutdown              = "shutdown"
+	NodePowerActionPowerOn               = "poweron"
+	NodePowerActionReboot                = "reboot"
+	NodeJobComplete                      = "complete"
+	NodeJobFailed                        = "failed"
+	DefaultHarvesterProvisioningTemplate = "default-harvester-template"
+	DefaultTinkStackService              = "tink-stack"
+	SeederConfig                         = "seeder-config"
+	DefaultEndpointPort                  = 9090
+	DefaultSeederDeploymentService       = "harvester-seeder-endpoint"
+	DefaultHegelDeploymentEndpointLookup = "smee"
 )
