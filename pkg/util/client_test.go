@@ -14,6 +14,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	typedCore "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/tools/clientcmd"
+	runtimelog "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 var k3sNodeAddress string
@@ -68,6 +69,13 @@ func TestMain(t *testing.M) {
 	k3sNodeAddress = k3s.GetIPInNetwork(&networks[0])
 	time.Sleep(60 * time.Second)
 
+	// needed to pass check in controller-runtime https://github.com/kubernetes-sigs/controller-runtime/commit/ed8be90b87613a10303ff8a74e9452bb47e77bf7
+
+	runtimelog.SetLogger(l)
+	if err != nil {
+		pool.Purge(k3s)
+		log.Fatal(err)
+	}
 	code := t.Run()
 	_ = pool.Purge(k3s)
 	os.Exit(code)

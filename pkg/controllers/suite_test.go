@@ -28,13 +28,14 @@ import (
 	dockertest "github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
-	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
+	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	log "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/crd"
@@ -108,10 +109,11 @@ var _ = BeforeSuite(func() {
 	Expect(k8sClient).NotTo(BeNil())
 
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:             scheme,
-		Port:               9444,
-		MetricsBindAddress: ":9080",
-		LeaderElection:     false,
+		Scheme: scheme,
+		Metrics: server.Options{
+			BindAddress: ":9080",
+		},
+		LeaderElection: false,
 	})
 	Expect(err).NotTo(HaveOccurred())
 

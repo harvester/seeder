@@ -69,6 +69,8 @@ metadata:
 `
 )
 
+var statusSubResources = []client.Object{&seederv1alpha1.Cluster{}, &seederv1alpha1.Inventory{}, &seederv1alpha1.AddressPool{}, &seederv1alpha1.Cluster{}}
+
 func generateObjects() ([]runtime.Object, error) {
 	objs, err := GenerateObjectsFromVar(DefaultObjects)
 	return objs, err
@@ -94,6 +96,6 @@ func GenerateFakeClientFromObjects(objs []runtime.Object) (client.WithWatch, err
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(seederv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(rufio.AddToScheme(scheme))
-	c := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(objs...).Build()
+	c := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(objs...).WithStatusSubresource(statusSubResources...).Build()
 	return c, nil
 }

@@ -21,7 +21,10 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/tink"
+	"github.com/harvester/seeder/pkg/util"
+	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -34,11 +37,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
-
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
-	"github.com/harvester/seeder/pkg/tink"
-	"github.com/harvester/seeder/pkg/util"
 )
 
 // ClusterReconciler reconciles a Cluster object
@@ -534,7 +532,7 @@ func (r *ClusterReconciler) markClusterReady(ctx context.Context, cObj *seederv1
 func (r *ClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&seederv1alpha1.Cluster{}).
-		Watches(&source.Kind{Type: &tinkv1alpha1.Hardware{}}, handler.EnqueueRequestsFromMapFunc(func(a client.Object) []reconcile.Request {
+		Watches(&tinkv1alpha1.Hardware{}, handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, a client.Object) []reconcile.Request {
 			var reconRequest []reconcile.Request
 			owners := a.GetOwnerReferences()
 			for _, o := range owners {
