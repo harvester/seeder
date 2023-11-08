@@ -73,7 +73,7 @@ func TestMain(t *testing.M) {
 
 	runtimelog.SetLogger(l)
 	if err != nil {
-		pool.Purge(k3s)
+		_ = pool.Purge(k3s)
 		log.Fatal(err)
 	}
 	code := t.Run()

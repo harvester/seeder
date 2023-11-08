@@ -57,6 +57,8 @@ const (
 	HarvesterCreateNode         condition.Cond = "harvesterCreateNode"
 	HarvesterJoinNode           condition.Cond = "harvesterJoinNode"
 	MachineNotContactable       condition.Cond = "machineNotContactable"
+	TinkHardwareCreated         condition.Cond = "tinkHardwareCreated"
+	TinkTemplateCreated         condition.Cond = "tinkTemplateCreated"
 )
 
 // InventorySpec defines the desired state of Inventory

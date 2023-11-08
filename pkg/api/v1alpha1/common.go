@@ -15,9 +15,12 @@ var (
 )
 
 const (
-	NodePowerActionShutdown = "shutdown"
-	NodePowerActionPowerOn  = "poweron"
-	NodePowerActionReboot   = "reboot"
-	NodeJobComplete         = "complete"
-	NodeJobFailed           = "failed"
+	NodePowerActionShutdown              = "shutdown"
+	NodePowerActionPowerOn               = "poweron"
+	NodePowerActionReboot                = "reboot"
+	NodeJobComplete                      = "complete"
+	NodeJobFailed                        = "failed"
+	DefaultHarvesterProvisioningTemplate = "default-harvester-template"
+	DefaultTinkStackService              = "tink-stack"
+	SeederConfig                         = "seeder-config"
 )

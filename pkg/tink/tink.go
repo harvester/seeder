@@ -49,13 +49,12 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 			Namespace: i.Namespace,
 		},
 		Spec: tinkv1alpha1.HardwareSpec{
+			UserData: &m,
 			Interfaces: []tinkv1alpha1.Interface{
 				{
 					Netboot: &tinkv1alpha1.Netboot{
-						AllowPXE: &[]bool{true}[0],
-						OSIE: &tinkv1alpha1.OSIE{
-							BaseURL: c.Spec.ImageURL,
-						},
+						AllowPXE:      &[]bool{true}[0],
+						AllowWorkflow: &[]bool{true}[0],
 					},
 					DHCP: &tinkv1alpha1.DHCP{
 						MAC:       i.Spec.ManagementInterfaceMacAddress,
@@ -81,7 +80,6 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 					FacilityCode: defaultFacilityCode,
 				},
 				Instance: &tinkv1alpha1.MetadataInstance{
-					Userdata: m,
 					OperatingSystem: &tinkv1alpha1.MetadataInstanceOperatingSystem{
 						Version: c.Spec.HarvesterVersion,
 						Distro:  defaultDistro,
@@ -183,4 +181,25 @@ func generateMetaDataV11(configURL, version, hwAddress, mode, disk, vip, token, 
 
 	metadata = output.String()
 	return metadata, nil
+}
+
+// GenerateWorkflow binds the template associated with inventory to the workflow
+// this needs to be done before the ipxe boot is performed to ensure correct workflow is executed on reboot
+func GenerateWorkflow(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (workflow *tinkv1alpha1.Workflow) {
+	workflow = &tinkv1alpha1.Workflow{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      i.Name,
+			Namespace: i.Namespace,
+		},
+		Spec: tinkv1alpha1.WorkflowSpec{
+			TemplateRef: i.Name,
+			HardwareRef: i.Name,
+		},
+	}
+
+	if c.Spec.ClusterConfig.CustomProvisioningTemplate != "" {
+		workflow.Spec.TemplateRef = c.Spec.ClusterConfig.CustomProvisioningTemplate
+	}
+
+	return workflow
 }

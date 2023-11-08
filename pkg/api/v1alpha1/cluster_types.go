@@ -45,9 +45,10 @@ type VIPConfig struct {
 }
 
 type ClusterConfig struct {
-	ConfigURL   string   `json:"configURL,omitempty"`
-	SSHKeys     []string `json:"sshKeys,omitempty"`
-	Nameservers []string `json:"nameservers,omitempty"`
+	ConfigURL                  string   `json:"configURL,omitempty"`
+	SSHKeys                    []string `json:"sshKeys,omitempty"`
+	Nameservers                []string `json:"nameservers,omitempty"`
+	CustomProvisioningTemplate string   `json:"customProvisioningTemplate,omitempty"`
 }
 
 type NodeConfig struct {
@@ -73,7 +74,7 @@ type ClusterWorkflowStatus string
 const (
 	ClusterConfigReady           ClusterWorkflowStatus = "clusterConfigReady"
 	ClusterNodesPatched          ClusterWorkflowStatus = "clusterNodesPatched"
-	ClusterTinkHardwareSubmitted ClusterWorkflowStatus = "tinkHardwareCreated"
+	ClusterTinkHardwareSubmitted ClusterWorkflowStatus = "tinkConfigReady"
 	ClusterRunning               ClusterWorkflowStatus = "clusterRunning"
 )
 

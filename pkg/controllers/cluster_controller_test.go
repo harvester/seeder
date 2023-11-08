@@ -151,7 +151,7 @@ var _ = Describe("Create cluster tests", func() {
 				return fmt.Errorf("expected inventory to be allocated to cluster %v", tmpInventory.Status)
 			}
 			// is tinkerbell workflow condition present
-			if !util.ConditionExists(tmpInventory, seederv1alpha1.TinkWorkflowCreated) {
+			if !util.ConditionExists(tmpInventory, seederv1alpha1.TinkHardwareCreated) {
 				return fmt.Errorf("expected tinkerbell hardware condition to exist %v", tmpInventory.Status.Conditions)
 			}
 
@@ -188,6 +188,31 @@ var _ = Describe("Create cluster tests", func() {
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 
+	It("reconcile tinkerbell workflow in cluster controller reconcile", func() {
+		Eventually(func() error {
+			tmpCluster := &seederv1alpha1.Cluster{}
+			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, tmpCluster); err != nil {
+				return err
+			}
+
+			if tmpCluster.Status.Status != seederv1alpha1.ClusterTinkHardwareSubmitted {
+				return fmt.Errorf("expected status to be tink hardware submitted")
+			}
+
+			workflowList := &tinkv1alpha1.WorkflowList{}
+			if err := k8sClient.List(ctx, workflowList, &client.ListOptions{Namespace: "default"}); err != nil {
+				return err
+			}
+
+			for _, v := range workflowList.Items {
+				if v.Name == i.Name && v.Namespace == i.Namespace {
+					return nil
+				}
+			}
+
+			return fmt.Errorf("did not find workflow matching the inventory %s", i.Name)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
 	// check cluster deletion and reconcilliation of hardware and inventory objects
 	// Test is flaky when using TestEnv. Disabling for now
 	It("delete cluster and check cleanup of inventory objects", func() {

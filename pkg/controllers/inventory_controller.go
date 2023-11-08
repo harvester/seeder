@@ -254,7 +254,9 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, iObj *seederv1a
 	// if tink hardware has been created and inventory is allocated to a cluster
 	// then reboot the hardware using BMC tasks
 	i := iObj.DeepCopy()
-	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i, seederv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) {
+	// TODO: Change it back to check seederv1alpha1.TinkWorkflowCreated exists since this will be a valid condition after move to
+	// workflow based processing
+	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i, seederv1alpha1.TinkHardwareCreated) && util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) {
 		// submit BMC task
 		i.Spec.PowerActionRequested = seederv1alpha1.NodePowerActionReboot
 		return r.Update(ctx, i)
