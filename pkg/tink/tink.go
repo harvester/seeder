@@ -1,13 +1,11 @@
 package tink
 
 import (
-	"bytes"
 	"fmt"
-	"html/template"
-	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/harvester/harvester-installer/pkg/config"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
+	"gopkg.in/yaml.v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
@@ -31,16 +29,10 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 		mode = "create"
 	}
 
-	var m string
-	if strings.Contains(c.Spec.HarvesterVersion, "v1.0") {
-		m, err = generateMetaDataV10(c.Spec.ConfigURL, c.Spec.HarvesterVersion, i.Spec.ManagementInterfaceMacAddress, mode,
-			i.Spec.PrimaryDisk, c.Status.ClusterAddress, c.Status.ClusterToken, i.Status.GeneratedPassword, c.Spec.ImageURL, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys)
-	} else {
-		m, err = generateMetaDataV11(c.Spec.ConfigURL, c.Spec.HarvesterVersion, i.Spec.ManagementInterfaceMacAddress, mode,
-			i.Spec.PrimaryDisk, c.Status.ClusterAddress, c.Status.ClusterToken, i.Status.GeneratedPassword, c.Spec.ImageURL, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys)
-	}
+	m, err := generateCloudConfig(c.Spec.ConfigURL, i.Spec.ManagementInterfaceMacAddress, mode, c.Status.ClusterAddress,
+		c.Status.ClusterToken, i.Status.GeneratedPassword, i.Status.Address, i.Status.Netmask, i.Status.Gateway, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys)
 	if err != nil {
-		return nil, errors.Wrap(err, "error during metadata generation")
+		return nil, fmt.Errorf("error during HW generation: %v", err)
 	}
 
 	hw = &tinkv1alpha1.Hardware{
@@ -92,97 +84,6 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 	return hw, nil
 }
 
-// generateMetaDataV10 is a wrapper to generate metadata for nodes to create or join a cluster
-func generateMetaDataV10(configURL, version, hwAddress, mode, disk, vip, token, password, imageurl string, Nameservers, SSHKeys []string) (metadata string, err error) {
-
-	var tmpStruct struct {
-		ConfigURL   string
-		HWAddress   string
-		Mode        string
-		Disk        string
-		VIP         string
-		Token       string
-		SSHKeys     []string
-		Nameservers []string
-		Password    string
-		IsoURL      string
-	}
-	var output bytes.Buffer
-	tmpStruct.ConfigURL = configURL
-	tmpStruct.HWAddress = hwAddress
-	tmpStruct.Mode = mode
-	tmpStruct.Disk = disk
-	tmpStruct.VIP = vip
-	tmpStruct.Token = token
-	tmpStruct.Password = password
-	tmpStruct.SSHKeys = SSHKeys
-	tmpStruct.Nameservers = Nameservers
-	tmpStruct.Password = password
-	endpoint := defaultISOURL
-	if imageurl != "" {
-		endpoint = imageurl
-	}
-	tmpStruct.IsoURL = fmt.Sprintf("%s/%s/harvester-%s-amd64.iso", endpoint, version, version)
-
-	var metaDataStruct = `{{ if ne .ConfigURL ""}}harvester.install.config_url={{ .ConfigURL }}{{end}} harvester.install.networks.harvester-mgmt.interfaces="hwAddr:{{ .HWAddress }}" ip=dhcp harvester.install.networks.harvester-mgmt.method=dhcp harvester.install.networks.harvester-mgmt.bond_options.mode=balance-tlb harvester.install.networks.harvester-mgmt.bond_options.miimon=100 console=ttyS1,115200  harvester.install.mode={{ .Mode }} harvester.token={{ .Token }} harvester.os.password={{ .Password }} {{ range $v := .SSHKeys}}harvester.os.ssh_authorized_keys=\"- {{ $v }} \ "{{ end }}{{range $v := .Nameservers}}harvester.os.dns_nameservers={{ $v }} {{end}} harvester.install.vip={{ .VIP }} harvester.install.vip_mode=static harvester.install.iso_url={{ .IsoURL }} harvester.install.device={{ .Disk }} {{if eq .Mode "join"}}harvester.server_url={{ printf "https://%s:8443" .VIP }}{{end}}`
-
-	metadataTmpl := template.Must(template.New("MetaData").Parse(metaDataStruct))
-
-	err = metadataTmpl.Execute(&output, tmpStruct)
-
-	if err != nil {
-		return metadata, err
-	}
-
-	metadata = output.String()
-	return metadata, nil
-}
-
-func generateMetaDataV11(configURL, version, hwAddress, mode, disk, vip, token, password, imageurl string, Nameservers, SSHKeys []string) (metadata string, err error) {
-
-	var tmpStruct struct {
-		ConfigURL   string
-		HWAddress   string
-		Mode        string
-		Disk        string
-		VIP         string
-		Token       string
-		SSHKeys     []string
-		Nameservers []string
-		Password    string
-		IsoURL      string
-	}
-	var output bytes.Buffer
-	tmpStruct.ConfigURL = configURL
-	tmpStruct.HWAddress = hwAddress
-	tmpStruct.Mode = mode
-	tmpStruct.Disk = disk
-	tmpStruct.VIP = vip
-	tmpStruct.Token = token
-	tmpStruct.Password = password
-	tmpStruct.SSHKeys = SSHKeys
-	tmpStruct.Nameservers = Nameservers
-	tmpStruct.Password = password
-	endpoint := defaultISOURL
-	if imageurl != "" {
-		endpoint = imageurl
-	}
-	tmpStruct.IsoURL = fmt.Sprintf("%s/%s/harvester-%s-amd64.iso", endpoint, version, version)
-
-	var metaDataStruct = `{{ if ne .ConfigURL ""}}harvester.install.config_url={{ .ConfigURL }}{{end}} harvester.install.management_interface.interfaces="hwAddr:{{ .HWAddress }}" ip=dhcp harvester.install.management_interface.method=dhcp harvester.management_interface.bond_options.mode=balance-tlb harvester.install.management_interface.bond_options.miimon=100 console=ttyS1,115200  harvester.install.mode={{ .Mode }} harvester.token={{ .Token }} harvester.os.password={{ .Password }} {{ range $v := .SSHKeys}}harvester.os.ssh_authorized_keys=\"- {{ $v }} \ "{{ end }}{{range $v := .Nameservers}}harvester.os.dns_nameservers={{ $v }} {{end}} harvester.install.vip={{ .VIP }} harvester.install.vip_mode=static harvester.install.iso_url={{ .IsoURL }} harvester.install.device={{ .Disk }} {{if eq .Mode "join"}}harvester.server_url={{ printf "https://%s:443" .VIP }}{{end}} harvester.scheme_version=1`
-
-	metadataTmpl := template.Must(template.New("MetaData").Parse(metaDataStruct))
-
-	err = metadataTmpl.Execute(&output, tmpStruct)
-
-	if err != nil {
-		return metadata, err
-	}
-
-	metadata = output.String()
-	return metadata, nil
-}
-
 // GenerateWorkflow binds the template associated with inventory to the workflow
 // this needs to be done before the ipxe boot is performed to ensure correct workflow is executed on reboot
 func GenerateWorkflow(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (workflow *tinkv1alpha1.Workflow) {
@@ -202,4 +103,40 @@ func GenerateWorkflow(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (w
 	}
 
 	return workflow
+}
+
+func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, subnetMask, gateway string, Nameservers, SSHKeys []string) (string, error) {
+	hc := config.NewHarvesterConfig()
+	hc.SchemeVersion = 1
+	hc.Token = token
+	if mode == "join" {
+		hc.ServerURL = fmt.Sprintf("https://%s:443/", vip)
+	} else {
+		hc.Install.Vip = vip
+		hc.Install.VipMode = "static"
+	}
+	hc.Install.Mode = mode
+	hc.Install.ManagementInterface = config.Network{
+		Method:       "static",
+		IP:           ip,
+		SubnetMask:   subnetMask,
+		Gateway:      gateway,
+		DefaultRoute: true,
+		Interfaces: []config.NetworkInterface{
+			{
+				HwAddr: hwAddress,
+			},
+		},
+	}
+	hc.Install.ConfigURL = configURL
+	hc.Install.Automatic = true
+	hc.OS.Password = password
+	hc.OS.DNSNameservers = Nameservers
+	hc.OS.SSHAuthorizedKeys = SSHKeys
+
+	hcBytes, err := yaml.Marshal(hc)
+	if err != nil {
+		return "", fmt.Errorf("error marshalling yaml: %v", err)
+	}
+	return string(hcBytes), nil
 }
