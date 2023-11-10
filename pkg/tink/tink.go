@@ -5,7 +5,7 @@ import (
 
 	"github.com/harvester/harvester-installer/pkg/config"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
@@ -95,6 +95,9 @@ func GenerateWorkflow(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (w
 		Spec: tinkv1alpha1.WorkflowSpec{
 			TemplateRef: i.Name,
 			HardwareRef: i.Name,
+			HardwareMap: map[string]string{
+				"device_1": i.Spec.ManagementInterfaceMacAddress,
+			},
 		},
 	}
 

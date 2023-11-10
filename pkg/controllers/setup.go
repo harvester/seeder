@@ -122,6 +122,11 @@ func (s *Server) Start(ctx context.Context) error {
 			Logger:        s.logger.WithName("inventory-event-controller"),
 			EventRecorder: mgr.GetEventRecorderFor("seeder"),
 		},
+		&WorkflowReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+			Logger: s.logger.WithName("workflow-controller"),
+		},
 	}
 
 	var embedModeControllers = []controller{

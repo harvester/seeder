@@ -19,8 +19,10 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/go-logr/logr"
+	"github.com/rancher/wrangler/pkg/condition"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -269,7 +271,6 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, cObj *
 	c := cObj.DeepCopy()
 	if c.Status.Status == seederv1alpha1.ClusterNodesPatched || c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted || c.Status.Status == seederv1alpha1.ClusterRunning {
 		for _, i := range c.Spec.Nodes {
-			var hardwareUpdated bool
 			inventory := &seederv1alpha1.Inventory{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: i.InventoryReference.Namespace, Name: i.InventoryReference.Name}, inventory)
 			if err != nil {
@@ -295,25 +296,9 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, cObj *
 			}
 
 			// create / update hardware object if one already exists
-			lookupHw := &tinkv1alpha1.Hardware{}
-			err = r.Get(ctx, types.NamespacedName{Namespace: hw.Namespace, Name: hw.Name}, lookupHw)
-
+			err = r.createOrUpdateHardware(ctx, hw, inventory)
 			if err != nil {
-				if apierrors.IsNotFound(err) {
-					if err := r.Create(ctx, hw); err != nil {
-						return err
-					}
-					hardwareUpdated = true
-				} else {
-					return err
-				}
-			}
-
-			if hardwareUpdated {
-				util.CreateOrUpdateCondition(inventory, seederv1alpha1.TinkHardwareCreated, "tink workflow created")
-				if err := r.Status().Update(ctx, inventory); err != nil {
-					return err
-				}
+				return err
 			}
 		}
 
@@ -385,23 +370,54 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, cObj *seederv1al
 				return err
 			}
 
+			var notFound bool
 			// find and clean up hardware object
 			hw := &tinkv1alpha1.Hardware{}
 			if err := r.Get(ctx, types.NamespacedName{Namespace: iObj.Namespace, Name: iObj.Name}, hw); err != nil {
 				if apierrors.IsNotFound(err) {
-					continue
+					notFound = true
 				} else {
 					return err
 				}
 			}
-			if err := r.Delete(ctx, hw); err != nil {
-				return err
+
+			if !notFound {
+				if err := r.Delete(ctx, hw); err != nil {
+					return err
+				}
 			}
 
 			// find and clean up template object
+			template := &tinkv1alpha1.Template{}
+			if err := r.Get(ctx, types.NamespacedName{Namespace: iObj.Namespace, Name: iObj.Name}, template); err != nil {
+				if apierrors.IsNotFound(err) {
+					notFound = true
+				} else {
+					return err
+				}
+			}
+
+			if !notFound {
+				if err := r.Delete(ctx, template); err != nil {
+					return err
+				}
+			}
 
 			// find and clean up workflow object
+			workflow := &tinkv1alpha1.Workflow{}
+			if err := r.Get(ctx, types.NamespacedName{Namespace: iObj.Namespace, Name: iObj.Name}, workflow); err != nil {
+				if apierrors.IsNotFound(err) {
+					notFound = true
+				} else {
+					return err
+				}
+			}
 
+			if !notFound {
+				if err := r.Delete(ctx, workflow); err != nil {
+					return err
+				}
+			}
 		}
 
 		// add nodes to cluster if needed
@@ -601,7 +617,6 @@ func (r *ClusterReconciler) createTinkerbellWorkflow(ctx context.Context, cObj *
 	c := cObj.DeepCopy()
 	if c.Status.Status == seederv1alpha1.ClusterNodesPatched || c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted || c.Status.Status == seederv1alpha1.ClusterRunning {
 		for _, i := range c.Spec.Nodes {
-			var workflowUpdated bool
 			inventory := &seederv1alpha1.Inventory{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: i.InventoryReference.Namespace, Name: i.InventoryReference.Name}, inventory)
 			if err != nil {
@@ -626,26 +641,9 @@ func (r *ClusterReconciler) createTinkerbellWorkflow(ctx context.Context, cObj *
 				return err
 			}
 
-			// create / update hardware object if one already exists
-			existingWorkflow := &tinkv1alpha1.Workflow{}
-			err = r.Get(ctx, types.NamespacedName{Namespace: workflow.Namespace, Name: workflow.Name}, existingWorkflow)
-
+			err = r.createOrUpdateWorkflow(ctx, workflow, inventory)
 			if err != nil {
-				if apierrors.IsNotFound(err) {
-					if err := r.Create(ctx, workflow); err != nil {
-						return err
-					}
-					workflowUpdated = true
-				} else {
-					return err
-				}
-			}
-
-			if workflowUpdated {
-				util.CreateOrUpdateCondition(inventory, seederv1alpha1.TinkWorkflowCreated, "tink workflow created")
-				if err := r.Status().Update(ctx, inventory); err != nil {
-					return err
-				}
+				return err
 			}
 		}
 
@@ -690,7 +688,6 @@ func (r *ClusterReconciler) createTinkerbellTemplate(ctx context.Context, cObj *
 		}
 
 		for _, i := range c.Spec.Nodes {
-			var templateUpdated bool
 			inventory := &seederv1alpha1.Inventory{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: i.InventoryReference.Namespace, Name: i.InventoryReference.Name}, inventory)
 			if err != nil {
@@ -716,29 +713,88 @@ func (r *ClusterReconciler) createTinkerbellTemplate(ctx context.Context, cObj *
 			}
 
 			// create / update hardware object if one already exists
-			existingTemplate := &tinkv1alpha1.Template{}
-			err = r.Get(ctx, types.NamespacedName{Namespace: template.Namespace, Name: template.Name}, existingTemplate)
-
+			err = r.createOrUpdateTemplate(ctx, template, inventory)
 			if err != nil {
-				if apierrors.IsNotFound(err) {
-					if err := r.Create(ctx, template); err != nil {
-						return err
-					}
-					templateUpdated = true
-				} else {
-					return err
-				}
-			}
-
-			if templateUpdated {
-				util.CreateOrUpdateCondition(inventory, seederv1alpha1.TinkTemplateCreated, "tink workflow created")
-				if err := r.Status().Update(ctx, inventory); err != nil {
-					return err
-				}
+				return err
 			}
 		}
 
 	}
 
 	return nil
+}
+
+func (r *ClusterReconciler) createOrUpdateWorkflow(ctx context.Context, wf *tinkv1alpha1.Workflow, inventory *seederv1alpha1.Inventory) error {
+	wfObj := &tinkv1alpha1.Workflow{}
+	err := r.Get(ctx, types.NamespacedName{Name: wf.Name, Namespace: wf.Namespace}, wfObj)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			if createErr := r.Create(ctx, wf); createErr != nil {
+				return createErr
+			}
+		}
+		return err
+	}
+
+	if !reflect.DeepEqual(wfObj.Spec, wf.Spec) {
+		wfObj.Spec = wf.Spec
+		if err := r.Update(ctx, wfObj); err != nil {
+			return err
+		}
+	}
+
+	return r.createOrUpdateInventoryConditions(ctx, inventory, seederv1alpha1.TinkWorkflowCreated, "tink workflow created")
+}
+
+func (r *ClusterReconciler) createOrUpdateTemplate(ctx context.Context, template *tinkv1alpha1.Template, inventory *seederv1alpha1.Inventory) error {
+	templateObj := &tinkv1alpha1.Template{}
+	err := r.Get(ctx, types.NamespacedName{Name: template.Name, Namespace: template.Namespace}, templateObj)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			if createErr := r.Create(ctx, template); createErr != nil {
+				return createErr
+			}
+		}
+		return err
+	}
+
+	if !reflect.DeepEqual(templateObj.Spec, template.Spec) {
+		templateObj.Spec = template.Spec
+		if err := r.Update(ctx, templateObj); err != nil {
+			return err
+		}
+	}
+
+	return r.createOrUpdateInventoryConditions(ctx, inventory, seederv1alpha1.TinkTemplateCreated, "tink template created")
+}
+
+func (r *ClusterReconciler) createOrUpdateInventoryConditions(ctx context.Context, inventory *seederv1alpha1.Inventory, cond condition.Cond, msg string) error {
+	iObj := &seederv1alpha1.Inventory{}
+	if err := r.Get(ctx, types.NamespacedName{Name: inventory.Name, Namespace: inventory.Namespace}, iObj); err != nil {
+		return err
+	}
+
+	if !util.ConditionExists(iObj, cond) {
+		util.CreateOrUpdateCondition(iObj, cond, msg)
+		if err := r.Status().Update(ctx, iObj); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *ClusterReconciler) createOrUpdateHardware(ctx context.Context, hardware *tinkv1alpha1.Hardware, inventory *seederv1alpha1.Inventory) error {
+	hardwareObj := &tinkv1alpha1.Hardware{}
+	err := r.Get(ctx, types.NamespacedName{Name: hardware.Name, Namespace: hardware.Namespace}, hardwareObj)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			if createErr := r.Create(ctx, hardware); createErr != nil {
+				return createErr
+			}
+		}
+		return err
+	}
+
+	return r.createOrUpdateInventoryConditions(ctx, inventory, seederv1alpha1.TinkHardwareCreated, "tink hardware created")
 }

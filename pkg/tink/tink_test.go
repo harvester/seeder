@@ -164,6 +164,9 @@ func Test_GenerateWorkflow(t *testing.T) {
 					Name:      "test-node",
 					Namespace: "harvester-system",
 				},
+				Spec: seederv1alpha1.InventorySpec{
+					ManagementInterfaceMacAddress: "xx:xx",
+				},
 			},
 			c: &seederv1alpha1.Cluster{
 				ObjectMeta: metav1.ObjectMeta{
@@ -179,6 +182,9 @@ func Test_GenerateWorkflow(t *testing.T) {
 				Spec: tinkv1alpha1.WorkflowSpec{
 					TemplateRef: "test-node",
 					HardwareRef: "test-node",
+					HardwareMap: map[string]string{
+						"device_1": "xx:xx",
+					},
 				},
 			},
 		}, {
@@ -187,6 +193,9 @@ func Test_GenerateWorkflow(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      "test-node",
 					Namespace: "harvester-system",
+				},
+				Spec: seederv1alpha1.InventorySpec{
+					ManagementInterfaceMacAddress: "xx:xx",
 				},
 			},
 			c: &seederv1alpha1.Cluster{
@@ -208,6 +217,9 @@ func Test_GenerateWorkflow(t *testing.T) {
 				Spec: tinkv1alpha1.WorkflowSpec{
 					TemplateRef: "override-template",
 					HardwareRef: "test-node",
+					HardwareMap: map[string]string{
+						"device_1": "xx:xx",
+					},
 				},
 			},
 		},

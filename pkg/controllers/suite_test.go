@@ -144,6 +144,13 @@ var _ = BeforeSuite(func() {
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
+	err = (&mock.FakeWorkflowReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: log.Log.WithName("controller.fake-workflow"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
 	err = (&AddressPoolReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
@@ -178,6 +185,13 @@ var _ = BeforeSuite(func() {
 		Scheme:        mgr.GetScheme(),
 		Logger:        log.Log.WithName("controller.local-cluster"),
 		EventRecorder: mgr.GetEventRecorderFor("seeder"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&WorkflowReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: log.Log.WithName("controller.workflow"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 

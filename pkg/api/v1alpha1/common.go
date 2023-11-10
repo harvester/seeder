@@ -8,6 +8,7 @@ const (
 	OverrideAPIPortLabel     = "clusterPort.harvesterhci.io"
 	OverrideRedfishPortLabel = "redfishPort.harvesterhci.io"
 	EventLoggerName          = "HarvesterHardwareDiscovery"
+	WorkflowLoggerName       = "WorkflowEvent"
 )
 
 var (
