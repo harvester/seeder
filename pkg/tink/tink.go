@@ -3,11 +3,11 @@ package tink
 import (
 	"fmt"
 
-	"github.com/harvester/harvester-installer/pkg/config"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
-	yaml "gopkg.in/yaml.v2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/yaml"
 
+	"github.com/harvester/harvester-installer/pkg/config"
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/util"
 )
@@ -29,8 +29,13 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (
 		mode = "create"
 	}
 
+	bondOptions := make(map[string]string)
+	if c.Spec.BondOptions == nil {
+		bondOptions["mode"] = "balance-tlb"
+		bondOptions["miimon"] = "100"
+	}
 	m, err := generateCloudConfig(c.Spec.ConfigURL, i.Spec.ManagementInterfaceMacAddress, mode, c.Status.ClusterAddress,
-		c.Status.ClusterToken, i.Status.GeneratedPassword, i.Status.Address, i.Status.Netmask, i.Status.Gateway, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys)
+		c.Status.ClusterToken, i.Status.GeneratedPassword, i.Status.Address, i.Status.Netmask, i.Status.Gateway, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys, bondOptions)
 	if err != nil {
 		return nil, fmt.Errorf("error during HW generation: %v", err)
 	}
@@ -108,7 +113,7 @@ func GenerateWorkflow(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (w
 	return workflow
 }
 
-func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, subnetMask, gateway string, Nameservers, SSHKeys []string) (string, error) {
+func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, subnetMask, gateway string, Nameservers, SSHKeys []string, bondOptions map[string]string) (string, error) {
 	hc := config.NewHarvesterConfig()
 	hc.SchemeVersion = 1
 	hc.Token = token
@@ -136,7 +141,7 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 	hc.OS.Password = password
 	hc.OS.DNSNameservers = Nameservers
 	hc.OS.SSHAuthorizedKeys = SSHKeys
-
+	hc.Install.ManagementInterface.BondOptions = bondOptions
 	hcBytes, err := yaml.Marshal(hc)
 	if err != nil {
 		return "", fmt.Errorf("error marshalling yaml: %v", err)

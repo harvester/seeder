@@ -71,10 +71,10 @@ func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 
 	if cluster != nil {
 		if wObj.Status.State == tinkv1alpha1.WorkflowStateSuccess {
-			r.EventRecorder.Event(cluster, "STATE_SUCCESS", seederv1alpha1.WorkflowLoggerName, fmt.Sprintf("workflow event for %s", wObj.Name))
+			r.EventRecorder.Event(cluster, "Normal", seederv1alpha1.WorkflowLoggerName, fmt.Sprintf("workflow event for %s", wObj.Name))
 		}
 		if wObj.Status.State == tinkv1alpha1.WorkflowStateFailed {
-			r.EventRecorder.Event(cluster, "STATE_FAILED", seederv1alpha1.WorkflowLoggerName, fmt.Sprintf("workflow event for %s", wObj.Name))
+			r.EventRecorder.Event(cluster, "Warning", seederv1alpha1.WorkflowLoggerName, fmt.Sprintf("workflow event for %s", wObj.Name))
 		}
 
 	}

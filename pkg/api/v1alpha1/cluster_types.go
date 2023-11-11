@@ -45,10 +45,11 @@ type VIPConfig struct {
 }
 
 type ClusterConfig struct {
-	ConfigURL                  string   `json:"configURL,omitempty"`
-	SSHKeys                    []string `json:"sshKeys,omitempty"`
-	Nameservers                []string `json:"nameservers,omitempty"`
-	CustomProvisioningTemplate string   `json:"customProvisioningTemplate,omitempty"`
+	ConfigURL                  string            `json:"configURL,omitempty"`
+	SSHKeys                    []string          `json:"sshKeys,omitempty"`
+	Nameservers                []string          `json:"nameservers,omitempty"`
+	CustomProvisioningTemplate string            `json:"customProvisioningTemplate,omitempty"`
+	BondOptions                map[string]string `json:"bondOptions,omitempty"`
 }
 
 type NodeConfig struct {
