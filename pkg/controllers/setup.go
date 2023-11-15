@@ -123,9 +123,10 @@ func (s *Server) Start(ctx context.Context) error {
 			EventRecorder: mgr.GetEventRecorderFor("seeder"),
 		},
 		&WorkflowReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-			Logger: s.logger.WithName("workflow-controller"),
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
+			Logger:        s.logger.WithName("workflow-controller"),
+			EventRecorder: mgr.GetEventRecorderFor("seeder"),
 		},
 	}
 

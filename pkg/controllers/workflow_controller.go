@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/go-logr/logr"
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -13,6 +12,8 @@ import (
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
 // WorkflowReconciler reconciles a Workflow object
@@ -64,19 +65,29 @@ func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, r.Update(ctx, hw)
 	}
 
-	cluster, err := r.getOwnerCluster(ctx, hw)
+	cluster, err := r.getOwnerCluster(ctx, wObj)
 	if err != nil {
+		if apierrors.IsNotFound(err) {
+			return ctrl.Result{}, nil
+		}
 		return ctrl.Result{}, fmt.Errorf("error fetching parent cluster object for workflow %s: %v", wObj.Name, err)
 	}
 
-	if cluster != nil {
-		if wObj.Status.State == tinkv1alpha1.WorkflowStateSuccess {
-			r.EventRecorder.Event(cluster, "Normal", seederv1alpha1.WorkflowLoggerName, fmt.Sprintf("workflow event for %s", wObj.Name))
-		}
-		if wObj.Status.State == tinkv1alpha1.WorkflowStateFailed {
-			r.EventRecorder.Event(cluster, "Warning", seederv1alpha1.WorkflowLoggerName, fmt.Sprintf("workflow event for %s", wObj.Name))
-		}
+	if cluster == nil {
+		return ctrl.Result{}, nil
+	}
 
+	if wObj.Status.State == tinkv1alpha1.WorkflowStateSuccess {
+		r.EventRecorder.Event(cluster, "Normal", seederv1alpha1.WorkflowLoggerName, fmt.Sprintf("workflow %s completed successfully", wObj.Name))
+	}
+	if wObj.Status.State == tinkv1alpha1.WorkflowStateFailed {
+		for _, task := range wObj.Status.Tasks {
+			for _, action := range task.Actions {
+				if action.Status == tinkv1alpha1.WorkflowStateFailed {
+					r.EventRecorder.Event(cluster, "Warning", seederv1alpha1.WorkflowLoggerName, fmt.Sprintf("workflow %s failed for task %s, action %s", wObj.Name, task.Name, action.Name))
+				}
+			}
+		}
 	}
 
 	return ctrl.Result{}, nil
@@ -89,16 +100,14 @@ func (r *WorkflowReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func (r *WorkflowReconciler) getOwnerCluster(ctx context.Context, hw *tinkv1alpha1.Hardware) (*seederv1alpha1.Cluster, error) {
-	owners := hw.GetOwnerReferences()
+func (r *WorkflowReconciler) getOwnerCluster(ctx context.Context, wf *tinkv1alpha1.Workflow) (*seederv1alpha1.Cluster, error) {
+	owners := wf.GetOwnerReferences()
+	clusterObj := &seederv1alpha1.Cluster{}
 	for _, v := range owners {
-		if v.Kind == seederv1alpha1.KindCluster {
-			clusterObj := &seederv1alpha1.Cluster{}
-			err := r.Get(ctx, types.NamespacedName{Name: v.Name, Namespace: hw.Namespace}, clusterObj)
-			if err != nil && apierrors.IsNotFound(err) {
-				return nil, nil
-			}
-			return nil, err
+		r.Info("owners are", v.Name, wf.Namespace)
+		if v.Kind == "Cluster" {
+			err := r.Get(ctx, types.NamespacedName{Name: v.Name, Namespace: wf.Namespace}, clusterObj)
+			return clusterObj, err
 		}
 	}
 	return nil, nil
