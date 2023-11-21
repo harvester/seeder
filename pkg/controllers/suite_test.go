@@ -189,9 +189,24 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&WorkflowReconciler{
+		Client:        mgr.GetClient(),
+		Scheme:        mgr.GetScheme(),
+		Logger:        log.Log.WithName("controller.workflow"),
+		EventRecorder: mgr.GetEventRecorderFor("seeder"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&ClusterTinkerbellTemplateReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Logger: log.Log.WithName("controller.workflow"),
+		Logger: log.Log.WithName("controller.cluster-tinkerbell-template"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&ClusterTinkerbellWorkflowReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: log.Log.WithName("controller.cluster-tinkerbell-workflow"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
