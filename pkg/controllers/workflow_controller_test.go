@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
@@ -12,6 +11,8 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
 var _ = Describe("Successful workflow and hardware reconcile", func() {
@@ -150,9 +151,8 @@ var _ = Describe("Successful workflow and hardware reconcile", func() {
 			if err != nil {
 				if apierrors.IsNotFound(err) {
 					return nil
-				} else {
-					return err
 				}
+				return err
 			}
 			return k8sClient.Delete(ctx, c)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
@@ -322,9 +322,8 @@ var _ = Describe("Failed workflow and hardware reconcile", func() {
 			if err != nil {
 				if apierrors.IsNotFound(err) {
 					return nil
-				} else {
-					return err
 				}
+				return err
 			}
 			return k8sClient.Delete(ctx, c)
 		}, "30s", "5s").ShouldNot(HaveOccurred())

@@ -15,7 +15,7 @@ import (
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
-var _ = Describe("reconcile tinkerbell workflow deletion test", func() {
+var _ = Describe("reconcile tinkerbell template deletion test", func() {
 	var i *seederv1alpha1.Inventory
 	var c *seederv1alpha1.Cluster
 	var a *seederv1alpha1.AddressPool
@@ -23,7 +23,7 @@ var _ = Describe("reconcile tinkerbell workflow deletion test", func() {
 	BeforeEach(func() {
 		a = &seederv1alpha1.AddressPool{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "cluster-workflow-test",
+				Name:      "cluster-template-test",
 				Namespace: "default",
 			},
 			Spec: seederv1alpha1.AddressSpec{
@@ -34,7 +34,7 @@ var _ = Describe("reconcile tinkerbell workflow deletion test", func() {
 
 		i = &seederv1alpha1.Inventory{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "cluster-workflow-test",
+				Name:      "cluster-template-test",
 				Namespace: "default",
 			},
 			Spec: seederv1alpha1.InventorySpec{
@@ -46,7 +46,7 @@ var _ = Describe("reconcile tinkerbell workflow deletion test", func() {
 						Port:        623,
 						InsecureTLS: true,
 						AuthSecretRef: v1.SecretReference{
-							Name:      "cluster-workflow-test",
+							Name:      "cluster-template-test",
 							Namespace: "default",
 						},
 					},
@@ -56,7 +56,7 @@ var _ = Describe("reconcile tinkerbell workflow deletion test", func() {
 
 		creds = &v1.Secret{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "cluster-workflow-test",
+				Name:      "cluster-template-test",
 				Namespace: "default",
 			},
 			StringData: map[string]string{
@@ -67,7 +67,7 @@ var _ = Describe("reconcile tinkerbell workflow deletion test", func() {
 
 		c = &seederv1alpha1.Cluster{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      "cluster-workflow-test",
+				Name:      "cluster-template-test",
 				Namespace: "default",
 			},
 			Spec: seederv1alpha1.ClusterSpec{
@@ -75,18 +75,18 @@ var _ = Describe("reconcile tinkerbell workflow deletion test", func() {
 				Nodes: []seederv1alpha1.NodeConfig{
 					{
 						InventoryReference: seederv1alpha1.ObjectReference{
-							Name:      "cluster-workflow-test",
+							Name:      "cluster-template-test",
 							Namespace: "default",
 						},
 						AddressPoolReference: seederv1alpha1.ObjectReference{
-							Name:      "cluster-workflow-test",
+							Name:      "cluster-template-test",
 							Namespace: "default",
 						},
 					},
 				},
 				VIPConfig: seederv1alpha1.VIPConfig{
 					AddressPoolReference: seederv1alpha1.ObjectReference{
-						Name:      "cluster-workflow-test",
+						Name:      "cluster-template-test",
 						Namespace: "default",
 					},
 				},
@@ -132,28 +132,28 @@ var _ = Describe("reconcile tinkerbell workflow deletion test", func() {
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 
-	It("ensure workflow object exists", func() {
+	It("ensure template object exists", func() {
 		Eventually(func() error {
-			workflowObj := &tinkv1alpha1.Workflow{}
-			return k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, workflowObj)
+			templateObj := &tinkv1alpha1.Template{}
+			return k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, templateObj)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 
-	It("delete workflow object", func() {
+	It("delete template object", func() {
 		Eventually(func() error {
-			workflowObj := &tinkv1alpha1.Workflow{}
-			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, workflowObj); err != nil {
+			templateObj := &tinkv1alpha1.Template{}
+			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, templateObj); err != nil {
 				return err
 			}
 
-			return k8sClient.Delete(ctx, workflowObj)
+			return k8sClient.Delete(ctx, templateObj)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 
-	It("ensure workflow object is recreated", func() {
+	It("ensure template object is recreated", func() {
 		Eventually(func() error {
-			workflowObj := &tinkv1alpha1.Workflow{}
-			return k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, workflowObj)
+			templateObj := &tinkv1alpha1.Template{}
+			return k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, templateObj)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 

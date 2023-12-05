@@ -39,7 +39,7 @@ func GenerateTemplate(svc *corev1.Service, cm *corev1.ConfigMap, i *seederv1alph
 func generateDataTemplate(svc *corev1.Service, cm *corev1.ConfigMap, i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (*string, error) {
 	//set StreamHarvester action environment variables
 	DefaultStreamHarvesterAction.Environment[DestDisk] = i.Spec.PrimaryDisk
-	DefaultStreamHarvesterAction.Environment[ImageURL] = fmt.Sprintf("%s/%s/harvester-%s-amd64.raw.gz", c.Spec.ImageURL, c.Spec.HarvesterVersion, c.Spec.HarvesterVersion)
+	DefaultStreamHarvesterAction.Environment[ImageURL] = fmt.Sprintf("%s/%s/harvester-%s-amd64.raw.zst", c.Spec.ImageURL, c.Spec.HarvesterVersion, c.Spec.HarvesterVersion)
 
 	//set ConfigureHarvester action environment variables
 	DefaultConfigureHarvesterAction.Environment[HarvesterDevice] = i.Spec.PrimaryDisk

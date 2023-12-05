@@ -54,7 +54,7 @@ var (
 	}
 	DefaultStreamHarvesterAction = Action{
 		Name:    "stream-harvester",
-		Image:   "quay.io/tinkerbell-actions/image2disk:v1.0.0",
+		Image:   "gmehta3/image2disk:dev",
 		Timeout: 3000,
 		Environment: map[string]string{
 			"COMPRESSED": "true",
