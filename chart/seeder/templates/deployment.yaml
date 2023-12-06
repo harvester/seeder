@@ -53,7 +53,13 @@ spec:
               protocol: TCP
             - name: leader
               containerPort: 9443
-              protocol: TCP                            
+              protocol: TCP
+            - name: webhook
+              containerPort: 443
+              protocol: TCP  
+            - name: endpoint
+              containerPort: 9090
+              protocol: TCP                          
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

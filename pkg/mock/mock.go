@@ -5,6 +5,7 @@ import (
 
 	"github.com/rancher/wrangler/pkg/yaml"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
+	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -96,6 +97,7 @@ func GenerateFakeClientFromObjects(objs []runtime.Object) (client.WithWatch, err
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(seederv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(rufio.AddToScheme(scheme))
+	utilruntime.Must(tinkv1alpha1.AddToScheme(scheme))
 	c := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(objs...).WithStatusSubresource(statusSubResources...).Build()
 	return c, nil
 }

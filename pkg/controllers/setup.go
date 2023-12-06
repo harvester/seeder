@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+	"github.com/harvester/seeder/pkg/endpoint"
 	"github.com/sirupsen/logrus"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	rufiocontrollers "github.com/tinkerbell/rufio/controller"
@@ -195,6 +196,12 @@ func (s *Server) Start(ctx context.Context) error {
 	eg.Go(func() error {
 		s.logger.Info("starting webhook")
 		return webhook.SetupWebhookServer(egCtx, mgr, s.LeaderElectionNamespace)
+	})
+
+	// create endpoint server
+	endpointServer := endpoint.NewServer(egCtx, mgr.GetClient(), s.logger.WithName("endpoint-server"))
+	eg.Go(func() error {
+		return endpointServer.Start()
 	})
 
 	return eg.Wait()

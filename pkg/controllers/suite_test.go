@@ -42,6 +42,7 @@ import (
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/crd"
+	"github.com/harvester/seeder/pkg/endpoint"
 	"github.com/harvester/seeder/pkg/mock"
 )
 
@@ -209,6 +210,13 @@ var _ = BeforeSuite(func() {
 		Logger: log.Log.WithName("controller.cluster-tinkerbell-workflow"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
+
+	endpointServer := endpoint.NewServer(ctx, mgr.GetClient(), log.Log.WithName("endpoint-server"))
+	go func() {
+		defer GinkgoRecover()
+		err = endpointServer.Start()
+		Expect(err).NotTo(HaveOccurred())
+	}()
 
 	go func() {
 		defer GinkgoRecover()
