@@ -36,7 +36,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
-	log "sigs.k8s.io/controller-runtime/pkg/log"
+	ctrlruntimelog "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
@@ -60,6 +60,7 @@ var (
 	k3sNodeAddress string
 	k3sNodeGateway string
 	redfishAddress string
+	watchedObjects []client.Object
 )
 
 const (
@@ -83,7 +84,7 @@ func TestAPIs(t *testing.T) {
 }
 
 var _ = BeforeSuite(func() {
-	log.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
+	ctrlruntimelog.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
 	ctx, cancel = context.WithCancel(context.TODO())
 	By("bootstrapping test environment")
 	testEnv = &envtest.Environment{}
@@ -112,7 +113,12 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
 
+	namespace = "harvester-system"
+	err = createHarvesterSystemNamespace(ctx, k8sClient)
+	Expect(err).NotTo(HaveOccurred())
 	err = createTinkStackService(ctx, k8sClient)
+	Expect(err).NotTo(HaveOccurred())
+	err = createSeederDeploymentService(ctx, k8sClient)
 	Expect(err).NotTo(HaveOccurred())
 
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
@@ -127,49 +133,49 @@ var _ = BeforeSuite(func() {
 	err = (&InventoryReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Logger: log.Log.WithName("controller.inventory"),
+		Logger: ctrlruntimelog.Log.WithName("controller.inventory"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&mock.FakeBaseboardReconciller{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Logger: log.Log.WithName("controller.baseboard"),
+		Logger: ctrlruntimelog.Log.WithName("controller.baseboard"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&mock.FakeBaseboardJobReconciller{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Logger: log.Log.WithName("controller.bmcjob"),
+		Logger: ctrlruntimelog.Log.WithName("controller.bmcjob"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&mock.FakeWorkflowReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Logger: log.Log.WithName("controller.fake-workflow"),
+		Logger: ctrlruntimelog.Log.WithName("controller.fake-workflow"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&AddressPoolReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Logger: log.Log.WithName("controller.addresspool"),
+		Logger: ctrlruntimelog.Log.WithName("controller.addresspool"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&ClusterReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Logger: log.Log.WithName("controller.cluster"),
+		Logger: ctrlruntimelog.Log.WithName("controller.cluster"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&InventoryEventReconciler{
 		Client:        mgr.GetClient(),
 		Scheme:        mgr.GetScheme(),
-		Logger:        log.Log.WithName("controller.invenory-event"),
+		Logger:        ctrlruntimelog.Log.WithName("controller.invenory-event"),
 		EventRecorder: mgr.GetEventRecorderFor("seeder"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
@@ -177,14 +183,14 @@ var _ = BeforeSuite(func() {
 	err = (&ClusterEventReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Logger: log.Log.WithName("controller.cluster-event"),
+		Logger: ctrlruntimelog.Log.WithName("controller.cluster-event"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&LocalClusterReconciler{
 		Client:        mgr.GetClient(),
 		Scheme:        mgr.GetScheme(),
-		Logger:        log.Log.WithName("controller.local-cluster"),
+		Logger:        ctrlruntimelog.Log.WithName("controller.local-cluster"),
 		EventRecorder: mgr.GetEventRecorderFor("seeder"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
@@ -192,7 +198,7 @@ var _ = BeforeSuite(func() {
 	err = (&WorkflowReconciler{
 		Client:        mgr.GetClient(),
 		Scheme:        mgr.GetScheme(),
-		Logger:        log.Log.WithName("controller.workflow"),
+		Logger:        ctrlruntimelog.Log.WithName("controller.workflow"),
 		EventRecorder: mgr.GetEventRecorderFor("seeder"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
@@ -200,18 +206,18 @@ var _ = BeforeSuite(func() {
 	err = (&ClusterTinkerbellTemplateReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Logger: log.Log.WithName("controller.cluster-tinkerbell-template"),
+		Logger: ctrlruntimelog.Log.WithName("controller.cluster-tinkerbell-template"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&ClusterTinkerbellWorkflowReconciler{
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
-		Logger: log.Log.WithName("controller.cluster-tinkerbell-workflow"),
+		Logger: ctrlruntimelog.Log.WithName("controller.cluster-tinkerbell-workflow"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-	endpointServer := endpoint.NewServer(ctx, mgr.GetClient(), log.Log.WithName("endpoint-server"))
+	endpointServer := endpoint.NewServer(ctx, mgr.GetClient(), ctrlruntimelog.Log.WithName("endpoint-server"))
 	go func() {
 		defer GinkgoRecover()
 		err = endpointServer.Start()
@@ -284,8 +290,10 @@ var _ = BeforeSuite(func() {
 
 var _ = AfterSuite(func() {
 	By("tearing down the test environment")
+	err := cleanupObjects(ctx, k8sClient)
+	Expect(err).ToNot(HaveOccurred())
 	cancel()
-	err := pool.Purge(redfishMock)
+	err = pool.Purge(redfishMock)
 	Expect(err).NotTo(HaveOccurred())
 	err = pool.Purge(k3sMock)
 	Expect(err).NotTo(HaveOccurred())
@@ -297,7 +305,7 @@ func createTinkStackService(ctx context.Context, k8sclient client.Client) error 
 	svc := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      seederv1alpha1.DefaultTinkStackService,
-			Namespace: "default",
+			Namespace: seederv1alpha1.DefaultLocalClusterNamespace,
 		},
 		Spec: corev1.ServiceSpec{
 			Ports: []corev1.ServicePort{
@@ -326,5 +334,64 @@ func createTinkStackService(ctx context.Context, k8sclient client.Client) error 
 		},
 	}
 
+	watchedObjects = append(watchedObjects, svc)
 	return k8sclient.Status().Update(ctx, svc)
+}
+
+func createSeederDeploymentService(ctx context.Context, k8sclient client.Client) error {
+	svc := &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      seederv1alpha1.DefaultSeederDeploymentService,
+			Namespace: seederv1alpha1.DefaultLocalClusterNamespace,
+		},
+		Spec: corev1.ServiceSpec{
+			Ports: []corev1.ServicePort{
+				{
+					Port: 9090,
+				},
+			},
+		},
+	}
+	err := k8sclient.Create(ctx, svc)
+	if err != nil {
+		return err
+	}
+
+	err = k8sclient.Get(ctx, types.NamespacedName{Name: svc.Name, Namespace: svc.Namespace}, svc)
+	if err != nil {
+		return err
+	}
+
+	svc.Status = corev1.ServiceStatus{
+		LoadBalancer: corev1.LoadBalancerStatus{
+			Ingress: []corev1.LoadBalancerIngress{{
+				IP: "192.168.1.2",
+			},
+			},
+		},
+	}
+
+	watchedObjects = append(watchedObjects, svc)
+	return k8sclient.Status().Update(ctx, svc)
+}
+
+func createHarvesterSystemNamespace(ctx context.Context, k8sclient client.Client) error {
+	ns := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: seederv1alpha1.DefaultLocalClusterNamespace,
+		},
+	}
+
+	watchedObjects = append(watchedObjects, ns)
+	return k8sclient.Create(ctx, ns)
+}
+
+func cleanupObjects(ctx context.Context, k8sclient client.Client) error {
+	for i := range watchedObjects {
+		index := i + 1
+		if err := k8sclient.Delete(ctx, watchedObjects[len(watchedObjects)-index]); err != nil {
+			return err
+		}
+	}
+	return nil
 }

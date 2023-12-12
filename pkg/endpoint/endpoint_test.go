@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/stretchr/testify/require"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	"k8s.io/apimachinery/pkg/types"
@@ -132,7 +133,7 @@ func Test_disableHardware(t *testing.T) {
 	}
 	assert := require.New(t)
 	for _, t := range tests {
-		req, err := http.NewRequest("PUT", fmt.Sprintf("http://localhost:%d/disable/%s/%s", defaultPort, t.namespace, t.name), nil)
+		req, err := http.NewRequest("PUT", fmt.Sprintf("http://localhost:%d/disable/%s/%s", seederv1alpha1.DefaultEndpointPort, t.namespace, t.name), nil)
 		assert.NoError(err, fmt.Sprintf("expected no error during generation of request for test %s", t.name))
 		resp, err := http.DefaultClient.Do(req)
 		assert.NoErrorf(err, fmt.Sprintf("error making call for test %s", t.name))

@@ -6,9 +6,6 @@ import (
 	"reflect"
 
 	"github.com/go-logr/logr"
-	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
-	"github.com/harvester/seeder/pkg/tink"
-	"github.com/harvester/seeder/pkg/util"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -19,6 +16,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
+	"github.com/harvester/seeder/pkg/tink"
+	"github.com/harvester/seeder/pkg/util"
 )
 
 // ClusterTinkerbellTemplateReconciler reconciles a Cluster object and watches associated TinkerbellTemplate for changes
@@ -71,7 +72,7 @@ func (r *ClusterTinkerbellTemplateReconciler) createTinkerbellTemplate(ctx conte
 	if c.Status.Status == seederv1alpha1.ClusterNodesPatched || c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted || c.Status.Status == seederv1alpha1.ClusterRunning {
 		// check to see if the service for tink-stack is ready
 		tinkStackService := &corev1.Service{}
-		err := r.Get(ctx, types.NamespacedName{Name: seederv1alpha1.DefaultTinkStackService, Namespace: c.Namespace}, tinkStackService)
+		err := r.Get(ctx, types.NamespacedName{Name: seederv1alpha1.DefaultTinkStackService, Namespace: namespace}, tinkStackService)
 		if err != nil {
 			return fmt.Errorf("error fetching svc %s in ns %s: %v", seederv1alpha1.DefaultTinkStackService, c.Namespace, err)
 		}

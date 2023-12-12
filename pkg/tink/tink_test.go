@@ -18,9 +18,8 @@ import (
 
 func Test_createModeCloudConfig(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("http://endpoint/node.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil)
+	cloudConfig, err := generateCloudConfig("http://endpoint/node.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system")
 	assert.NoError(err)
-	t.Log(cloudConfig)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
 	assert.NoError(err)
@@ -41,7 +40,7 @@ func Test_createModeCloudConfig(t *testing.T) {
 
 func Test_joinModeCloudConfig(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("http://endpoint/node.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil)
+	cloudConfig, err := generateCloudConfig("http://endpoint/node.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
@@ -140,12 +139,46 @@ var (
 			ClusterAddress: "192.168.1.100",
 		},
 	}
+
+	svc = &v1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "test-svc",
+			Namespace: "harvester-system",
+		},
+		Spec: v1.ServiceSpec{},
+		Status: v1.ServiceStatus{
+			LoadBalancer: v1.LoadBalancerStatus{
+				Ingress: []v1.LoadBalancerIngress{
+					{
+						IP: "127.0.0.1",
+					},
+				},
+			},
+		},
+	}
+
+	hegelSvc = &v1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "hegel-svc",
+			Namespace: "harvester-system",
+		},
+		Spec: v1.ServiceSpec{},
+		Status: v1.ServiceStatus{
+			LoadBalancer: v1.LoadBalancerStatus{
+				Ingress: []v1.LoadBalancerIngress{
+					{
+						IP: "127.0.0.1",
+					},
+				},
+			},
+		},
+	}
 )
 
 func Test_GenerateHWRequest(t *testing.T) {
 	assert := require.New(t)
 	util.CreateOrUpdateCondition(i, seederv1alpha1.HarvesterCreateNode, "")
-	hw, err := GenerateHWRequest(i, c)
+	hw, err := GenerateHWRequest(i, c, svc, hegelSvc)
 	assert.NoError(err, "expected no error during hardware generation")
 	assert.NotNil(hw.Spec.UserData, "expected user data to be set")
 }
@@ -230,4 +263,72 @@ func Test_GenerateWorkflow(t *testing.T) {
 		generatedWorkflow := GenerateWorkflow(v.i, v.c)
 		assert.Equal(v.expectedWorkflow, generatedWorkflow, fmt.Sprintf("expected generatedWorkflow to match expected workflow for case %s", v.name))
 	}
+}
+
+func Test_generateIPXEScript(t *testing.T) {
+	assert := require.New(t)
+	output, err := generateIPXEScript("v1.1.3", "http://imagestore/iso", "hegelEndpoint", "ab:cd:ef:gh:ij", "/dev/sda", "172.19.108.2", "255.255.255.0", "172.19.108.1")
+	assert.NoError(err, "expect no error during generation of ipxe script")
+	assert.Contains(output, "harvester.install.management_interface.method=static", "expected to find static interface configiration")
+	assert.Contains(output, "harvester.install.management_interface.ip", "expected to find an ip for management interface")
+	assert.Contains(output, "harvester.install.management_interface.subnet_mask", "expected to find subnet mask for management interface")
+	assert.Contains(output, "harvester.install.management_interface.gateway", "expected to find gateway for management interface")
+	assert.Contains(output, "harvester.install.device", "expected to find install disk")
+}
+
+func Test_GenerateHardwareRequestV11(t *testing.T) {
+	assert := require.New(t)
+	cObj := c.DeepCopy()
+	cObj.Spec.HarvesterVersion = "v1.1.2"
+	hw, err := GenerateHWRequest(i, cObj, svc, hegelSvc)
+	assert.NoError(err, "expected no error during hardware generation")
+	assert.NotNil(hw.Spec.UserData, "expected user data to be set")
+	for _, v := range hw.Spec.Interfaces {
+		assert.NotNil(v.Netboot.IPXE, "expect ipxe definition to exist")
+		assert.NotEmpty(v.Netboot.IPXE.Contents, "expected content script to be defined")
+	}
+}
+
+func Test_createModeCloudConfigV11(t *testing.T) {
+	assert := require.New(t)
+	cloudConfig, err := generateCloudConfig("http://endpoint/node.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system")
+	assert.NoError(err)
+	hc := config.NewHarvesterConfig()
+	err = yaml.Unmarshal([]byte(cloudConfig), hc)
+	assert.NoError(err)
+	assert.True(hc.Install.Automatic, "expected automatic installation to be set")
+	assert.Empty(hc.ServerURL, "expected serverURL to be empty")
+	assert.NotEmpty(hc.Install.Vip, "expected VIP to be set")
+	assert.Equal(hc.Install.VipMode, "static", "expected vip mode to be static")
+	assert.Equal(hc.Install.Mode, "create", "expected install mode to be create")
+	assert.Len(hc.Install.ManagementInterface.Interfaces, 1, "expected to find 1 interface defined")
+	assert.Empty(hc.Install.ConfigURL, "expected configURL to be empty")
+	assert.NotEmpty(hc.OS.Password, "expected password to be set")
+	assert.Len(hc.OS.DNSNameservers, 1, "expected to find 1 dns server")
+	assert.Len(hc.OS.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
+	assert.NotEmpty(hc.Install.ManagementInterface.IP, "expected IP to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.Gateway, "expected gateway to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.SubnetMask, "expected subnet mask to be set")
+	assert.Len(hc.Install.Webhooks, 1, "expected to find atleast 1 webhook definition")
+}
+
+func Test_joinModeCloudConfigV11(t *testing.T) {
+	assert := require.New(t)
+	cloudConfig, err := generateCloudConfig("http://endpoint/node.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system")
+	assert.NoError(err)
+	hc := config.NewHarvesterConfig()
+	err = yaml.Unmarshal([]byte(cloudConfig), hc)
+	assert.NoError(err)
+	assert.True(hc.Install.Automatic, "expected automatic installation to be set")
+	assert.NotEmpty(hc.ServerURL, "expected serverURL to be empty")
+	assert.Equal(hc.Install.Mode, "join", "expected install mode to be create")
+	assert.Len(hc.Install.ManagementInterface.Interfaces, 1, "expected to find 1 interface defined")
+	assert.Empty(hc.Install.ConfigURL, "expected configURL to be empty")
+	assert.NotEmpty(hc.OS.Password, "expected password to be set")
+	assert.Len(hc.OS.DNSNameservers, 1, "expected to find 1 dns server")
+	assert.Len(hc.OS.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
+	assert.NotEmpty(hc.Install.ManagementInterface.IP, "expected IP to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.Gateway, "expected gateway to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.SubnetMask, "expected subnet mask to be set")
+	assert.Len(hc.Install.Webhooks, 1, "expected to find atleast 1 webhook definition")
 }

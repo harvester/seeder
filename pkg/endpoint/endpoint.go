@@ -13,6 +13,8 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )
 
 type Server struct {
@@ -21,10 +23,6 @@ type Server struct {
 	log    logr.Logger
 	route  *mux.Router
 }
-
-const (
-	defaultPort = 9090
-)
 
 func NewServer(ctx context.Context, client client.Client, log logr.Logger) *Server {
 	s := &Server{
@@ -40,7 +38,7 @@ func NewServer(ctx context.Context, client client.Client, log logr.Logger) *Serv
 
 func (s *Server) Start() error {
 	srv := &http.Server{
-		Addr:         fmt.Sprintf("0.0.0.0:%d", defaultPort),
+		Addr:         fmt.Sprintf("0.0.0.0:%d", seederv1alpha1.DefaultEndpointPort),
 		WriteTimeout: 5 * time.Second,
 		ReadTimeout:  5 * time.Second,
 		IdleTimeout:  5 * time.Second,

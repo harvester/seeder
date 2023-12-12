@@ -24,4 +24,6 @@ const (
 	DefaultHarvesterProvisioningTemplate = "default-harvester-template"
 	DefaultTinkStackService              = "tink-stack"
 	SeederConfig                         = "seeder-config"
+	DefaultEndpointPort                  = 9090
+	DefaultSeederDeploymentService       = "harvester-seeder-endpoint"
 )

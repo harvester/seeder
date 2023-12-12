@@ -26,10 +26,12 @@ import (
 	"github.com/harvester/seeder/pkg/rufiojobwrapper"
 	"github.com/harvester/seeder/pkg/util"
 	"github.com/harvester/seeder/pkg/webhook"
+	ctrlruntimelog "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 var (
-	scheme = runtime.NewScheme()
+	scheme    = runtime.NewScheme()
+	namespace string
 )
 
 const (
@@ -71,6 +73,9 @@ func (s *Server) Start(ctx context.Context) error {
 		logrus.Error(err, "unable to start manager")
 		return err
 	}
+
+	// used by other methods to lookup tink-stack and harvester-seeder-deployment services
+	namespace = s.LeaderElectionNamespace
 
 	// create CRDs
 	err = crd.Create(ctx, mgr.GetConfig())
@@ -209,4 +214,5 @@ func (s *Server) Start(ctx context.Context) error {
 
 func (s *Server) initLogs() {
 	s.logger = zap.New(zap.UseDevMode(s.Debug))
+	ctrlruntimelog.SetLogger(s.logger)
 }

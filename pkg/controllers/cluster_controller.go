@@ -23,6 +23,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/rancher/wrangler/pkg/condition"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
+	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -266,6 +267,21 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, cObj *seeder
 func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, cObj *seederv1alpha1.Cluster) error {
 	c := cObj.DeepCopy()
 	if c.Status.Status == seederv1alpha1.ClusterNodesPatched || c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted || c.Status.Status == seederv1alpha1.ClusterRunning {
+
+		// check to see if the service for tink-stack is ready
+		tinkStackService := &corev1.Service{}
+		err := r.Get(ctx, types.NamespacedName{Name: seederv1alpha1.DefaultTinkStackService, Namespace: namespace}, tinkStackService)
+		if err != nil {
+			return fmt.Errorf("error fetching svc %s in ns %s: %v", seederv1alpha1.DefaultTinkStackService, seederv1alpha1.DefaultLocalClusterNamespace, err)
+		}
+
+		seederDeploymentService := &corev1.Service{}
+		err = r.Get(ctx, types.NamespacedName{Name: seederv1alpha1.DefaultSeederDeploymentService, Namespace: namespace}, seederDeploymentService)
+
+		if err != nil {
+			return fmt.Errorf("error fetching svc %s in ns %s: %v", seederv1alpha1.DefaultSeederDeploymentService, seederv1alpha1.DefaultLocalClusterNamespace, err)
+		}
+
 		for _, i := range c.Spec.Nodes {
 			inventory := &seederv1alpha1.Inventory{}
 			err := r.Get(ctx, types.NamespacedName{Namespace: i.InventoryReference.Namespace, Name: i.InventoryReference.Name}, inventory)
@@ -281,7 +297,9 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, cObj *
 				continue
 			}
 
-			hw, err := tink.GenerateHWRequest(inventory, c)
+			// tinkStack Service exposes Hegel endpoint
+			// seederDeploymentService exposes the api endpoint to update hardware objects
+			hw, err := tink.GenerateHWRequest(inventory, c, seederDeploymentService, tinkStackService)
 			if err != nil {
 				return err
 			}
