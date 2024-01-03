@@ -6,12 +6,12 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/harvester/harvester-installer/pkg/config"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/yaml"
 
+	"github.com/harvester/harvester-installer/pkg/config"
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/util"
 )
@@ -100,7 +100,7 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster, s
 	// if version is pre v1.2.x then hardware will use custom ipxe boot script and not workflow based provisioning
 	if strings.HasPrefix(c.Spec.HarvesterVersion, v11Prefix) {
 		customIPXEScript, err := generateIPXEScript(c.Spec.HarvesterVersion, c.Spec.ImageURL, fmt.Sprintf("http://%s:%s/2009-04-04/user-data",
-			tinkStackService.Status.LoadBalancer.Ingress[0].IP, HegelDefaultPort), i.Spec.ManagementInterfaceMacAddress,i.Spec.PrimaryDisk, i.Status.Address, i.Status.Netmask, i.Status.Gateway)
+			tinkStackService.Status.LoadBalancer.Ingress[0].IP, HegelDefaultPort), i.Spec.ManagementInterfaceMacAddress, i.Spec.PrimaryDisk, i.Status.Address, i.Status.Netmask, i.Status.Gateway)
 		if err != nil {
 			return nil, fmt.Errorf("error generating custom ipxe script for inventory %s: %v", i.Name, err)
 		}
@@ -232,7 +232,7 @@ func generateIPXEScript(harvesterVersion, isoURL, hegelEndpoint, macAddress, dis
 	goto setupboot
 
 	:setupboot
-	kernel ${base}/harvester-${version}-vmlinuz-amd64 initrd=harvester-${version}-initrd-amd64 ip=dhcp net.ifnames=1 rd.cos.disable rd.noverifyssl root=live:${base}/harvester-${version}-rootfs-amd64.squashfs harvester.install.management_interface.interfaces=hwAddr:{{ .MacAddress }} harvester.install.management_interface.method=static harvester.install.management_interface.ip={{ .Address }} harvester.install.management_interface.subnet_mask={{ .Netmask }} harvester.install.management_interface.gateway={{ .Gateway }} harvester.install.device={{ .Disk }} harvester.install.management_interface.bond_options.mode=balance-tlb harvester.install.management_interface.bond_options.miimon=100 console=tty1 harvester.install.automatic=true boot_cmd='echo include_ping_test=yes >> /etc/conf.d/net-online' harvester.install.config_url={{ .HegelEndpoint }}
+	kernel ${base}/harvester-${version}-vmlinuz-amd64 initrd=harvester-${version}-initrd-amd64 ip=dhcp net.ifnames=1 rd.cos.disable rd.noverifyssl BOOTIF={{ .MacAddress }} root=live:${base}/harvester-${version}-rootfs-amd64.squashfs harvester.install.management_interface.interfaces=hwAddr:{{ .MacAddress }} harvester.install.management_interface.method=static harvester.install.management_interface.ip={{ .Address }} harvester.install.management_interface.subnet_mask={{ .Netmask }} harvester.install.management_interface.gateway={{ .Gateway }} harvester.install.device={{ .Disk }} harvester.install.management_interface.bond_options.mode=balance-tlb harvester.install.management_interface.bond_options.miimon=100 console=tty1 harvester.install.automatic=true boot_cmd='echo include_ping_test=yes >> /etc/conf.d/net-online' harvester.install.config_url={{ .HegelEndpoint }}
 	initrd ${base}/harvester-${version}-initrd-amd64
 	boot
 	`
