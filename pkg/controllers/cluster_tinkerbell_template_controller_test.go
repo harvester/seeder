@@ -95,7 +95,7 @@ var _ = Describe("reconcile tinkerbell template deletion test", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}

@@ -556,8 +556,8 @@ func (r *ClusterReconciler) markClusterReady(ctx context.Context, cObj *seederv1
 		return err
 	}
 
-	if len(nl.Items) < 1 {
-		return fmt.Errorf("api server is running but waiting for one of the nodes to be available")
+	if len(nl.Items) != len(c.Spec.Nodes) {
+		return fmt.Errorf("api server is running, expected to find %d nodes but only found %d nodes", len(nl.Items), len(c.Spec.Nodes))
 	}
 
 	c.Status.Status = seederv1alpha1.ClusterRunning

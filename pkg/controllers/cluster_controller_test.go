@@ -97,7 +97,7 @@ var _ = Describe("Create cluster tests", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}
@@ -426,7 +426,7 @@ var _ = Describe("add inventory to cluster tests", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}
@@ -672,7 +672,7 @@ var _ = Describe("delete inventory from cluster tests", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}
@@ -896,7 +896,7 @@ var _ = Describe("cluster running test", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}
@@ -1155,7 +1155,7 @@ var _ = Describe("multi-node cluster provisioning test", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}

@@ -77,6 +77,7 @@ func TestAPIs(t *testing.T) {
 	if ok {
 		suiteConfig.LabelFilter = "!skip-in-drone"
 	}
+	suiteConfig.FailFast = true
 	RunSpecs(t,
 		"Controller Suite",
 		suiteConfig,

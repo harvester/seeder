@@ -95,7 +95,7 @@ var _ = Describe("Successful workflow and hardware reconcile", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}
@@ -263,7 +263,7 @@ var _ = Describe("Failed workflow and hardware reconcile", func() {
 						"abc",
 						"def",
 					},
-					ConfigURL: "localhost:30300/config.yaml",
+					ConfigURL: "file:///testdata/config.yaml",
 				},
 			},
 		}

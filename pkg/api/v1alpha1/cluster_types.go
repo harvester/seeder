@@ -50,6 +50,12 @@ type ClusterConfig struct {
 	Nameservers                []string          `json:"nameservers,omitempty"`
 	CustomProvisioningTemplate string            `json:"customProvisioningTemplate,omitempty"`
 	BondOptions                map[string]string `json:"bondOptions,omitempty"`
+	// +kubebuilder:default=1
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum4094
+	VlanID          int  `json:"vlanID"`
+	StreamImageMode bool `json:"streamImageMode,omitempty"`
+	WipeDisks       bool `json:"wipeDisks,omitempty"`
 }
 
 type NodeConfig struct {

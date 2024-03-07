@@ -48,7 +48,13 @@ spec:
             properties:
               clusterConfig:
                 properties:
+                  bondOptions:
+                    additionalProperties:
+                      type: string
+                    type: object
                   configURL:
+                    type: string
+                  customProvisioningTemplate:
                     type: string
                   nameservers:
                     items:
@@ -58,6 +64,12 @@ spec:
                     items:
                       type: string
                     type: array
+                  streamImageMode:
+                    type: boolean
+                  vlanID:
+                    type: integer
+                  wipeDisks:
+                    type: boolean
                 type: object
               imageURL:
                 type: string
