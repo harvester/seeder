@@ -68,6 +68,9 @@ type InventorySpec struct {
 	BaseboardManagementSpec       rufio.MachineSpec `json:"baseboardSpec"`
 	Events                        `json:"events"`
 	PowerActionRequested          string `json:"powerActionRequested,omitempty"`
+	// +kubebuilder:default=amd64
+	// +kubebuilder:validation:Enum=amd64;arm64
+	Arch string `json:"arch,omitempty"`
 }
 
 type BMCSecretReference struct {

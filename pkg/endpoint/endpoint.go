@@ -32,6 +32,7 @@ func NewServer(ctx context.Context, client client.Client, log logr.Logger) *Serv
 	}
 	r := mux.NewRouter()
 	r.HandleFunc("/disable/{namespace}/{name}", s.disableHardware).Methods("PUT")
+	r.PathPrefix("/debug/pprof/").Handler(http.DefaultServeMux)
 	s.route = r
 	return s
 }
