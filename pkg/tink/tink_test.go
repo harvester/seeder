@@ -18,7 +18,7 @@ import (
 
 func Test_createModeCloudConfig(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
@@ -28,17 +28,20 @@ func Test_createModeCloudConfig(t *testing.T) {
 	assert.NotEmpty(hc.Install.Vip, "expected VIP to be set")
 	assert.Equal(hc.Install.VipMode, "static", "expected vip mode to be static")
 	assert.Equal(hc.Install.Mode, "create", "expected install mode to be create")
-	assert.Len(hc.Install.ManagementInterface.Interfaces, 0, "expected to find 0 interface defined")
+	assert.Len(hc.Install.ManagementInterface.Interfaces, 1, "expected to find 1 interface defined")
 	assert.Empty(hc.Install.ConfigURL, "expected configURL to be set")
 	assert.NotEmpty(hc.OS.Password, "expected password to be set")
 	assert.Len(hc.OS.DNSNameservers, 1, "expected to find 1 dns server")
 	assert.Len(hc.OS.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
+	assert.NotEmpty(hc.Install.ManagementInterface.IP, "expected IP to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.Gateway, "expected gateway to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.SubnetMask, "expected subnet mask to be set")
 	assert.True(hc.Install.WipeDisks, "expected wipe disks to be set")
 }
 
 func Test_joinModeCloudConfig(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
@@ -46,11 +49,14 @@ func Test_joinModeCloudConfig(t *testing.T) {
 	assert.True(hc.Install.Automatic, "expected automatic installation to be set")
 	assert.NotEmpty(hc.ServerURL, "expected serverURL to be empty")
 	assert.Equal(hc.Install.Mode, "join", "expected install mode to be create")
-	assert.Len(hc.Install.ManagementInterface.Interfaces, 0, "expected to find 0 interface defined")
+	assert.Len(hc.Install.ManagementInterface.Interfaces, 1, "expected to find 1 interface defined")
 	assert.Empty(hc.Install.ConfigURL, "expected configURL to be set")
 	assert.NotEmpty(hc.OS.Password, "expected password to be set")
 	assert.Len(hc.OS.DNSNameservers, 1, "expected to find 1 dns server")
 	assert.Len(hc.OS.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
+	assert.NotEmpty(hc.Install.ManagementInterface.IP, "expected IP to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.Gateway, "expected gateway to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.SubnetMask, "expected subnet mask to be set")
 	assert.True(hc.Install.WipeDisks, "expected wipe disks to be set")
 }
 
@@ -263,7 +269,7 @@ func Test_GenerateWorkflow(t *testing.T) {
 
 func Test_generateIPXEScript(t *testing.T) {
 	assert := require.New(t)
-	output, err := generateIPXEScript("v1.1.3", "http://imagestore/iso", "hegelEndpoint", "ab:cd:ef:gh:ij", "/dev/sda", "172.19.108.2", "255.255.255.0", "172.19.108.1", "amd64")
+	output, err := generateIPXEScript("v1.1.3", "http://imagestore/iso", "hegelEndpoint", "ab:cd:ef:gh:ij", "amd64")
 	assert.NoError(err, "expect no error during generation of ipxe script")
 	assert.Contains(output, "harvester.install.management_interface.method=static", "expected to find static interface configiration")
 	assert.Contains(output, "harvester.install.management_interface.ip", "expected to find an ip for management interface")
@@ -287,7 +293,7 @@ func Test_GenerateHardwareRequestV11(t *testing.T) {
 
 func Test_createModeCloudConfigV11(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
@@ -297,18 +303,21 @@ func Test_createModeCloudConfigV11(t *testing.T) {
 	assert.NotEmpty(hc.Install.Vip, "expected VIP to be set")
 	assert.Equal(hc.Install.VipMode, "static", "expected vip mode to be static")
 	assert.Equal(hc.Install.Mode, "create", "expected install mode to be create")
-	assert.Len(hc.Install.ManagementInterface.Interfaces, 0, "expected to find 0 interface defined")
+	assert.Len(hc.Install.ManagementInterface.Interfaces, 1, "expected to find 1 interface defined")
 	assert.Empty(hc.Install.ConfigURL, "expected configURL to be empty")
 	assert.NotEmpty(hc.OS.Password, "expected password to be set")
 	assert.Len(hc.OS.DNSNameservers, 1, "expected to find 1 dns server")
 	assert.Len(hc.OS.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
 	assert.Len(hc.Install.Webhooks, 1, "expected to find atleast 1 webhook definition")
+	assert.NotEmpty(hc.Install.ManagementInterface.IP, "expected IP to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.Gateway, "expected gateway to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.SubnetMask, "expected subnet mask to be set")
 	assert.True(hc.Install.WipeDisks, "expected wipe disks to be set")
 }
 
 func Test_joinModeCloudConfigV11(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
@@ -316,11 +325,14 @@ func Test_joinModeCloudConfigV11(t *testing.T) {
 	assert.True(hc.Install.Automatic, "expected automatic installation to be set")
 	assert.NotEmpty(hc.ServerURL, "expected serverURL to be empty")
 	assert.Equal(hc.Install.Mode, "join", "expected install mode to be create")
-	assert.Len(hc.Install.ManagementInterface.Interfaces, 0, "expected to find 0 interface defined")
+	assert.Len(hc.Install.ManagementInterface.Interfaces, 1, "expected to find 1 interface defined")
 	assert.Empty(hc.Install.ConfigURL, "expected configURL to be empty")
 	assert.NotEmpty(hc.OS.Password, "expected password to be set")
 	assert.Len(hc.OS.DNSNameservers, 1, "expected to find 1 dns server")
 	assert.Len(hc.OS.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
 	assert.Len(hc.Install.Webhooks, 1, "expected to find atleast 1 webhook definition")
+	assert.NotEmpty(hc.Install.ManagementInterface.IP, "expected IP to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.Gateway, "expected gateway to be set")
+	assert.NotEmpty(hc.Install.ManagementInterface.SubnetMask, "expected subnet mask to be set")
 	assert.True(hc.Install.WipeDisks, "expected wipe disks to be set")
 }

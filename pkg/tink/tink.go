@@ -44,7 +44,7 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster, s
 		bondOptions["miimon"] = "100"
 	}
 	m, err := generateCloudConfig(c.Spec.ConfigURL, i.Spec.ManagementInterfaceMacAddress, mode, c.Status.ClusterAddress,
-		c.Status.ClusterToken, i.Status.GeneratedPassword, i.Status.Address, i.Status.Netmask, i.Status.Gateway, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys, bondOptions, c.Spec.ImageURL, c.Spec.HarvesterVersion, seederDeploymentService.Status.LoadBalancer.Ingress[0].IP, i.Name, i.Namespace, c.Spec.StreamImageMode, c.Spec.WipeDisks, c.Spec.VlanID, i.Spec.Arch)
+		c.Status.ClusterToken, i.Status.GeneratedPassword, i.Status.Address, i.Status.Netmask, i.Status.Gateway, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys, bondOptions, c.Spec.ImageURL, c.Spec.HarvesterVersion, seederDeploymentService.Status.LoadBalancer.Ingress[0].IP, i.Name, i.Namespace, c.Spec.StreamImageMode, c.Spec.WipeDisks, c.Spec.VlanID, i.Spec.Arch, i.Spec.PrimaryDisk)
 
 	if err != nil {
 		return nil, fmt.Errorf("error during HW generation: %v", err)
@@ -99,7 +99,7 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster, s
 	// if not using StreamImage mode then define a custom ipxe url with info needed to provision harvester
 	if !c.Spec.StreamImageMode {
 		customIPXEScript, err := generateIPXEScript(c.Spec.HarvesterVersion, c.Spec.ImageURL, fmt.Sprintf("http://%s:%s/2009-04-04/user-data",
-			tinkStackService.Status.LoadBalancer.Ingress[0].IP, HegelDefaultPort), i.Spec.ManagementInterfaceMacAddress, i.Spec.PrimaryDisk, i.Status.Address, i.Status.Netmask, i.Status.Gateway, i.Spec.Arch)
+			tinkStackService.Status.LoadBalancer.Ingress[0].IP, HegelDefaultPort), i.Spec.ManagementInterfaceMacAddress, i.Spec.Arch)
 		if err != nil {
 			return nil, fmt.Errorf("error generating custom ipxe script for inventory %s: %v", i.Name, err)
 		}
@@ -136,7 +136,7 @@ func GenerateWorkflow(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (w
 	return workflow
 }
 
-func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, subnetMask, gateway string, Nameservers, SSHKeys []string, bondOptions map[string]string, imageURL string, harvesterVersion string, webhookURL string, hwName string, hwNamespace string, streamImage bool, wipeDisks bool, vlanID int, arch string) (string, error) {
+func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, subnetMask, gateway string, Nameservers, SSHKeys []string, bondOptions map[string]string, imageURL string, harvesterVersion string, webhookURL string, hwName string, hwNamespace string, streamImage bool, wipeDisks bool, vlanID int, arch string, disk string) (string, error) {
 	hc := config.NewHarvesterConfig()
 	if configURL != "" {
 		if err := readConfigURL(hc, configURL); err != nil {
@@ -152,7 +152,7 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 		hc.Install.VipMode = "static"
 	}
 	hc.Install.Mode = mode
-	/*hc.Install.ManagementInterface = config.Network{
+	hc.Install.ManagementInterface = config.Network{
 		Method:       "static",
 		IP:           ip,
 		SubnetMask:   subnetMask,
@@ -166,13 +166,15 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 	}
 	if vlanID > 0 {
 		hc.Install.ManagementInterface.VlanID = vlanID
-	} */
+	}
 	hc.Install.Automatic = true
 	hc.OS.Password = password
 	hc.OS.DNSNameservers = append(hc.OS.DNSNameservers, Nameservers...)
 	hc.OS.SSHAuthorizedKeys = append(hc.OS.SSHAuthorizedKeys, SSHKeys...)
 	hc.Install.ManagementInterface.BondOptions = bondOptions
 	hc.Install.WipeDisks = wipeDisks
+	hc.Install.Device = disk
+	hc.Install.SkipChecks = true
 	// for versions older than v1.2.x where streaming image mode is not available
 	// we need to provide ISO URL
 	if !streamImage {
@@ -195,27 +197,19 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 
 // generateIPXEScript will generate an inline ipxe script similar to https://github.com/harvester/ipxe-examples/blob/main/general/ipxe-create
 // and uses the same for create / join of node
-func generateIPXEScript(harvesterVersion, isoURL, hegelEndpoint, macAddress, disk, address, netmask, gateway, arch string) (string, error) {
+func generateIPXEScript(harvesterVersion, isoURL, hegelEndpoint, macAddress, arch string) (string, error) {
 
 	ipxeTemplateStruct := struct {
 		Version       string
 		ISOURL        string
 		HegelEndpoint string
 		MacAddress    string
-		Address       string
-		Netmask       string
-		Gateway       string
-		Disk          string
 		Arch          string
 	}{
 		Version:       harvesterVersion,
 		ISOURL:        isoURL,
 		HegelEndpoint: hegelEndpoint,
 		MacAddress:    macAddress,
-		Disk:          disk,
-		Address:       address,
-		Netmask:       netmask,
-		Gateway:       gateway,
 		Arch:          arch,
 	}
 
@@ -242,7 +236,7 @@ set address ${net3/mac}
 goto setupboot
 
 :setupboot
-kernel ${base}/harvester-${version}-vmlinuz-${arch} initrd=harvester-${version}-initrd-${arch} ip=dhcp net.ifnames=1 rd.cos.disable rd.noverifyssl BOOTIF={{ .MacAddress }} root=live:${base}/harvester-${version}-rootfs-${arch}.squashfs harvester.install.management_interface.interfaces=hwAddr:{{ .MacAddress }} harvester.install.management_interface.method=static harvester.install.management_interface.ip={{ .Address }} harvester.install.management_interface.subnet_mask={{ .Netmask }} harvester.install.management_interface.gateway={{ .Gateway }} harvester.install.device={{ .Disk }} harvester.install.management_interface.bond_options.mode=balance-tlb harvester.install.management_interface.bond_options.miimon=100 console=tty1 harvester.install.automatic=true boot_cmd='echo include_ping_test=yes >> /etc/conf.d/net-online' harvester.install.config_url={{ .HegelEndpoint }} harvester.install.skipchecks=true
+kernel ${base}/harvester-${version}-vmlinuz-${arch} initrd=harvester-${version}-initrd-${arch} ip=dhcp net.ifnames=1 rd.cos.disable rd.noverifyssl BOOTIF={{ .MacAddress }} root=live:${base}/harvester-${version}-rootfs-${arch}.squashfs console=tty1 harvester.install.automatic=true boot_cmd='echo include_ping_test=yes >> /etc/conf.d/net-online' harvester.install.config_url={{ .HegelEndpoint }}
 initrd ${base}/harvester-${version}-initrd-${arch}
 boot
 `
