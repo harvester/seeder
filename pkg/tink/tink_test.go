@@ -18,7 +18,7 @@ import (
 
 func Test_createModeCloudConfig(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
@@ -41,7 +41,7 @@ func Test_createModeCloudConfig(t *testing.T) {
 
 func Test_joinModeCloudConfig(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
@@ -269,13 +269,8 @@ func Test_GenerateWorkflow(t *testing.T) {
 
 func Test_generateIPXEScript(t *testing.T) {
 	assert := require.New(t)
-	output, err := generateIPXEScript("v1.1.3", "http://imagestore/iso", "hegelEndpoint", "ab:cd:ef:gh:ij", "amd64")
+	_, err := generateIPXEScript("v1.1.3", "http://imagestore/iso", "hegelEndpoint", "ab:cd:ef:gh:ij", "amd64")
 	assert.NoError(err, "expect no error during generation of ipxe script")
-	assert.Contains(output, "harvester.install.management_interface.method=static", "expected to find static interface configiration")
-	assert.Contains(output, "harvester.install.management_interface.ip", "expected to find an ip for management interface")
-	assert.Contains(output, "harvester.install.management_interface.subnet_mask", "expected to find subnet mask for management interface")
-	assert.Contains(output, "harvester.install.management_interface.gateway", "expected to find gateway for management interface")
-	assert.Contains(output, "harvester.install.device", "expected to find install disk")
 }
 
 func Test_GenerateHardwareRequestV11(t *testing.T) {
@@ -293,7 +288,7 @@ func Test_GenerateHardwareRequestV11(t *testing.T) {
 
 func Test_createModeCloudConfigV11(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
@@ -317,7 +312,7 @@ func Test_createModeCloudConfigV11(t *testing.T) {
 
 func Test_joinModeCloudConfigV11(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)

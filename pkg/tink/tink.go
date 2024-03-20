@@ -44,10 +44,18 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster, s
 		bondOptions["miimon"] = "100"
 	}
 	m, err := generateCloudConfig(c.Spec.ConfigURL, i.Spec.ManagementInterfaceMacAddress, mode, c.Status.ClusterAddress,
-		c.Status.ClusterToken, i.Status.GeneratedPassword, i.Status.Address, i.Status.Netmask, i.Status.Gateway, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys, bondOptions, c.Spec.ImageURL, c.Spec.HarvesterVersion, seederDeploymentService.Status.LoadBalancer.Ingress[0].IP, i.Name, i.Namespace, c.Spec.StreamImageMode, c.Spec.WipeDisks, c.Spec.VlanID, i.Spec.Arch, i.Spec.PrimaryDisk)
+		c.Status.ClusterToken, i.Status.GeneratedPassword, i.Status.Address, i.Status.Netmask, i.Status.Gateway, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys, bondOptions, c.Spec.ImageURL, c.Spec.HarvesterVersion, seederDeploymentService.Status.LoadBalancer.Ingress[0].IP, i.Name, i.Namespace, c.Spec.StreamImageMode, c.Spec.WipeDisks, c.Spec.VlanID, i.Spec.Arch, i.Spec.PrimaryDisk, fmt.Sprintf("%s-%s", i.Name, i.Namespace))
 
 	if err != nil {
 		return nil, fmt.Errorf("error during HW generation: %v", err)
+	}
+
+	// work around needed since boots represents amd64 arch as x86_64
+	var hwArch string
+	if i.Spec.Arch == "amd64" {
+		hwArch = "x86_64"
+	} else {
+		hwArch = "aarch64"
 	}
 
 	hw = &tinkv1alpha1.Hardware{
@@ -67,7 +75,7 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster, s
 						MAC:       i.Spec.ManagementInterfaceMacAddress,
 						Hostname:  fmt.Sprintf("%s-%s", i.Name, i.Namespace),
 						LeaseTime: defaultLeaseTime,
-						Arch:      i.Spec.Arch,
+						Arch:      hwArch,
 						UEFI:      true,
 						IP: &tinkv1alpha1.IP{
 							Address: i.Status.Address,
@@ -136,7 +144,7 @@ func GenerateWorkflow(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (w
 	return workflow
 }
 
-func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, subnetMask, gateway string, Nameservers, SSHKeys []string, bondOptions map[string]string, imageURL string, harvesterVersion string, webhookURL string, hwName string, hwNamespace string, streamImage bool, wipeDisks bool, vlanID int, arch string, disk string) (string, error) {
+func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, subnetMask, gateway string, Nameservers, SSHKeys []string, bondOptions map[string]string, imageURL string, harvesterVersion string, webhookURL string, hwName string, hwNamespace string, streamImage bool, wipeDisks bool, vlanID int, arch string, disk string, hostname string) (string, error) {
 	hc := config.NewHarvesterConfig()
 	if configURL != "" {
 		if err := readConfigURL(hc, configURL); err != nil {
@@ -171,6 +179,7 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 	hc.OS.Password = password
 	hc.OS.DNSNameservers = append(hc.OS.DNSNameservers, Nameservers...)
 	hc.OS.SSHAuthorizedKeys = append(hc.OS.SSHAuthorizedKeys, SSHKeys...)
+	hc.OS.Hostname = hostname
 	hc.Install.ManagementInterface.BondOptions = bondOptions
 	hc.Install.WipeDisks = wipeDisks
 	hc.Install.Device = disk
