@@ -4,8 +4,8 @@
 
 replicaCount: 1
 
-image: 
-  repository: rancher/harvester-seeder
+image:
+  repository: gmehta3/harvester-seeder
   tag: dev
   pullPolicy: Always
 
@@ -24,10 +24,12 @@ serviceAccount:
 
 podAnnotations: {}
 
-podSecurityContext: {}
+podSecurityContext:
+  {}
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -40,8 +42,8 @@ resources:
     cpu: "0.25"
     memory: "250Mi"
   limits:
-    cpu: "0.25"
-    memory: "250Mi"
+    cpu: "0.50"
+    memory: "500Mi"
 
 strategy:
   rollingUpdate:
@@ -51,4 +53,22 @@ strategy:
 
 # set to true for use in harvester-addon
 embeddedMode: false
-subchartsEnabled: true
+
+apiAffinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - seeder
+        topologyKey: kubernetes.io/hostname
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/os
+              operator: In
+              values:
+                - linux
