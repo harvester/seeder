@@ -26,7 +26,7 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "seeder.serviceAccountName" . }}
       affinity:
-  {{ include "seeder.apiAffinity" . | indent 8 }}
+  {{- toYaml .Values.apiAffinity | nindent 8 }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -53,7 +53,13 @@ spec:
               protocol: TCP
             - name: leader
               containerPort: 9443
-              protocol: TCP                            
+              protocol: TCP
+            - name: webhook
+              containerPort: 443
+              protocol: TCP
+            - name: endpoint
+              containerPort: 9090
+              protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

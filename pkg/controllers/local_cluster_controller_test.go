@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"context"
 	"fmt"
 	"reflect"
 
@@ -12,7 +11,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
@@ -128,10 +126,6 @@ var _ = Describe("Create and run local cluster tests", func() {
 				},
 			},
 		}
-
-		Eventually(func() error {
-			return createHarvesterNamespace(ctx, k8sClient)
-		}, "30s", "5s").ShouldNot(HaveOccurred())
 
 		Eventually(func() error {
 			return util.SetupLocalCluster(ctx, k8sClient)
@@ -344,19 +338,3 @@ var _ = Describe("Create and run local cluster tests", func() {
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
 })
-
-func createHarvesterNamespace(ctx context.Context, k8sClient client.Client) error {
-	ns := &corev1.Namespace{}
-	err := k8sClient.Get(ctx, types.NamespacedName{Name: "harvester-system", Namespace: ""}, ns)
-	if err != nil {
-		if apierrors.IsNotFound(err) {
-			ns := &corev1.Namespace{
-				ObjectMeta: metav1.ObjectMeta{
-					Name: "harvester-system",
-				},
-			}
-			return k8sClient.Create(ctx, ns)
-		}
-	}
-	return err
-}

@@ -28,6 +28,16 @@ steps:
     volumes:
       - name: docker
         path: /var/run/docker.sock
+    when:
+      instance:
+        - drone-publish.rancher.io
+        - drone-pr.rancher.io
+      ref:
+        - refs/head/main
+        - refs/tags/*
+      event:
+        - tag        
+        - push
 
   - name: docker-publish-master
     image: plugins/docker

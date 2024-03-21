@@ -3,15 +3,14 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
-	bmclib "github.com/bmc-toolbox/bmclib/v2"
 	"github.com/go-logr/logr"
+	"github.com/harvester/seeder/pkg/endpoint"
 	"github.com/sirupsen/logrus"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
-	rufiocontrollers "github.com/tinkerbell/rufio/controllers"
-	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
+	rufiocontrollers "github.com/tinkerbell/rufio/controller"
+	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	"golang.org/x/sync/errgroup"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
@@ -20,16 +19,23 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/crd"
 	"github.com/harvester/seeder/pkg/rufiojobwrapper"
 	"github.com/harvester/seeder/pkg/util"
 	"github.com/harvester/seeder/pkg/webhook"
+	ctrlruntimelog "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 var (
-	scheme = runtime.NewScheme()
+	scheme              = runtime.NewScheme()
+	deploymentNamespace string //contains name of namespace where seeder is deployed
+)
+
+const (
+	defaultRufioTimeout = 30 * time.Second
 )
 
 type Server struct {
@@ -54,9 +60,10 @@ func (s *Server) Start(ctx context.Context) error {
 	utilruntime.Must(tinkv1alpha1.AddToScheme(scheme))
 	s.initLogs()
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                  scheme,
-		MetricsBindAddress:      s.MetricsAddress,
-		Port:                    9443,
+		Scheme: scheme,
+		Metrics: server.Options{
+			BindAddress: ":9080",
+		},
 		HealthProbeBindAddress:  s.ProbeAddress,
 		LeaderElection:          s.EnableLeaderElection,
 		LeaderElectionID:        "28b21117.harvesterhci.io",
@@ -66,6 +73,9 @@ func (s *Server) Start(ctx context.Context) error {
 		logrus.Error(err, "unable to start manager")
 		return err
 	}
+
+	// used by other methods to lookup tink-stack and harvester-seeder-deployment services
+	deploymentNamespace = s.LeaderElectionNamespace
 
 	// create CRDs
 	err = crd.Create(ctx, mgr.GetConfig())
@@ -94,16 +104,14 @@ func (s *Server) Start(ctx context.Context) error {
 		rufiocontrollers.NewMachineReconciler(
 			mgr.GetClient(),
 			mgr.GetEventRecorderFor("machine-controller"),
-			NewCustomBMCClientFactoryFunc(ctx),
-			s.logger.WithName("controller").WithName("Machine"),
+			rufiocontrollers.NewClientFunc(defaultRufioTimeout),
 		),
 		rufiojobwrapper.NewRufioWrapper(ctx,
 			mgr.GetClient(),
-			s.logger.WithName("controller").WithName("Job"),
 		),
 		rufiocontrollers.NewTaskReconciler(
 			mgr.GetClient(),
-			rufiocontrollers.NewBMCClientFactoryFunc(ctx),
+			rufiocontrollers.NewClientFunc(defaultRufioTimeout),
 		),
 	}
 
@@ -119,6 +127,22 @@ func (s *Server) Start(ctx context.Context) error {
 			Scheme:        mgr.GetScheme(),
 			Logger:        s.logger.WithName("inventory-event-controller"),
 			EventRecorder: mgr.GetEventRecorderFor("seeder"),
+		},
+		&WorkflowReconciler{
+			Client:        mgr.GetClient(),
+			Scheme:        mgr.GetScheme(),
+			Logger:        s.logger.WithName("workflow-controller"),
+			EventRecorder: mgr.GetEventRecorderFor("seeder"),
+		},
+		&ClusterTinkerbellTemplateReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+			Logger: s.logger.WithName("cluster-tinkerbell-template-controller"),
+		},
+		&ClusterTinkerbellWorkflowReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+			Logger: s.logger.WithName("cluster-tinkerbell-workflow-controller"),
 		},
 	}
 
@@ -179,32 +203,16 @@ func (s *Server) Start(ctx context.Context) error {
 		return webhook.SetupWebhookServer(egCtx, mgr, s.LeaderElectionNamespace)
 	})
 
+	// create endpoint server
+	endpointServer := endpoint.NewServer(egCtx, mgr.GetClient(), s.logger.WithName("endpoint-server"))
+	eg.Go(func() error {
+		return endpointServer.Start()
+	})
+
 	return eg.Wait()
 }
 
 func (s *Server) initLogs() {
 	s.logger = zap.New(zap.UseDevMode(s.Debug))
-}
-
-// NewBMCClientFactoryFunc returns a new BMCClientFactoryFunc
-// which uses a context allowing timeout of connection
-// this allows the client to fail fast when machine is not reachable
-func NewCustomBMCClientFactoryFunc(ctx context.Context) rufiocontrollers.BMCClientFactoryFunc {
-	// Initializes a bmclib client based on input host and credentials
-	// Establishes a connection with the bmc with client.Open
-	// Returns a BMCClient
-	return func(ctx context.Context, hostIP, port, username, password string) (rufiocontrollers.BMCClient, error) {
-
-		ctxWithTimeout, cancelFunc := context.WithTimeout(ctx, 60*time.Second)
-		defer cancelFunc()
-
-		httpClient := http.DefaultClient
-		httpClient.Timeout = 30 * time.Second
-		client := bmclib.NewClient(hostIP, port, username, password, bmclib.WithHTTPClient(httpClient))
-		client.Registry.Drivers = client.Registry.PreferDriver("gofish")
-		if err := client.Open(ctxWithTimeout); err != nil {
-			return nil, fmt.Errorf("failed to open connection to BMC: %v", err)
-		}
-		return client, nil
-	}
+	ctrlruntimelog.SetLogger(s.logger)
 }

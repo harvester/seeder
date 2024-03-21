@@ -33,7 +33,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/util"
@@ -238,7 +237,7 @@ func (r *InventoryReconciler) handleInventoryDeletion(ctx context.Context, iObj 
 func (r *InventoryReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&seederv1alpha1.Inventory{}).
-		Watches(&source.Kind{Type: &rufio.Machine{}}, handler.EnqueueRequestsFromMapFunc(func(a client.Object) []reconcile.Request {
+		Watches(&rufio.Machine{}, handler.EnqueueRequestsFromMapFunc(func(ctx context.Context, a client.Object) []reconcile.Request {
 			return []reconcile.Request{{
 				NamespacedName: types.NamespacedName{
 					Namespace: a.GetNamespace(),
@@ -255,7 +254,9 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, iObj *seederv1a
 	// if tink hardware has been created and inventory is allocated to a cluster
 	// then reboot the hardware using BMC tasks
 	i := iObj.DeepCopy()
-	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i, seederv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) {
+	// TODO: Change it back to check seederv1alpha1.TinkWorkflowCreated exists since this will be a valid condition after move to
+	// workflow based processing
+	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i, seederv1alpha1.TinkHardwareCreated) && util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) {
 		// submit BMC task
 		i.Spec.PowerActionRequested = seederv1alpha1.NodePowerActionReboot
 		return r.Update(ctx, i)
