@@ -30,8 +30,8 @@ import (
 )
 
 var (
-	scheme    = runtime.NewScheme()
-	namespace string
+	scheme              = runtime.NewScheme()
+	deploymentNamespace string //contains name of namespace where seeder is deployed
 )
 
 const (
@@ -75,7 +75,7 @@ func (s *Server) Start(ctx context.Context) error {
 	}
 
 	// used by other methods to lookup tink-stack and harvester-seeder-deployment services
-	namespace = s.LeaderElectionNamespace
+	deploymentNamespace = s.LeaderElectionNamespace
 
 	// create CRDs
 	err = crd.Create(ctx, mgr.GetConfig())

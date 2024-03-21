@@ -26,4 +26,5 @@ const (
 	SeederConfig                         = "seeder-config"
 	DefaultEndpointPort                  = 9090
 	DefaultSeederDeploymentService       = "harvester-seeder-endpoint"
+	DefaultHegelDeploymentEndpointLookup = "smee"
 )

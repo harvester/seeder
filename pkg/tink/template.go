@@ -19,7 +19,7 @@ const (
 	RebootHarvesterImageKey    = "reboot-harvester-image"
 )
 
-func GenerateTemplate(svc *corev1.Service, cm *corev1.ConfigMap, i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (*tinkv1alpha1.Template, error) {
+func GenerateTemplate(hegelEndpoint string, cm *corev1.ConfigMap, i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (*tinkv1alpha1.Template, error) {
 	template := &tinkv1alpha1.Template{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      i.Name,
@@ -27,7 +27,7 @@ func GenerateTemplate(svc *corev1.Service, cm *corev1.ConfigMap, i *seederv1alph
 		},
 	}
 
-	data, err := generateDataTemplate(svc, cm, i, c)
+	data, err := generateDataTemplate(hegelEndpoint, cm, i, c)
 	if err != nil {
 		return nil, fmt.Errorf("error generating template data: %v", err)
 	}
@@ -36,7 +36,7 @@ func GenerateTemplate(svc *corev1.Service, cm *corev1.ConfigMap, i *seederv1alph
 	return template, nil
 }
 
-func generateDataTemplate(svc *corev1.Service, cm *corev1.ConfigMap, i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (*string, error) {
+func generateDataTemplate(hegelEndpoint string, cm *corev1.ConfigMap, i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (*string, error) {
 	//set StreamHarvester action environment variables
 	DefaultStreamHarvesterAction.Environment[DestDisk] = i.Spec.PrimaryDisk
 	DefaultStreamHarvesterAction.Environment[ImageURL] = fmt.Sprintf("%s/%s/harvester-%s-%s.raw.gz", c.Spec.ImageURL, c.Spec.HarvesterVersion, c.Spec.HarvesterVersion, i.Spec.Arch)
@@ -44,7 +44,9 @@ func generateDataTemplate(svc *corev1.Service, cm *corev1.ConfigMap, i *seederv1
 	//set ConfigureHarvester action environment variables
 	DefaultConfigureHarvesterAction.Environment[HarvesterDevice] = i.Spec.PrimaryDisk
 	DefaultConfigureHarvesterAction.Environment[HarvesterCloudInitURL] = fmt.Sprintf("http://%s:%s/2009-04-04/user-data",
-		svc.Status.LoadBalancer.Ingress[0].IP, HegelDefaultPort)
+		hegelEndpoint, HegelDefaultPort)
+
+	//svc.Status.LoadBalancer.Ingress[0].IP
 
 	// override images if specified
 	if cm != nil {

@@ -9,6 +9,7 @@ import (
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -71,10 +72,12 @@ func (r *ClusterTinkerbellTemplateReconciler) createTinkerbellTemplate(ctx conte
 	c := cObj.DeepCopy()
 	if c.Status.Status == seederv1alpha1.ClusterNodesPatched || c.Status.Status == seederv1alpha1.ClusterTinkHardwareSubmitted || c.Status.Status == seederv1alpha1.ClusterRunning {
 		// check to see if the service for tink-stack is ready
-		tinkStackService := &corev1.Service{}
-		err := r.Get(ctx, types.NamespacedName{Name: seederv1alpha1.DefaultTinkStackService, Namespace: namespace}, tinkStackService)
+		// if using an external tinkerbell stack this service should be ready as HegelEndpoint is used for serving harvester config via userdata on hardware object
+		// if using the custom tinkerbell chart in seeder repo, then tink-stack is not deployed but an nginx server is deployed
+		// to run with smee/boots, and this serves as a proxy to hegel endpoint, and we should switch to the same
+		hegelEndpoint, err := r.fetchHegelEndpoint(ctx)
 		if err != nil {
-			return fmt.Errorf("error fetching svc %s in ns %s: %v", seederv1alpha1.DefaultTinkStackService, c.Namespace, err)
+			return fmt.Errorf("fetching hegel endpoint: %v", err)
 		}
 
 		seederConfig := &corev1.ConfigMap{}
@@ -98,7 +101,7 @@ func (r *ClusterTinkerbellTemplateReconciler) createTinkerbellTemplate(ctx conte
 				continue
 			}
 
-			template, err := tink.GenerateTemplate(tinkStackService, seederConfig, inventory, c)
+			template, err := tink.GenerateTemplate(hegelEndpoint, seederConfig, inventory, c)
 			if err != nil {
 				return err
 			}
@@ -163,4 +166,42 @@ func (r *ClusterTinkerbellTemplateReconciler) SetupWithManager(mgr ctrl.Manager)
 			return reconRequest
 		})).
 		Complete(r)
+}
+
+func (r *ClusterTinkerbellTemplateReconciler) fetchHegelEndpoint(ctx context.Context) (string, error) {
+	// check to see if the service for tink-stack is ready
+	// if using an external tinkerbell stack this service should be ready as HegelEndpoint is used for serving harvester config via userdata on hardware object
+	// if using the custom tinkerbell chart in seeder repo, then tink-stack is not deployed but an nginx server is deployed
+	// to run with smee/boots, and this serves as a proxy to hegel endpoint, and we should switch to the same
+	tinkStackService := &corev1.Service{}
+	err := r.Get(ctx, types.NamespacedName{Name: seederv1alpha1.DefaultTinkStackService, Namespace: deploymentNamespace}, tinkStackService)
+
+	if err != nil {
+		if !apierrors.IsNotFound(err) {
+			return "", fmt.Errorf("error fetching svc %s in ns %s: %v", seederv1alpha1.DefaultTinkStackService, deploymentNamespace, err)
+		}
+	} else {
+		return tinkStackService.Status.LoadBalancer.Ingress[0].IP, nil
+	}
+
+	// lookup smee pod address
+	podList := &corev1.PodList{}
+	ls := labels.SelectorFromSet(map[string]string{
+		"app":   seederv1alpha1.DefaultHegelDeploymentEndpointLookup,
+		"stack": "tinkerbell",
+	})
+	err = r.List(ctx, podList, &client.ListOptions{
+		LabelSelector: ls,
+		Namespace:     deploymentNamespace,
+	})
+
+	if err != nil {
+		return "nil", err
+	}
+
+	if len(podList.Items) == 0 {
+		return "", fmt.Errorf("no pods matching smee requirements found")
+	}
+	return podList.Items[0].Status.HostIP, nil
+
 }

@@ -270,13 +270,13 @@ func (r *ClusterReconciler) createTinkerbellHardware(ctx context.Context, cObj *
 
 		// check to see if the service for tink-stack is ready
 		tinkStackService := &corev1.Service{}
-		err := r.Get(ctx, types.NamespacedName{Name: seederv1alpha1.DefaultTinkStackService, Namespace: namespace}, tinkStackService)
+		err := r.Get(ctx, types.NamespacedName{Name: seederv1alpha1.DefaultTinkStackService, Namespace: deploymentNamespace}, tinkStackService)
 		if err != nil {
 			return fmt.Errorf("error fetching svc %s in ns %s: %v", seederv1alpha1.DefaultTinkStackService, seederv1alpha1.DefaultLocalClusterNamespace, err)
 		}
 
 		seederDeploymentService := &corev1.Service{}
-		err = r.Get(ctx, types.NamespacedName{Name: seederv1alpha1.DefaultSeederDeploymentService, Namespace: namespace}, seederDeploymentService)
+		err = r.Get(ctx, types.NamespacedName{Name: seederv1alpha1.DefaultSeederDeploymentService, Namespace: deploymentNamespace}, seederDeploymentService)
 
 		if err != nil {
 			return fmt.Errorf("error fetching svc %s in ns %s: %v", seederv1alpha1.DefaultSeederDeploymentService, seederv1alpha1.DefaultLocalClusterNamespace, err)

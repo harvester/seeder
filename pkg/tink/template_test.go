@@ -6,7 +6,6 @@ import (
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/rancher/wrangler/pkg/yaml"
 	"github.com/stretchr/testify/require"
-	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -33,23 +32,7 @@ func Test_GenerateTemplate(t *testing.T) {
 		},
 	}
 
-	tinkStackSvc := &corev1.Service{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "tink-stack",
-			Namespace: "harvester-system",
-		},
-		Status: corev1.ServiceStatus{
-			LoadBalancer: corev1.LoadBalancerStatus{
-				Ingress: []corev1.LoadBalancerIngress{
-					{
-						IP: "192.168.1.100",
-					},
-				},
-			},
-		},
-	}
-
-	template, err := GenerateTemplate(tinkStackSvc, nil, i, c)
+	template, err := GenerateTemplate("192.168.1.100", nil, i, c)
 	assert.NoError(err, "exppected no error during template generation")
 	assert.Equal(template.Name, i.Name, "expected template name to match inventory name")
 	assert.Equal(template.Namespace, i.Namespace, "expected template namespace to match inventory namespace")

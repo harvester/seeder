@@ -114,7 +114,7 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
 
-	namespace = "harvester-system"
+	deploymentNamespace = "harvester-system"
 	err = createHarvesterSystemNamespace(ctx, k8sClient)
 	Expect(err).NotTo(HaveOccurred())
 	err = createTinkStackService(ctx, k8sClient)
