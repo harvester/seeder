@@ -20,7 +20,7 @@ require (
 	github.com/urfave/cli/v2 v2.25.3
 	golang.org/x/net v0.17.0
 	golang.org/x/sync v0.4.0
-	inet.af/netaddr v0.0.0-20211027220019-c74959edd3b6
+	inet.af/netaddr v0.0.0-20230525184311-b8eac61e914a
 	k8s.io/api v0.28.3
 	k8s.io/apimachinery v0.28.3
 	k8s.io/client-go v12.0.0+incompatible
@@ -87,7 +87,7 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go4.org/intern v0.0.0-20211027215823-ae77deb06f29 // indirect
-	go4.org/unsafe/assume-no-moving-gc v0.0.0-20211027215541-db492cf91b37 // indirect
+	go4.org/unsafe/assume-no-moving-gc v0.0.0-20230525183740-e7c30c78aeb2 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/exp v0.0.0-20230127130021-4ca2cb1a16b7 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
@@ -145,7 +145,4 @@ require (
 	sigs.k8s.io/yaml v1.3.0
 )
 
-replace (
-	go4.org/unsafe/assume-no-moving-gc v0.0.0-20211027215541-db492cf91b37 => go4.org/unsafe/assume-no-moving-gc v0.0.0-20220617031537-928513b29760
-	k8s.io/client-go => k8s.io/client-go v0.28.2
-)
+replace k8s.io/client-go => k8s.io/client-go v0.28.2
