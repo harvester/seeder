@@ -128,3 +128,4 @@ additionalArgs: []
 additionalEnv: []
 trustedProxies:
   - "10.42.0.0/24"
+nginxImage: nginx:1.25.1

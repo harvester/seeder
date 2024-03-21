@@ -1,13 +1,4 @@
 stack:
-  enabled: true
-  name: tink-stack
-  service:
-    enabled: true
-    type: LoadBalancer
-  selector:
-    app: tink-stack
-  # Once the Kubernetes Gateway API is more stable, we will use that for all services instead of nginx.
-  image: nginx:1.25.1
   hook:
     enabled: true
     name: hook-files
@@ -16,28 +7,7 @@ stack:
     downloadsDest: /opt/hook
     # downloadURL only works with the > 0.8.1 Hook release because
     # previous Hook versions didn't provide a checksum file.
-    downloadURL: https://github.com/tinkerbell/hook/releases/download/latest
-  kubevip:
-    enabled: false
-    name: kube-vip
-    image: ghcr.io/kube-vip/kube-vip:v0.6.3
-    imagePullPolicy: IfNotPresent
-    roleName: kube-vip-role
-    roleBindingName: kube-vip-rolebinding
-    # Customize the interface KubeVIP advertises on. When unset, KubeVIP will autodetect the interface.
-    # interface: enp0s8
-  relay: # relay allows us to listen and respond to layer broadcast DHCP requests
-    name: dhcp-relay
-    enabled: false
-    # This image (ghcr.io/jacobweinstock/dhcrelay) is used because the other public dhcprelay images out there (`modem7/dhcprelay`)
-    # doesn't respect signals properly when run as PID 1.
-    image: ghcr.io/jacobweinstock/dhcrelay
-    maxHopCount: 10
-    # sourceInterface is the Host/Node interface to use for listening for DHCP broadcast packets.
-    # When unset, the interface from the default route will be used.
-    # sourceInterface: eno1
-    # TODO(jacobweinstock): add feature to be able to disable listening for broadcast traffic.
-
+    downloadURL: https://github.com/tinkerbell/hook/releases/download/v0.8.1
 # -- Overrides
 # The values defined here override those in the individual charts. Some of them require tweaking
 # before deployment as they are environment dependent; others are surfaced for convenience.
@@ -51,6 +21,9 @@ smee:
   trustedProxies: *range
   publicIP: *publicIP
   hostNetwork: true
+  deployment:
+    strategy:
+      type: Recreate
 
 hegel:
   image: quay.io/tinkerbell/hegel:v0.11.1

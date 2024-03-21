@@ -13,14 +13,12 @@ data:
     cd /output
     rm -f *.tar.gz checksum.txt vmlinuz* initramfs*
     base_loc="{{ .Values.stack.hook.downloadURL }}"
-    files="$base_loc/hook_aarch64.tar.gz $base_loc/hook_x86_64.tar.gz $base_loc/checksum.txt"
+    files="$base_loc/hook_aarch64.tar.gz $base_loc/hook_x86_64.tar.gz"
     tmp_dir=$(mktemp -d)
     for f in ${files}; do
       echo "${f}"
       wget -P "${tmp_dir}" "${f}"
     done
-    (cd "${tmp_dir}" && sha512sum -c checksum.txt)
-    mv "${tmp_dir}"/checksum.txt .
     for f in ${tmp_dir}/*.tar.gz; do tar --no-same-permissions --overwrite -ozxvf "${f}" && rm -f "${f}"; done
     rm -rf "${tmp_dir}"
 ---
