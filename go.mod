@@ -1,6 +1,6 @@
 module github.com/harvester/seeder
 
-go 1.20
+go 1.21
 
 require (
 	github.com/bmc-toolbox/bmclib/v2 v2.0.1-0.20230212165211-bac64498b8ba
