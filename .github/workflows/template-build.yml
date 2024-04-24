@@ -53,5 +53,3 @@ jobs:
           file: package/Dockerfile
           push: ${{ inputs.push }}
           tags: ${{env.imageName}}:${{ inputs.release-tag-name }}
-          build-args: |
-            VERSION=${{ github.ref_name }}-${{ github.sha }}-head

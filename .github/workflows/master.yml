@@ -3,7 +3,7 @@ name: Master Build and Publish
 on:
   push:
     branches:
-      - master
+      - main
       - release/v*
 
 jobs:
