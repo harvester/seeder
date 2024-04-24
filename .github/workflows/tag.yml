@@ -1,0 +1,14 @@
+name: Tag Build and Publish
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  build-tag:
+    uses: ./.github/workflows/template-build.yml
+    with:
+      release-tag-name: ${{ github.ref_name }}
+      push: true
+    secrets: inherit
