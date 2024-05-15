@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"time"
@@ -199,6 +200,7 @@ func NewCustomBMCClientFactoryFunc(ctx context.Context) rufiocontrollers.BMCClie
 		defer cancelFunc()
 
 		httpClient := http.DefaultClient
+		httpClient.Transport = &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 		httpClient.Timeout = 30 * time.Second
 		client := bmclib.NewClient(hostIP, port, username, password, bmclib.WithHTTPClient(httpClient))
 		client.Registry.Drivers = client.Registry.PreferDriver("gofish")
