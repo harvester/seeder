@@ -3,14 +3,12 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
-	bmclib "github.com/bmc-toolbox/bmclib/v2"
 	"github.com/go-logr/logr"
 	"github.com/sirupsen/logrus"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
-	rufiocontrollers "github.com/tinkerbell/rufio/controllers"
+	rufiocontrollers "github.com/tinkerbell/rufio/controller"
 	tinkv1alpha1 "github.com/tinkerbell/tink/pkg/apis/core/v1alpha1"
 	"golang.org/x/sync/errgroup"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -30,6 +28,10 @@ import (
 
 var (
 	scheme = runtime.NewScheme()
+)
+
+const (
+	defaultConnectionTimeout = 60 * time.Second
 )
 
 type Server struct {
@@ -94,8 +96,7 @@ func (s *Server) Start(ctx context.Context) error {
 		rufiocontrollers.NewMachineReconciler(
 			mgr.GetClient(),
 			mgr.GetEventRecorderFor("machine-controller"),
-			NewCustomBMCClientFactoryFunc(ctx),
-			s.logger.WithName("controller").WithName("Machine"),
+			rufiocontrollers.NewClientFunc(defaultConnectionTimeout),
 		),
 		rufiojobwrapper.NewRufioWrapper(ctx,
 			mgr.GetClient(),
@@ -103,11 +104,11 @@ func (s *Server) Start(ctx context.Context) error {
 		),
 		rufiocontrollers.NewTaskReconciler(
 			mgr.GetClient(),
-			rufiocontrollers.NewBMCClientFactoryFunc(ctx),
+			rufiocontrollers.NewClientFunc(defaultConnectionTimeout),
 		),
 	}
 
-	// embed mode doesnt need inventory events as they eventually flow into cluster events
+	// embed mode doesn't need inventory events as they eventually flow into cluster events
 	var nonEmbedModeControllers = []controller{
 		&AddressPoolReconciler{
 			Client: mgr.GetClient(),
@@ -184,27 +185,4 @@ func (s *Server) Start(ctx context.Context) error {
 
 func (s *Server) initLogs() {
 	s.logger = zap.New(zap.UseDevMode(s.Debug))
-}
-
-// NewBMCClientFactoryFunc returns a new BMCClientFactoryFunc
-// which uses a context allowing timeout of connection
-// this allows the client to fail fast when machine is not reachable
-func NewCustomBMCClientFactoryFunc(ctx context.Context) rufiocontrollers.BMCClientFactoryFunc {
-	// Initializes a bmclib client based on input host and credentials
-	// Establishes a connection with the bmc with client.Open
-	// Returns a BMCClient
-	return func(ctx context.Context, hostIP, port, username, password string) (rufiocontrollers.BMCClient, error) {
-
-		ctxWithTimeout, cancelFunc := context.WithTimeout(ctx, 60*time.Second)
-		defer cancelFunc()
-
-		httpClient := http.DefaultClient
-		httpClient.Timeout = 30 * time.Second
-		client := bmclib.NewClient(hostIP, port, username, password, bmclib.WithHTTPClient(httpClient))
-		client.Registry.Drivers = client.Registry.PreferDriver("gofish")
-		if err := client.Open(ctxWithTimeout); err != nil {
-			return nil, fmt.Errorf("failed to open connection to BMC: %v", err)
-		}
-		return client, nil
-	}
 }
