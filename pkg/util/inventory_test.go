@@ -8,7 +8,7 @@ import (
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/mock"
@@ -16,7 +16,7 @@ import (
 
 var (
 	ctx = context.TODO()
-	l   = log.FromContext(ctx)
+	l   = zap.New()
 )
 
 // Test_CheckSecretExists tests the CheckSecretExists utility function
