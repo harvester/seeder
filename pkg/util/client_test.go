@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	dockertest "github.com/ory/dockertest/v3"
+	"github.com/ory/dockertest/v3"
 	"github.com/ory/dockertest/v3/docker"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,7 +33,7 @@ func TestMain(t *testing.M) {
 	runOpts := &dockertest.RunOptions{
 		Name:       "k3s-mock",
 		Repository: "rancher/k3s",
-		Tag:        "v1.24.2-k3s1",
+		Tag:        "v1.28.2-k3s1",
 		Cmd:        []string{"server", "--cluster-init"},
 		Env: []string{
 			fmt.Sprintf("K3S_TOKEN=%s", token),
