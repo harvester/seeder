@@ -94,6 +94,6 @@ func GenerateFakeClientFromObjects(objs []runtime.Object) (client.WithWatch, err
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 	utilruntime.Must(seederv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(rufio.AddToScheme(scheme))
-	c := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(objs...).Build()
+	c := fake.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(objs...).WithStatusSubresource(&seederv1alpha1.Cluster{}).Build()
 	return c, nil
 }
