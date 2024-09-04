@@ -1,6 +1,6 @@
 module github.com/harvester/seeder
 
-go 1.21
+go 1.22
 
 require (
 	github.com/go-bindata/go-bindata/v3 v3.1.3
