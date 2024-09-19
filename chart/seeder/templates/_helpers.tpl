@@ -60,23 +60,3 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
-
-{{- define "seeder.apiAffinity" }}
-podAntiAffinity:
-  requiredDuringSchedulingIgnoredDuringExecution:
-    - labelSelector:
-        matchExpressions:
-          - key: app.kubernetes.io/name
-            operator: In
-            values:
-              - seeder
-      topologyKey: kubernetes.io/hostname
-nodeAffinity:
-  requiredDuringSchedulingIgnoredDuringExecution:
-    nodeSelectorTerms:
-      - matchExpressions:
-          - key: kubernetes.io/os
-            operator: In
-            values:
-              - linux
-{{- end }}

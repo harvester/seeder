@@ -1,0 +1,52 @@
+# The NGINX ConfigMap is in a separate file because its checksum is used to trigger updates in
+# the deployment.
+{{ if .Values.deploy -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf
+  namespace: {{ .Release.Namespace | quote }}
+data:
+  nginx.conf: |
+    worker_processes 1;
+    events {
+        worker_connections  1024;
+    }
+    user root;
+
+    http {
+      server {
+        listen 50061;
+        location / {
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          resolver $POD_NAMESERVER;
+          set $hegel_dns hegel.{{ .Release.Namespace }}.svc.cluster.local.; # needed in Kubernetes for dynamic DNS resolution
+
+          proxy_pass http://$hegel_dns:50061;
+        }
+      }
+
+      server {
+        listen 42113;
+        http2 on;
+        location / {
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          resolver $POD_NAMESERVER;
+          set $tink_dns tink-server.{{ .Release.Namespace }}.svc.cluster.local.; # needed in Kubernetes for dynamic DNS resolution
+
+          grpc_pass grpc://$tink_dns:42113;
+        }
+      }
+
+       server {
+        listen 8080;
+        location / {
+          sendfile           on;
+          sendfile_max_chunk 1m;
+          root /usr/share/nginx/html;
+        }
+      }
+    }
+{{- end }}

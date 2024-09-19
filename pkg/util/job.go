@@ -19,13 +19,21 @@ func GenerateJob(name, namespace, powerAction string) *rufio.Job {
 		PowerAction: rufio.PowerOn.Ptr(),
 	}
 
+	pxeBoot := rufio.Action{
+		OneTimeBootDeviceAction: &rufio.OneTimeBootDeviceAction{
+			Devices: []rufio.BootDevice{
+				rufio.PXE,
+			},
+		},
+	}
+
 	switch powerAction {
 	case seederv1alpha1.NodePowerActionPowerOn:
 		tasks = append(tasks, powerOnTask)
 	case seederv1alpha1.NodePowerActionShutdown:
 		tasks = append(tasks, powerOffTask)
 	case seederv1alpha1.NodePowerActionReboot:
-		tasks = append(tasks, powerOffTask, powerOnTask)
+		tasks = append(tasks, powerOffTask, pxeBoot, powerOnTask)
 	default:
 		return nil
 	}

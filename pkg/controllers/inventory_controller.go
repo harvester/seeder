@@ -254,10 +254,17 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, iObj *seederv1a
 	// if tink hardware has been created and inventory is allocated to a cluster
 	// then reboot the hardware using BMC tasks
 	i := iObj.DeepCopy()
-	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i, seederv1alpha1.TinkWorkflowCreated) && util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) {
+	// TODO: Change it back to check seederv1alpha1.TinkWorkflowCreated exists since this will be a valid condition after move to
+	// workflow based processing
+	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i, seederv1alpha1.TinkHardwareCreated) && util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) && i.Status.PowerAction.LastJobName == "" {
 		// submit BMC task
-		i.Spec.PowerActionRequested = seederv1alpha1.NodePowerActionReboot
-		return r.Update(ctx, i)
+		j := util.GenerateJob(i.Name, i.Namespace, "reboot")
+		if err := r.jobWrapper(ctx, i, j); err != nil {
+			return err
+		}
+		util.CreateOrUpdateCondition(i, seederv1alpha1.BMCJobSubmitted, "BMCJob Submitted")
+		i.Status.PowerAction.LastJobName = j.Name
+		return r.Status().Update(ctx, i)
 	}
 
 	return nil
@@ -306,27 +313,9 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, iObj *seederv
 func (r *InventoryReconciler) inventoryFreed(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
 	i := iObj.DeepCopy()
 	if util.ConditionExists(i, seederv1alpha1.InventoryFreed) {
-		// check and submit a power off job
-		var notFound bool
-
 		j := util.GenerateJob(i.Name, i.Namespace, "shutdown")
-		jobObj := &rufio.Job{}
-		err := r.Get(ctx, types.NamespacedName{Namespace: j.Namespace, Name: j.Name}, jobObj)
-		if err != nil {
-			if apierrors.IsNotFound(err) {
-				notFound = true
-			} else {
-				return err
-			}
-		}
-
-		if notFound {
-			if err := controllerutil.SetOwnerReference(i, j, r.Scheme); err != nil {
-				return err
-			}
-			if err := r.Create(ctx, j); err != nil {
-				return err
-			}
+		if err := r.jobWrapper(ctx, i, j); err != nil {
+			return err
 		}
 
 		// trigger status update
@@ -430,6 +419,29 @@ func (r *InventoryReconciler) checkAndResetInventory(ctx context.Context, iObj *
 		util.RemoveCondition(i, seederv1alpha1.MachineNotContactable)
 		i.Status.Status = ""
 		return r.Status().Update(ctx, i)
+	}
+	return nil
+}
+
+func (r *InventoryReconciler) jobWrapper(ctx context.Context, i *seederv1alpha1.Inventory, j *rufio.Job) error {
+	var notFound bool
+	jobObj := &rufio.Job{}
+	err := r.Get(ctx, types.NamespacedName{Namespace: j.Namespace, Name: j.Name}, jobObj)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			notFound = true
+		} else {
+			return err
+		}
+	}
+
+	if notFound {
+		if err := controllerutil.SetOwnerReference(i, j, r.Scheme); err != nil {
+			return err
+		}
+		if err := r.Create(ctx, j); err != nil {
+			return err
+		}
 	}
 	return nil
 }
