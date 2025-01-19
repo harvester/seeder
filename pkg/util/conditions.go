@@ -29,7 +29,7 @@ func CreateOrUpdateCondition(i *seederv1alpha1.Inventory, cond condition.Cond, m
 
 func SetErrorCondition(i *seederv1alpha1.Inventory, cond condition.Cond, message string) {
 	now := time.Now().UTC().Format(time.RFC3339)
-	cond.SetError(i, "", fmt.Errorf(message))
+	cond.SetError(i, "", fmt.Errorf("%s", message))
 	cond.True(i)
 	cond.LastUpdated(i, now)
 }
