@@ -182,7 +182,7 @@ func chartSeederCrdTemplatesBmcTinkerbellOrg_machinesYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/bmc.tinkerbell.org_machines.yaml", size: 13020, mode: os.FileMode(420), modTime: time.Unix(1736896865, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/bmc.tinkerbell.org_machines.yaml", size: 13020, mode: os.FileMode(420), modTime: time.Unix(1737329731, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -222,7 +222,7 @@ func chartSeederCrdTemplatesMetalHarvesterhciIo_addresspoolsYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/metal.harvesterhci.io_addresspools.yaml", size: 3227, mode: os.FileMode(420), modTime: time.Unix(1736896865, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/metal.harvesterhci.io_addresspools.yaml", size: 3227, mode: os.FileMode(420), modTime: time.Unix(1737329731, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -242,7 +242,7 @@ func chartSeederCrdTemplatesMetalHarvesterhciIo_clustersYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/metal.harvesterhci.io_clusters.yaml", size: 4750, mode: os.FileMode(420), modTime: time.Unix(1736896865, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/metal.harvesterhci.io_clusters.yaml", size: 4750, mode: os.FileMode(420), modTime: time.Unix(1737329731, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -262,7 +262,7 @@ func chartSeederCrdTemplatesMetalHarvesterhciIo_inventoriesYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/metal.harvesterhci.io_inventories.yaml", size: 15658, mode: os.FileMode(420), modTime: time.Unix(1736896865, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/metal.harvesterhci.io_inventories.yaml", size: 15658, mode: os.FileMode(420), modTime: time.Unix(1737329731, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
