@@ -314,6 +314,13 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, iObj *seederv
 func (r *InventoryReconciler) inventoryFreed(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
 	i := iObj.DeepCopy()
 	if util.ConditionExists(i, seederv1alpha1.InventoryFreed) {
+		if i.Labels != nil {
+			if _, ok := i.Labels[seederv1alpha1.ClusterOwnerKey]; ok {
+				delete(i.Labels, seederv1alpha1.ClusterOwnerKey)
+				delete(i.Labels, seederv1alpha1.ClusterOwnerDetailsKey)
+				return r.Update(ctx, i)
+			}
+		}
 		j := util.GenerateJob(i.Name, i.Namespace, "shutdown")
 		if err := r.jobWrapper(ctx, i, j); err != nil {
 			return err
