@@ -3,7 +3,7 @@
         "github>harvester/renovate:renovate-default"
     ],
     "baseBranches": [
-        "master",
+        "main",
         "/^v.*/"
     ]
 }
