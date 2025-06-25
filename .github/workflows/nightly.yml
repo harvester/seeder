@@ -1,0 +1,23 @@
+name: nightly
+
+on:
+  workflow_dispatch:
+  schedule:
+    # run at 03:30 UTC every night
+    - cron:  '30 3 * * *'
+
+jobs:
+  build-for-main:
+    uses: ./.github/workflows/template-build.yml
+    with:
+      release-tag-name: ${{ github.ref_name }}-head
+      push: true
+    secrets: inherit
+
+  build-for-v1_6:
+    uses: ./.github/workflows/template-build.yml
+    with:
+      refs: v1.6
+      release-tag-name: v1.6-head
+      push: true
+    secrets: inherit
