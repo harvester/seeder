@@ -157,6 +157,6 @@ func (r *ClusterTinkerbellWorkflowReconciler) SetupWithManager(mgr ctrl.Manager)
 				}
 			}
 			return reconRequest
-		})).
+		})).Named("clusterworkflow").
 		Complete(r)
 }

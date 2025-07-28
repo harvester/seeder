@@ -164,7 +164,7 @@ func (r *ClusterTinkerbellTemplateReconciler) SetupWithManager(mgr ctrl.Manager)
 				}
 			}
 			return reconRequest
-		})).
+		})).Named("templates").
 		Complete(r)
 }
 

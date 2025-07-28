@@ -49,6 +49,6 @@ func (f *FakeWorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request
 // SetupWithManager sets up the controller with the Manager.
 func (f *FakeWorkflowReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&tinkv1alpha1.Workflow{}).
+		For(&tinkv1alpha1.Workflow{}).Named("fakeworkflow").
 		Complete(f)
 }
