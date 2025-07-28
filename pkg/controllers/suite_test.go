@@ -309,6 +309,7 @@ func createTinkStackService(ctx context.Context, k8sclient client.Client) error 
 			Namespace: seederv1alpha1.DefaultLocalClusterNamespace,
 		},
 		Spec: corev1.ServiceSpec{
+			Type: corev1.ServiceTypeLoadBalancer,
 			Ports: []corev1.ServicePort{
 				{
 					Port: 8080,
@@ -346,6 +347,7 @@ func createSeederDeploymentService(ctx context.Context, k8sclient client.Client)
 			Namespace: seederv1alpha1.DefaultLocalClusterNamespace,
 		},
 		Spec: corev1.ServiceSpec{
+			Type: corev1.ServiceTypeLoadBalancer,
 			Ports: []corev1.ServicePort{
 				{
 					Port: 9090,

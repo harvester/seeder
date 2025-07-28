@@ -38,6 +38,6 @@ func (f *FakeBaseboardReconciller) Reconcile(ctx context.Context, req ctrl.Reque
 // SetupWithManager sets up the controller with the Manager.
 func (f *FakeBaseboardReconciller) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&rufio.Machine{}).
+		For(&rufio.Machine{}).Named("fakemachine").
 		Complete(f)
 }

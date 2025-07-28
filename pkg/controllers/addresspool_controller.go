@@ -172,6 +172,7 @@ func (r *AddressPoolReconciler) deleteAddressPool(ctx context.Context, poolObj *
 func (r *AddressPoolReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&seederv1alpha1.AddressPool{}).
+		Named("addresspoool").
 		Complete(r)
 }
 
