@@ -586,7 +586,7 @@ func (r *ClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				}
 			}
 			return reconRequest
-		})).
+		})).Named("cluster").
 		Complete(r)
 }
 

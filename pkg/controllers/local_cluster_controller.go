@@ -228,6 +228,6 @@ func (r *LocalClusterReconciler) manageStatus(ctx context.Context, iObj *seederv
 func (r *LocalClusterReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&seederv1alpha1.Inventory{}).
-		Owns(&rufio.Machine{}).
+		Owns(&rufio.Machine{}).Named("localcluster").
 		Complete(r)
 }

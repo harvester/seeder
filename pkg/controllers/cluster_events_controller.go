@@ -178,5 +178,6 @@ func remoteEventRecorder(c *typedCore.CoreV1Client, scheme *runtime.Scheme) reco
 func (r *ClusterEventReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&seederv1alpha1.Cluster{}).
+		Named("clusterevents").
 		Complete(r)
 }

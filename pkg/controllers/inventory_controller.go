@@ -245,7 +245,7 @@ func (r *InventoryReconciler) SetupWithManager(mgr ctrl.Manager) error {
 				},
 			},
 			}
-		})).
+		})).Named("inventory").
 		Complete(r)
 }
 
