@@ -173,6 +173,6 @@ func (r *InventoryEventReconciler) getInventoryInfo(ctx context.Context, i *seed
 // SetupWithManager sets up the controller with the Manager.
 func (r *InventoryEventReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&seederv1alpha1.Inventory{}).
+		For(&seederv1alpha1.Inventory{}).Named("inventoryevent").
 		Complete(r)
 }
