@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"sync"
 
 	"github.com/go-logr/logr"
 	"github.com/rancher/wrangler/pkg/condition"
@@ -47,6 +48,7 @@ type ClusterReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 	logr.Logger
+	mutex *sync.Mutex
 }
 
 type clusterReconciler func(context.Context, *seederv1alpha1.Cluster) error
@@ -150,7 +152,7 @@ func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, cObj *see
 						Namespace: c.Namespace,
 					},
 				}
-				if err := r.Status().Update(ctx, vipPool); err != nil {
+				if err := r.lockedAddressPoolUpdate(ctx, vipPool); err != nil {
 					return fmt.Errorf("error updating address pool with cluster vip: %v", err)
 				}
 			}
@@ -217,7 +219,7 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, cObj *seeder
 					},
 					Kind: seederv1alpha1.KindInventory,
 				}
-				err = r.Status().Update(ctx, pool)
+				err = r.lockedAddressPoolUpdate(ctx, pool)
 				if err != nil {
 					return fmt.Errorf("error updating address pool after allocation: %v", err)
 				}
@@ -487,7 +489,7 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, cObj *seeder
 
 		if !poolmissing {
 			delete(pool.Status.AddressAllocation, i.Status.PXEBootInterface.Address)
-			if err := r.Status().Update(ctx, pool); err != nil {
+			if err := r.lockedAddressPoolUpdate(ctx, pool); err != nil {
 				return err
 			}
 		}
@@ -527,7 +529,7 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, cObj *seeder
 
 		if !poolNotFound {
 			delete(pool.Status.AddressAllocation, c.Status.ClusterAddress)
-			if err := r.Status().Update(ctx, pool); err != nil {
+			if err := r.lockedAddressPoolUpdate(ctx, pool); err != nil {
 				return err
 			}
 		}
@@ -658,4 +660,11 @@ func (r *ClusterReconciler) createOrUpdateHardware(ctx context.Context, hardware
 	}
 
 	return createOrUpdateInventoryConditions(ctx, inventory, seederv1alpha1.TinkHardwareCreated, "tink hardware created", r.Client)
+}
+
+// lockedAddressPool ensures only one caller can perform an update at a time
+func (r *ClusterReconciler) lockedAddressPoolUpdate(ctx context.Context, pool *seederv1alpha1.AddressPool) error {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	return r.Status().Update(ctx, pool)
 }

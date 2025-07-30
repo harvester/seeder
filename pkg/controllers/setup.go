@@ -3,6 +3,7 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -89,6 +90,7 @@ func (s *Server) Start(ctx context.Context) error {
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 			Logger: s.logger.WithName("cluster-controller"),
+			mutex:  &sync.Mutex{},
 		},
 		&InventoryReconciler{
 			Client: mgr.GetClient(),
