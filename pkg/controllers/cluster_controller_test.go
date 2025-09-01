@@ -17,12 +17,12 @@ import (
 	"github.com/harvester/seeder/pkg/util"
 )
 
-var _ = Describe("Create cluster tests", func() {
+var _ = Describe("Create cluster tests", Ordered, func() {
 	var i *seederv1alpha1.Inventory
 	var c *seederv1alpha1.Cluster
 	var a *seederv1alpha1.AddressPool
 	var creds *v1.Secret
-	BeforeEach(func() {
+	BeforeAll(func() {
 		a = &seederv1alpha1.AddressPool{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "cluster-test",
@@ -118,6 +118,7 @@ var _ = Describe("Create cluster tests", func() {
 			return k8sClient.Create(ctx, c)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
+
 	It("check address pool reconcile in cluster controller workflow", func() {
 
 		Eventually(func() error {
@@ -262,29 +263,104 @@ var _ = Describe("Create cluster tests", func() {
 			return nil
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 	})
+
+	It("ensure finalizer is set on cluster", func() {
+		Eventually(func() error {
+			tmpCluster := &seederv1alpha1.Cluster{}
+			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, tmpCluster); err != nil {
+				return err
+			}
+			if len(tmpCluster.GetObjectMeta().GetFinalizers()) == 0 {
+				return fmt.Errorf("waiting for finalizers to be setup on cluster %s", c.Name)
+			}
+			return nil
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
+
+	It("ensure inventory reboot job has completed", func() {
+		Eventually(func() error {
+			iObj := &seederv1alpha1.Inventory{}
+			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj); err != nil {
+				return err
+			}
+			if util.ConditionExists(iObj, seederv1alpha1.BMCJobComplete) {
+				return nil
+			}
+			return fmt.Errorf("waiting for reboot job %s to complete", iObj.Status.PowerAction.LastJobName)
+		}, "90s", "5s").ShouldNot(HaveOccurred())
+	})
 	// check cluster deletion and reconcilliation of hardware and inventory objects
 	// Test is flaky when using TestEnv. Disabling for now
 	It("delete cluster and check cleanup of inventory objects", func() {
+
+		Eventually(func() error {
+			// ensure that previous reboot job has been reconcilled
+			clusterObj := &seederv1alpha1.Cluster{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Name: c.Name, Namespace: c.Namespace}, clusterObj)
+			if err != nil {
+				if apierrors.IsNotFound(err) {
+					GinkgoWriter.Printf("cluster object deleted\n")
+					return nil
+				}
+			}
+			return nil
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
 		Eventually(func() error {
 			return k8sClient.Delete(ctx, c)
 		}, "30s", "5s").ShouldNot(HaveOccurred())
 
+		Eventually(func() error {
+			clusterObj := &seederv1alpha1.Cluster{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Name: c.Name, Namespace: c.Namespace}, clusterObj)
+			if err != nil {
+				if apierrors.IsNotFound(err) {
+					GinkgoWriter.Printf("cluster object deleted\n")
+					return nil
+				}
+			}
+			return nil
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			machineObj := &rufio.Machine{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, machineObj)
+			if err != nil {
+				return err
+			}
+			if machineObj.Status.Power != rufio.Off {
+				return fmt.Errorf("expected to get rufio power state %s but got %s", rufio.Off, machineObj.Status.Power)
+			}
+			return nil
+		}, "120s", "10s").ShouldNot(HaveOccurred())
+
+		// ensure the following conditions are met
+		// Condition InventoryAllocatedToCluster is removed
+		// PowerActionRequested is cleared
+		// LastJobName is wiped
 		Eventually(func() error {
 			iObj := &seederv1alpha1.Inventory{}
 			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj); err != nil {
 				return err
 			}
 
-			if len(iObj.Status.Conditions) != 1 {
-				return fmt.Errorf("expected 1 conditions but found %d conditions %v", len(iObj.Status.Conditions), iObj.Status)
+			if util.ConditionExists(iObj, seederv1alpha1.InventoryAllocatedToCluster) {
+				return fmt.Errorf("condition inventoryAllocatedToCluster exists, waiting for it to be removed")
 			}
 
+			if iObj.Spec.PowerActionRequested != "" {
+				return fmt.Errorf("waiting for PowerActionRequested to be reset")
+			}
+
+			if iObj.Status.PowerAction.LastJobName != "" {
+				return fmt.Errorf("waiting for LastJobName to be reset")
+			}
 			return nil
 		}, "60s", "5s").ShouldNot(HaveOccurred())
 	})
 
-	AfterEach(func() {
-
+	AfterAll(func() {
+		fmt.Println("running after each")
 		Eventually(func() error {
 			// check and delete cluster if needed. Need this since one of the tests simulates removing cluster
 			// and checking gc of hardware objects

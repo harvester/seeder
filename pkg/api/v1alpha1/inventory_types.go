@@ -59,6 +59,7 @@ const (
 	MachineNotContactable       condition.Cond = "machineNotContactable"
 	TinkHardwareCreated         condition.Cond = "tinkHardwareCreated"
 	TinkTemplateCreated         condition.Cond = "tinkTemplateCreated"
+	ClusterCleanupSubmitted     condition.Cond = "clusterCleanupSubmitted"
 )
 
 // InventorySpec defines the desired state of Inventory

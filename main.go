@@ -15,7 +15,6 @@ limitations under the License.
 */
 //go:generate /bin/bash scripts/generate
 //go:generate /bin/bash scripts/generate-manifest
-//go:generate go run ./pkg/bindata
 
 package main
 

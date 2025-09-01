@@ -20,9 +20,11 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/go-logr/logr"
 	"github.com/rancher/wrangler/pkg/condition"
+	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -50,6 +52,10 @@ type ClusterReconciler struct {
 	logr.Logger
 	mutex *sync.Mutex
 }
+
+const (
+	DefaultDeletionReconcileInterval = 30 * time.Second
+)
 
 type clusterReconciler func(context.Context, *seederv1alpha1.Cluster) error
 
@@ -99,6 +105,10 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	if c.DeletionTimestamp.IsZero() {
+		if !controllerutil.ContainsFinalizer(c, seederv1alpha1.ClusterFinalizer) {
+			controllerutil.AddFinalizer(c, seederv1alpha1.ClusterFinalizer)
+			return ctrl.Result{}, r.Update(ctx, c)
+		}
 		for _, reconciler := range reconcileList {
 			if err := reconciler(ctx, c); err != nil {
 				return ctrl.Result{}, err
@@ -107,7 +117,7 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	} else {
 		for _, reconciler := range deletionReconcileList {
 			if err := reconciler(ctx, c); err != nil {
-				return ctrl.Result{}, err
+				return ctrl.Result{RequeueAfter: DefaultDeletionReconcileInterval}, err
 			}
 		}
 	}
@@ -256,11 +266,6 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, cObj *seeder
 			return err
 		}
 
-		if !controllerutil.ContainsFinalizer(c, seederv1alpha1.ClusterFinalizer) {
-			controllerutil.AddFinalizer(c, seederv1alpha1.ClusterFinalizer)
-			return r.Update(ctx, c)
-		}
-
 	}
 	return nil
 }
@@ -360,6 +365,11 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, cObj *seederv1al
 				}
 			}
 
+			// skip cleanup of node allocated to another cluster
+			if iObj.Status.Cluster.Name != c.Name || iObj.Status.Cluster.Namespace != c.Namespace {
+				continue
+			}
+
 			// free up address
 			a, err := util.FindIPInAddressPools(ctx, r.Client, i.Name, i.Namespace, i.Status.PXEBootInterface.Address)
 			if err != nil {
@@ -372,6 +382,14 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, cObj *seederv1al
 					return err
 				}
 			}
+			ok, err := r.ensureInventoryIsShutdown(ctx, c, iObj)
+			if err != nil {
+				return fmt.Errorf("error ensuring inventory %s is shutdown %v", i.Name, err)
+			}
+
+			if !ok {
+				return fmt.Errorf("waiting for inventory %s to be shutdown", i.Name)
+			}
 			// need to clean up inventory
 			iObj.Status.PXEBootInterface = seederv1alpha1.PXEBootInterface{}
 			iObj.Status.Cluster = seederv1alpha1.ObjectReference{}
@@ -381,6 +399,7 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, cObj *seederv1al
 			util.RemoveCondition(iObj, seederv1alpha1.HarvesterJoinNode)
 			util.RemoveCondition(iObj, seederv1alpha1.TinkWorkflowCreated)
 			util.RemoveCondition(iObj, seederv1alpha1.TinkTemplateCreated)
+			util.RemoveCondition(iObj, seederv1alpha1.ClusterCleanupSubmitted)
 			util.CreateOrUpdateCondition(iObj, seederv1alpha1.InventoryFreed, "")
 			if err := r.Status().Update(ctx, iObj); err != nil {
 				return err
@@ -461,6 +480,7 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, cObj *seederv1al
 
 // cleanupClusterDeps will trigger cleanup of nodes and associated infra
 func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, cObj *seederv1alpha1.Cluster) error {
+	r.Info("cleaning up cluster components", "cluster", cObj.Name)
 	c := cObj.DeepCopy()
 	// clean up nodes
 	for _, nc := range c.Spec.Nodes {
@@ -495,18 +515,46 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, cObj *seeder
 		}
 
 		if !inventorymissing {
-			if util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) {
-				return fmt.Errorf("waiting for condition BMCJobSubmitted to be removed from inventory %s before triggering cleanup", i.Name)
+			// make sure inventory is actually allocated to current cluster. This is a minor change since we now apply a finalizer to cluster at start of reconcile loop. This will result in the deletion reconcile getting triggered.
+			// there may be cases where an inventory has been accidentally allocated to a cluster so it never gets patched, so we need to ensure it does not get shutdown
+			if i.Status.Cluster.Name != c.Name || i.Status.Cluster.Namespace != c.Namespace {
+				continue
 			}
-			i.Status.PXEBootInterface = seederv1alpha1.PXEBootInterface{}
-			i.Status.Cluster = seederv1alpha1.ObjectReference{}
-			i.Status.GeneratedPassword = ""
-			i.Status.PowerAction = seederv1alpha1.PowerActionDetails{}
-			util.RemoveCondition(i, seederv1alpha1.InventoryAllocatedToCluster)
-			util.RemoveCondition(i, seederv1alpha1.HarvesterJoinNode)
-			util.RemoveCondition(i, seederv1alpha1.HarvesterCreateNode)
+
+			if util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) {
+				return fmt.Errorf("waiting for existing bmcjob to be reconcilled from inventory %s before triggering cleanup", i.Name)
+			}
+
+			ok, err := r.ensureInventoryIsShutdown(ctx, c, i)
+			if err != nil {
+				return fmt.Errorf("error ensuring inventory %s is shutdown %v", i.Name, err)
+			}
+
+			if !ok {
+				return fmt.Errorf("waiting for inventory %s to be shutdown", i.Name)
+			}
+			// fetch and clear last job request
+			iObj := &seederv1alpha1.Inventory{}
+			err = r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj)
+			if err != nil {
+				return fmt.Errorf("error getting inventory during cleanupClusterDeps %s %v", i.Name, err)
+			}
+			iObj.Spec.PowerActionRequested = ""
+			err = r.Update(ctx, iObj)
+			if err != nil {
+				return fmt.Errorf("error resetting powerActionRequested on inventory %s during cleanupClusterDeps %v", i.Name, err)
+			}
+			iObj.Status.PXEBootInterface = seederv1alpha1.PXEBootInterface{}
+			iObj.Status.Cluster = seederv1alpha1.ObjectReference{}
+			iObj.Status.GeneratedPassword = ""
+			iObj.Status.PowerAction.LastJobName = ""
+			util.RemoveCondition(iObj, seederv1alpha1.InventoryAllocatedToCluster)
+			util.RemoveCondition(iObj, seederv1alpha1.HarvesterJoinNode)
+			util.RemoveCondition(iObj, seederv1alpha1.HarvesterCreateNode)
+			util.RemoveCondition(iObj, seederv1alpha1.ClusterCleanupSubmitted)
 			util.CreateOrUpdateCondition(i, seederv1alpha1.InventoryFreed, "")
-			err = r.Status().Update(ctx, i)
+			err = r.Status().Update(ctx, iObj)
+
 			if err != nil {
 				return err
 			}
@@ -660,6 +708,55 @@ func (r *ClusterReconciler) createOrUpdateHardware(ctx context.Context, hardware
 	}
 
 	return createOrUpdateInventoryConditions(ctx, inventory, seederv1alpha1.TinkHardwareCreated, "tink hardware created", r.Client)
+}
+
+// ensureInventoryIsShutdown ensures underlying Machine is shutdown before inventory is freed from cluster
+func (r *ClusterReconciler) ensureInventoryIsShutdown(ctx context.Context, c *seederv1alpha1.Cluster, i *seederv1alpha1.Inventory) (bool, error) {
+	r.Info("ensuring inventory is shutdown", "inventory", i.Name)
+	machineObj := &rufio.Machine{}
+	err := r.Get(ctx, types.NamespacedName{Name: i.Name, Namespace: i.Namespace}, machineObj)
+	if err != nil {
+		return false, fmt.Errorf("error fetching machine %s: %w", machineObj.Name, err)
+	}
+
+	// machine is already turned off, nothing else needed
+	if machineObj.Status.Power == rufio.Off {
+		return true, nil
+	}
+
+	if !util.ConditionExists(i, seederv1alpha1.ClusterCleanupSubmitted) {
+		iObj := i.DeepCopy()
+		util.CreateOrUpdateCondition(i, seederv1alpha1.ClusterCleanupSubmitted, c.Name)
+		i.Status.PowerAction.LastJobName = ""
+		err := r.Status().Patch(ctx, i, client.MergeFrom(iObj))
+		if err != nil {
+			return false, fmt.Errorf("error patching inventory status while triggering shutdown: %w", err)
+		}
+		// fetch i and apply conditionth
+		err = r.Get(ctx, types.NamespacedName{Name: iObj.Name, Namespace: iObj.Namespace}, i)
+		if err != nil {
+			return false, fmt.Errorf("error fetching inventory %s: %w", iObj.Name, err)
+		}
+
+		iObj = i.DeepCopy()
+
+		i.Spec.PowerActionRequested = seederv1alpha1.NodePowerActionShutdown
+
+		// return false and update from status patch
+		// on subsequent reconcile with condition is found
+		// we validate machine state
+		return false, r.Patch(ctx, i, client.MergeFrom(iObj))
+	}
+
+	// patch machineObj with an annotation to trigger reconcile
+	// else the machine reconcile will occur every 3 mins which can cause
+	// cluster deletion to be blocked
+	machineObjCopy := machineObj.DeepCopy()
+	if machineObj.Annotations == nil {
+		machineObj.Annotations = map[string]string{}
+	}
+	machineObj.Annotations[seederv1alpha1.MachineReconcileAnnotationName] = metav1.Now().String()
+	return false, r.Patch(ctx, machineObj, client.MergeFrom(machineObjCopy))
 }
 
 // lockedAddressPool ensures only one caller can perform an update at a time
