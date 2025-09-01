@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sync"
 	"testing"
 	"time"
 
@@ -170,6 +171,7 @@ var _ = BeforeSuite(func() {
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 		Logger: ctrlruntimelog.Log.WithName("controller.cluster"),
+		mutex:  &sync.Mutex{},
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
