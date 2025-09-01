@@ -2,13 +2,14 @@ package v1alpha1
 
 // common constants not associated with a particular type
 const (
-	DefaultNS                = "metal-system"
-	TinkConfig               = "tinkerbell"
-	DefaultAPIPort           = "9345"
-	OverrideAPIPortLabel     = "clusterPort.harvesterhci.io"
-	OverrideRedfishPortLabel = "redfishPort.harvesterhci.io"
-	EventLoggerName          = "HarvesterHardwareDiscovery"
-	WorkflowLoggerName       = "WorkflowEvent"
+	DefaultNS                      = "metal-system"
+	TinkConfig                     = "tinkerbell"
+	DefaultAPIPort                 = "9345"
+	OverrideAPIPortLabel           = "clusterPort.harvesterhci.io"
+	OverrideRedfishPortLabel       = "redfishPort.harvesterhci.io"
+	EventLoggerName                = "HarvesterHardwareDiscovery"
+	WorkflowLoggerName             = "WorkflowEvent"
+	MachineReconcileAnnotationName = "harvesterhci.io/machine-reconcile"
 )
 
 var (

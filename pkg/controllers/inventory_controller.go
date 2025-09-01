@@ -256,7 +256,7 @@ func (r *InventoryReconciler) triggerReboot(ctx context.Context, iObj *seederv1a
 	i := iObj.DeepCopy()
 	// TODO: Change it back to check seederv1alpha1.TinkWorkflowCreated exists since this will be a valid condition after move to
 	// workflow based processing
-	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i, seederv1alpha1.TinkHardwareCreated) && util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) && i.Status.PowerAction.LastJobName == "" {
+	if i.Status.Status == seederv1alpha1.InventoryReady && util.ConditionExists(i, seederv1alpha1.TinkHardwareCreated) && util.ConditionExists(i, seederv1alpha1.InventoryAllocatedToCluster) && !util.ConditionExists(i, seederv1alpha1.BMCJobSubmitted) && i.Status.PowerAction.LastJobName == "" && !util.ConditionExists(i, seederv1alpha1.ClusterCleanupSubmitted) {
 		// submit BMC task
 		j := util.GenerateJob(i.Name, i.Namespace, "reboot")
 		if err := r.jobWrapper(ctx, i, j); err != nil {
@@ -302,6 +302,7 @@ func (r *InventoryReconciler) reconcileBMCJob(ctx context.Context, iObj *seederv
 		// job has completed, BMCJobSubmitted condition can be removed to avoid
 		// further reconciles by reconcileBMCJob handler
 		if completed {
+			r.Info("reoncileBMCJob being executed", "inventory", *i, "job", *j)
 			util.RemoveCondition(i, seederv1alpha1.BMCJobSubmitted)
 			return r.Status().Update(ctx, i)
 		}
@@ -382,6 +383,7 @@ func (r *InventoryReconciler) triggerPowerAction(ctx context.Context, iObj *seed
 		util.CreateOrUpdateCondition(i, seederv1alpha1.BMCJobSubmitted, "BMCJob Submitted")
 		util.RemoveCondition(i, seederv1alpha1.BMCJobError)
 		util.RemoveCondition(i, seederv1alpha1.BMCJobComplete)
+		r.Info("triggerPowerAction called", "inventory", i.Name, "jobName", job.Name)
 	}
 
 	if !reflect.DeepEqual(iObj.Status, i.Status) {

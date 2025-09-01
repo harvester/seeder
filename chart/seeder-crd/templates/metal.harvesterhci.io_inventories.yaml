@@ -1,11 +1,9 @@
-
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.6.1
-  creationTimestamp: null
+    {}
   name: inventories.metal.harvesterhci.io
 spec:
   group: metal.harvesterhci.io
@@ -32,14 +30,19 @@ spec:
         description: Inventory is the Schema for the inventories API
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -60,10 +63,10 @@ spec:
                       Management Controller.
                     properties:
                       authSecretRef:
-                        description: AuthSecretRef is the SecretReference that contains
-                          authentication information of the Machine. The Secret must
-                          contain username and password keys. This is optional as
-                          it is not required when using the RPC provider.
+                        description: |-
+                          AuthSecretRef is the SecretReference that contains authentication information of the Machine.
+                          The Secret must contain username and password keys. This is optional as it is not required when using
+                          the RPC provider.
                         properties:
                           name:
                             description: name is unique within a namespace to reference
@@ -74,6 +77,7 @@ spec:
                               the secret name must be unique.
                             type: string
                         type: object
+                        x-kubernetes-map-type: atomic
                       host:
                         description: Host is the host IP address or hostname of the
                           Machine.
@@ -127,9 +131,9 @@ spec:
                               RPC provider.
                             properties:
                               consumerURL:
-                                description: ConsumerURL is the URL where an rpc consumer/listener
-                                  is running and to which we will send and receive
-                                  all notifications.
+                                description: |-
+                                  ConsumerURL is the URL where an rpc consumer/listener is running
+                                  and to which we will send and receive all notifications.
                                 type: string
                               experimental:
                                 description: Experimental options.
@@ -153,8 +157,27 @@ spec:
                                       Example: sha256=abc123'
                                     type: boolean
                                   secrets:
+                                    additionalProperties:
+                                      items:
+                                        description: |-
+                                          SecretReference represents a Secret Reference. It has enough information to retrieve secret
+                                          in any namespace
+                                        properties:
+                                          name:
+                                            description: name is unique within a namespace
+                                              to reference a secret resource.
+                                            type: string
+                                          namespace:
+                                            description: namespace defines the space
+                                              within which the secret name must be
+                                              unique.
+                                            type: string
+                                        type: object
+                                        x-kubernetes-map-type: atomic
+                                      type: array
                                     description: Secrets are a map of algorithms to
                                       secrets used for signing.
+                                    type: object
                                 type: object
                               logNotificationsDisabled:
                                 description: LogNotificationsDisabled determines whether
@@ -196,22 +219,19 @@ spec:
                                   an HMAC signature to an HTTP request.
                                 properties:
                                   appendAlgoToHeaderDisabled:
-                                    description: 'AppendAlgoToHeaderDisabled decides
-                                      whether to append the algorithm to the signature
-                                      header or not. Example: X-BMCLIB-Signature becomes
-                                      X-BMCLIB-Signature-256 When set to true, a header
-                                      will be added for each algorithm. Example: X-BMCLIB-Signature-256
-                                      and X-BMCLIB-Signature-512'
+                                    description: |-
+                                      AppendAlgoToHeaderDisabled decides whether to append the algorithm to the signature header or not.
+                                      Example: X-BMCLIB-Signature becomes X-BMCLIB-Signature-256
+                                      When set to true, a header will be added for each algorithm. Example: X-BMCLIB-Signature-256 and X-BMCLIB-Signature-512
                                     type: boolean
                                   headerName:
                                     description: 'HeaderName is the header name that
                                       should contain the signature(s). Example: X-BMCLIB-Signature'
                                     type: string
                                   includedPayloadHeaders:
-                                    description: 'IncludedPayloadHeaders are headers
-                                      whose values will be included in the signature
-                                      payload. Example: X-BMCLIB-My-Custom-Header
-                                      All headers will be deduplicated.'
+                                    description: |-
+                                      IncludedPayloadHeaders are headers whose values will be included in the signature payload. Example: X-BMCLIB-My-Custom-Header
+                                      All headers will be deduplicated.
                                     items:
                                       type: string
                                     type: array
@@ -318,9 +338,3 @@ spec:
     storage: true
     subresources:
       status: {}
-status:
-  acceptedNames:
-    kind: ""
-    plural: ""
-  conditions: []
-  storedVersions: []
