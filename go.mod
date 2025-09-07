@@ -5,7 +5,7 @@ go 1.21
 require (
 	github.com/bmc-toolbox/bmclib/v2 v2.0.1-0.20230212165211-bac64498b8ba
 	github.com/go-bindata/go-bindata/v3 v3.1.3
-	github.com/go-logr/logr v1.2.3
+	github.com/go-logr/logr v1.4.3
 	github.com/google/uuid v1.3.0
 	github.com/harvester/webhook v0.1.4
 	github.com/onsi/ginkgo/v2 v2.6.0
@@ -26,7 +26,6 @@ require (
 	k8s.io/apimachinery v0.26.3
 	k8s.io/client-go v12.0.0+incompatible
 	sigs.k8s.io/controller-runtime v0.14.4
-
 )
 
 require (
