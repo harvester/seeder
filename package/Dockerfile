@@ -1,7 +1,7 @@
-# syntax=docker/dockerfile:1.7.0
+# syntax=docker/dockerfile:1.18.0
 
 # Build the manager binary
-FROM registry.suse.com/bci/bci-base:15.6
+FROM registry.suse.com/bci/bci-base:15.7
 RUN zypper -n install ipmitool=1.8.18.238.gb7adc1d-150600.8.3 && zypper clean
 ARG TARGETPLATFORM
 
