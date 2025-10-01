@@ -390,10 +390,21 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, cObj *seederv1al
 			if !ok {
 				return fmt.Errorf("waiting for inventory %s to be shutdown", i.Name)
 			}
+			// fetch and clear last job request
+			err = r.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj)
+			if err != nil {
+				return fmt.Errorf("error getting inventory during cleanupClusterDeps %s %v", i.Name, err)
+			}
+			iObj.Spec.PowerActionRequested = ""
+			err = r.Update(ctx, iObj)
+			if err != nil {
+				return fmt.Errorf("error resetting powerActionRequested on inventory %s during cleanupClusterDeps %v", i.Name, err)
+			}
 			// need to clean up inventory
 			iObj.Status.PXEBootInterface = seederv1alpha1.PXEBootInterface{}
 			iObj.Status.Cluster = seederv1alpha1.ObjectReference{}
 			iObj.Status.GeneratedPassword = ""
+			iObj.Status.PowerAction.LastJobName = ""
 			util.RemoveCondition(iObj, seederv1alpha1.InventoryAllocatedToCluster)
 			util.RemoveCondition(iObj, seederv1alpha1.TinkHardwareCreated)
 			util.RemoveCondition(iObj, seederv1alpha1.HarvesterJoinNode)

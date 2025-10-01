@@ -850,6 +850,38 @@ var _ = Describe("delete inventory from cluster tests", func() {
 
 			return fmt.Errorf("waiting for hardware to be cleaned up")
 		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			machineObj := &rufio.Machine{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i2.Namespace, Name: i2.Name}, machineObj)
+			if err != nil {
+				return err
+			}
+			if machineObj.Status.Power != rufio.Off {
+				return fmt.Errorf("expected to get rufio power state %s but got %s", rufio.Off, machineObj.Status.Power)
+			}
+			return nil
+		}, "120s", "10s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			iObj := &seederv1alpha1.Inventory{}
+			if err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i2.Namespace, Name: i2.Name}, iObj); err != nil {
+				return err
+			}
+
+			if util.ConditionExists(iObj, seederv1alpha1.InventoryAllocatedToCluster) {
+				return fmt.Errorf("condition inventoryAllocatedToCluster exists, waiting for it to be removed")
+			}
+
+			if iObj.Spec.PowerActionRequested != "" {
+				return fmt.Errorf("waiting for PowerActionRequested to be reset")
+			}
+
+			if iObj.Status.PowerAction.LastJobName != "" {
+				return fmt.Errorf("waiting for LastJobName to be reset")
+			}
+			return nil
+		}, "60s", "5s").ShouldNot(HaveOccurred())
 	})
 
 	AfterEach(func() {
