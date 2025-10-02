@@ -518,13 +518,6 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, cObj *seeder
 			}
 		}
 
-		if !poolmissing {
-			delete(pool.Status.AddressAllocation, i.Status.PXEBootInterface.Address)
-			if err := r.lockedAddressPoolUpdate(ctx, pool); err != nil {
-				return err
-			}
-		}
-
 		if !inventorymissing {
 			// make sure inventory is actually allocated to current cluster. This is a minor change since we now apply a finalizer to cluster at start of reconcile loop. This will result in the deletion reconcile getting triggered.
 			// there may be cases where an inventory has been accidentally allocated to a cluster so it never gets patched, so we need to ensure it does not get shutdown
@@ -571,6 +564,12 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, cObj *seeder
 			}
 		}
 
+		if !poolmissing {
+			delete(pool.Status.AddressAllocation, i.Status.PXEBootInterface.Address)
+			if err := r.lockedAddressPoolUpdate(ctx, pool); err != nil {
+				return err
+			}
+		}
 	}
 
 	//cleanup VIP address pool
