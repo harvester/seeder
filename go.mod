@@ -8,23 +8,23 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.0
 	github.com/harvester/webhook v0.1.4
-	github.com/onsi/ginkgo/v2 v2.22.0
-	github.com/onsi/gomega v1.36.1
-	github.com/rancher/dynamiclistener v0.3.5
+	github.com/onsi/ginkgo/v2 v2.25.3
+	github.com/onsi/gomega v1.38.2
+	github.com/rancher/dynamiclistener v0.7.0
 	github.com/rancher/wrangler v1.1.1
 	github.com/sirupsen/logrus v1.9.3
-	github.com/stmcginnis/gofish v0.14.1-0.20230920133920-77490fd98fa2
-	github.com/stretchr/testify v1.9.0
-	github.com/tinkerbell/rufio v0.3.2
-	github.com/tinkerbell/tink v0.9.0
-	github.com/urfave/cli/v2 v2.25.3
-	golang.org/x/net v0.30.0
-	golang.org/x/sync v0.8.0
+	github.com/stmcginnis/gofish v0.20.0
+	github.com/stretchr/testify v1.11.1
+	github.com/tinkerbell/rufio v0.6.5
+	github.com/tinkerbell/tink v0.12.2
+	github.com/urfave/cli/v2 v2.27.7
+	golang.org/x/net v0.44.0
+	golang.org/x/sync v0.17.0
 	inet.af/netaddr v0.0.0-20230525184311-b8eac61e914a
-	k8s.io/api v0.32.5
-	k8s.io/apimachinery v0.32.5
+	k8s.io/api v0.34.1
+	k8s.io/apimachinery v0.34.1
 	k8s.io/client-go v12.0.0+incompatible
-	sigs.k8s.io/controller-runtime v0.20.4
+	sigs.k8s.io/controller-runtime v0.22.1
 
 )
 
@@ -113,11 +113,11 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/harvester/harvester-installer v1.3.0-rc4
+	github.com/harvester/harvester-installer v1.6.0
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/ory/dockertest/v3 v3.9.1
+	github.com/ory/dockertest/v3 v3.12.0
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_golang v1.19.1 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
@@ -142,18 +142,18 @@ require (
 	k8s.io/kube-openapi v0.0.0-20241105132330-32ad38e42d3f // indirect
 	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.2 // indirect
-	sigs.k8s.io/yaml v1.4.0
+	sigs.k8s.io/yaml v1.6.0
 )
 
 replace (
-	github.com/harvester/harvester-install => github.com/harvester/harvester-installer v1.5.1
-	github.com/tinkerbell/rufio => github.com/tinkerbell/rufio v0.3.2
+	github.com/harvester/harvester-install => github.com/harvester/harvester-installer v1.6.0
+	github.com/tinkerbell/rufio => github.com/tinkerbell/rufio v0.6.5
 	github.com/tinkerbell/tink v0.6.0 => github.com/tinkerbell/tink v0.6.1-0.20220524234633-0a800a4b5e25
 	github.com/tredoe/osutil => github.com/tredoe/osutil v1.5.0
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20211027215541-db492cf91b37 => go4.org/unsafe/assume-no-moving-gc v0.0.0-20220617031537-928513b29760
-	google.golang.org/protobuf => google.golang.org/protobuf v1.33.0
-	k8s.io/api => k8s.io/api v0.32.5
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.32.5
-	k8s.io/apimachinery => k8s.io/apimachinery v0.32.5
-	k8s.io/client-go => k8s.io/client-go v0.32.5
+	google.golang.org/protobuf => google.golang.org/protobuf v1.36.9
+	k8s.io/api => k8s.io/api v0.34.1
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.34.1
+	k8s.io/apimachinery => k8s.io/apimachinery v0.34.1
+	k8s.io/client-go => k8s.io/client-go v0.34.1
 )
