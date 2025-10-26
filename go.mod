@@ -4,14 +4,14 @@ go 1.24.5
 
 require (
 	github.com/go-bindata/go-bindata/v3 v3.1.3
-	github.com/go-logr/logr v1.4.2
+	github.com/go-logr/logr v1.4.3
 	github.com/google/uuid v1.6.0
-	github.com/gorilla/mux v1.8.0
-	github.com/harvester/webhook v0.1.4
+	github.com/gorilla/mux v1.8.1
+	github.com/harvester/webhook v0.1.5
 	github.com/onsi/ginkgo/v2 v2.22.0
 	github.com/onsi/gomega v1.36.1
 	github.com/rancher/dynamiclistener v0.3.5
-	github.com/rancher/wrangler v1.1.1
+	github.com/rancher/wrangler v1.1.2
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stmcginnis/gofish v0.14.1-0.20230920133920-77490fd98fa2
 	github.com/stretchr/testify v1.9.0
