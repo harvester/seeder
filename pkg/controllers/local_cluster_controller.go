@@ -113,7 +113,7 @@ func (r *LocalClusterReconciler) addToLocalCluster(ctx context.Context, i *seede
 			return fmt.Errorf("error updating local cluster")
 		}
 
-		r.EventRecorder.Event(localCluster, "Normal", "ClusterUpdated", fmt.Sprintf("inventory %s in namespace %s added to local cluster", i.Name, i.Namespace))
+		r.Event(localCluster, "Normal", "ClusterUpdated", fmt.Sprintf("inventory %s in namespace %s added to local cluster", i.Name, i.Namespace))
 	}
 
 	// apply finalizer
@@ -146,7 +146,7 @@ func (r *LocalClusterReconciler) removeFromLocalCluster(ctx context.Context, i *
 		if err != nil {
 			return fmt.Errorf("error updating local cluster")
 		}
-		r.EventRecorder.Event(localCluster, "Normal", "ClusterUpdated", fmt.Sprintf("inventory %s in namespace %s removed from local cluster", i.Name, i.Namespace))
+		r.Event(localCluster, "Normal", "ClusterUpdated", fmt.Sprintf("inventory %s in namespace %s removed from local cluster", i.Name, i.Namespace))
 	}
 
 	// remove finalizer
@@ -210,7 +210,7 @@ func (r *LocalClusterReconciler) manageStatus(ctx context.Context, iObj *seederv
 
 	for _, v := range nodeObj.Status.Addresses {
 		if v.Type == corev1.NodeInternalIP {
-			i.Status.PXEBootInterface.Address = v.Address
+			i.Status.Address = v.Address
 		}
 	}
 

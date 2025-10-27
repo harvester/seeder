@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/rancher/wrangler/pkg/condition"
+	"github.com/rancher/wrangler/v3/pkg/condition"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -130,8 +130,8 @@ func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, cObj *see
 	c := cObj.DeepCopy()
 	if c.Status.Status == "" {
 		vipPool := &seederv1alpha1.AddressPool{}
-		err := r.Get(ctx, types.NamespacedName{Namespace: c.Spec.VIPConfig.AddressPoolReference.Namespace,
-			Name: c.Spec.VIPConfig.AddressPoolReference.Name}, vipPool)
+		err := r.Get(ctx, types.NamespacedName{Namespace: c.Spec.AddressPoolReference.Namespace,
+			Name: c.Spec.AddressPoolReference.Name}, vipPool)
 		if err != nil {
 			return err
 		}
@@ -149,7 +149,7 @@ func (r *ClusterReconciler) generateClusterConfig(ctx context.Context, cObj *see
 				}
 			}
 			if !addressFound {
-				vip, err := util.AllocateAddress(vipPool.Status.DeepCopy(), c.Spec.VIPConfig.StaticAddress)
+				vip, err := util.AllocateAddress(vipPool.Status.DeepCopy(), c.Spec.StaticAddress)
 				if err != nil {
 					return err
 				}
@@ -235,9 +235,9 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, cObj *seeder
 				}
 			}
 
-			i.Status.PXEBootInterface.Address = nodeAddress
-			i.Status.PXEBootInterface.Gateway = pool.Spec.Gateway
-			i.Status.PXEBootInterface.Netmask = pool.Status.Netmask
+			i.Status.Address = nodeAddress
+			i.Status.Gateway = pool.Spec.Gateway
+			i.Status.Netmask = pool.Status.Netmask
 
 			// node password and conditions
 			i.Status.GeneratedPassword = util.GenerateRand()
@@ -371,13 +371,13 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, cObj *seederv1al
 			}
 
 			// free up address
-			a, err := util.FindIPInAddressPools(ctx, r.Client, i.Name, i.Namespace, i.Status.PXEBootInterface.Address)
+			a, err := util.FindIPInAddressPools(ctx, r.Client, i.Name, i.Namespace, i.Status.Address)
 			if err != nil {
 				return err
 			}
 
 			if a != nil {
-				delete(a.Status.AddressAllocation, i.Status.PXEBootInterface.Address)
+				delete(a.Status.AddressAllocation, i.Status.Address)
 				if err := r.Status().Update(ctx, a); err != nil {
 					return err
 				}
@@ -565,7 +565,7 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, cObj *seeder
 		}
 
 		if !poolmissing {
-			delete(pool.Status.AddressAllocation, i.Status.PXEBootInterface.Address)
+			delete(pool.Status.AddressAllocation, i.Status.Address)
 			if err := r.lockedAddressPoolUpdate(ctx, pool); err != nil {
 				return err
 			}
@@ -576,8 +576,8 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, cObj *seeder
 	if c.Status.ClusterAddress != "" {
 		var poolNotFound bool
 		pool := &seederv1alpha1.AddressPool{}
-		if err := r.Get(ctx, types.NamespacedName{Namespace: c.Spec.VIPConfig.AddressPoolReference.Namespace,
-			Name: c.Spec.VIPConfig.AddressPoolReference.Name}, pool); err != nil {
+		if err := r.Get(ctx, types.NamespacedName{Namespace: c.Spec.AddressPoolReference.Namespace,
+			Name: c.Spec.AddressPoolReference.Name}, pool); err != nil {
 			if apierrors.IsNotFound(err) {
 				poolNotFound = true
 			} else {

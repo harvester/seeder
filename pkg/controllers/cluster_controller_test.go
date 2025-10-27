@@ -360,7 +360,6 @@ var _ = Describe("Create cluster tests", Ordered, func() {
 	})
 
 	AfterAll(func() {
-		fmt.Println("running after each")
 		Eventually(func() error {
 			// check and delete cluster if needed. Need this since one of the tests simulates removing cluster
 			// and checking gc of hardware objects

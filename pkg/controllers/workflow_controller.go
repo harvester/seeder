@@ -78,13 +78,13 @@ func (r *WorkflowReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 
 	if wObj.Status.State == tinkv1alpha1.WorkflowStateSuccess {
-		r.EventRecorder.Event(cluster, "Normal", seederv1alpha1.WorkflowLoggerName, fmt.Sprintf("workflow %s completed successfully", wObj.Name))
+		r.Event(cluster, "Normal", seederv1alpha1.WorkflowLoggerName, fmt.Sprintf("workflow %s completed successfully", wObj.Name))
 	}
 	if wObj.Status.State == tinkv1alpha1.WorkflowStateFailed {
 		for _, task := range wObj.Status.Tasks {
 			for _, action := range task.Actions {
 				if action.Status == tinkv1alpha1.WorkflowStateFailed {
-					r.EventRecorder.Event(cluster, "Warning", seederv1alpha1.WorkflowLoggerName, fmt.Sprintf("workflow %s failed for task %s, action %s", wObj.Name, task.Name, action.Name))
+					r.Event(cluster, "Warning", seederv1alpha1.WorkflowLoggerName, fmt.Sprintf("workflow %s failed for task %s, action %s", wObj.Name, task.Name, action.Name))
 				}
 			}
 		}
