@@ -44,7 +44,7 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster, s
 		bondOptions["miimon"] = "100"
 	}
 	userdata, err := generateCloudConfig(c.Spec.ConfigURL, i.Spec.ManagementInterfaceMacAddress, mode, c.Status.ClusterAddress,
-		c.Status.ClusterToken, i.Status.GeneratedPassword, i.Status.Address, i.Status.Netmask, i.Status.Gateway, c.Spec.ClusterConfig.Nameservers, c.Spec.ClusterConfig.SSHKeys, bondOptions, c.Spec.ImageURL, c.Spec.HarvesterVersion, seederDeploymentService.Status.LoadBalancer.Ingress[0].IP, i.Name, i.Namespace, c.Spec.StreamImageMode, c.Spec.WipeDisks, c.Spec.VlanID, i.Spec.Arch, i.Spec.PrimaryDisk, fmt.Sprintf("%s-%s", i.Name, i.Namespace))
+		c.Status.ClusterToken, i.Status.GeneratedPassword, i.Status.Address, i.Status.Netmask, i.Status.Gateway, c.Spec.Nameservers, c.Spec.SSHKeys, bondOptions, c.Spec.ImageURL, c.Spec.HarvesterVersion, seederDeploymentService.Status.LoadBalancer.Ingress[0].IP, i.Name, i.Namespace, c.Spec.StreamImageMode, c.Spec.WipeDisks, c.Spec.VlanID, i.Spec.Arch, i.Spec.PrimaryDisk, fmt.Sprintf("%s-%s", i.Name, i.Namespace))
 
 	if err != nil {
 		return nil, fmt.Errorf("error during HW generation: %v", err)
@@ -107,7 +107,7 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster, s
 	// if not using StreamImage mode then define a custom ipxe url with info needed to provision harvester
 	if !c.Spec.StreamImageMode {
 		customIPXEScript, err := generateIPXEScript(c.Spec.HarvesterVersion, c.Spec.ImageURL, fmt.Sprintf("http://%s:%s/2009-04-04/user-data",
-			tinkStackService.Status.LoadBalancer.Ingress[0].IP, HegelDefaultPort), i.Spec.ManagementInterfaceMacAddress, i.Spec.Arch, c.Spec.ClusterConfig.VlanID)
+			tinkStackService.Status.LoadBalancer.Ingress[0].IP, HegelDefaultPort), i.Spec.ManagementInterfaceMacAddress, i.Spec.Arch, c.Spec.VlanID)
 		if err != nil {
 			return nil, fmt.Errorf("error generating custom ipxe script for inventory %s: %v", i.Name, err)
 		}
@@ -137,8 +137,8 @@ func GenerateWorkflow(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (w
 		},
 	}
 
-	if c.Spec.ClusterConfig.CustomProvisioningTemplate != "" {
-		workflow.Spec.TemplateRef = c.Spec.ClusterConfig.CustomProvisioningTemplate
+	if c.Spec.CustomProvisioningTemplate != "" {
+		workflow.Spec.TemplateRef = c.Spec.CustomProvisioningTemplate
 	}
 
 	return workflow
@@ -156,11 +156,11 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 	if mode == "join" {
 		hc.ServerURL = fmt.Sprintf("https://%s:443", vip)
 	} else {
-		hc.Install.Vip = vip
-		hc.Install.VipMode = "static"
+		hc.Vip = vip
+		hc.VipMode = "static"
 	}
-	hc.Install.Mode = mode
-	hc.Install.ManagementInterface = config.Network{
+	hc.Mode = mode
+	hc.ManagementInterface = config.Network{
 		Method:       "static",
 		IP:           ip,
 		SubnetMask:   subnetMask,
@@ -173,26 +173,26 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 		},
 	}
 	if vlanID > 0 {
-		hc.Install.ManagementInterface.VlanID = vlanID
+		hc.ManagementInterface.VlanID = vlanID
 	}
-	hc.Install.Automatic = true
-	hc.OS.Password = password
-	hc.OS.DNSNameservers = append(hc.OS.DNSNameservers, Nameservers...)
-	hc.OS.SSHAuthorizedKeys = append(hc.OS.SSHAuthorizedKeys, SSHKeys...)
-	hc.OS.Hostname = hostname
+	hc.Automatic = true
+	hc.Password = password
+	hc.DNSNameservers = append(hc.DNSNameservers, Nameservers...)
+	hc.SSHAuthorizedKeys = append(hc.SSHAuthorizedKeys, SSHKeys...)
+	hc.Hostname = hostname
 	if vlanID > 1 {
-		hc.OS.AfterInstallChrootCommands = []string{fmt.Sprintf("grub2-editenv /oem/grubenv set extra_cmdline=\"ifname=netboot:%s\"", hwAddress)}
+		hc.AfterInstallChrootCommands = []string{fmt.Sprintf("grub2-editenv /oem/grubenv set extra_cmdline=\"ifname=netboot:%s\"", hwAddress)}
 	}
-	hc.Install.ManagementInterface.BondOptions = bondOptions
-	hc.Install.WipeDisks = wipeDisks
-	hc.Install.Device = disk
-	hc.Install.SkipChecks = true
+	hc.ManagementInterface.BondOptions = bondOptions
+	hc.WipeDisks = wipeDisks
+	hc.Device = disk
+	hc.SkipChecks = true
 	// for versions older than v1.2.x where streaming image mode is not available
 	// we need to provide ISO URL
 	if !streamImage {
 		//hc.Install.ConfigURL = "" // reset the config url
-		hc.Install.ISOURL = fmt.Sprintf("%s/%s/harvester-%s-%s.iso", imageURL, harvesterVersion, harvesterVersion, arch)
-		hc.Install.Webhooks = []config.Webhook{
+		hc.ISOURL = fmt.Sprintf("%s/%s/harvester-%s-%s.iso", imageURL, harvesterVersion, harvesterVersion, arch)
+		hc.Webhooks = []config.Webhook{
 			{
 				Event:  defaultEvent,
 				Method: defaultMethod,
@@ -256,7 +256,11 @@ func readConfigURL(hc *config.HarvesterConfig, url string) error {
 	if err != nil {
 		return fmt.Errorf("error fetching config url %s: %v", url, err)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("error during http call, status code: %v", resp.Status)
 	}

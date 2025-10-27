@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
-	"github.com/rancher/wrangler/pkg/yaml"
+	"github.com/rancher/wrangler/v3/pkg/yaml"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

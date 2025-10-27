@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/rancher/wrangler/pkg/condition"
+	"github.com/rancher/wrangler/v3/pkg/condition"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 )

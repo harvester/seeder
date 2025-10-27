@@ -145,7 +145,7 @@ func (r *ClusterEventReconciler) identifyInventory(ctx context.Context, c *seede
 		if err != nil {
 			return nil, err
 		}
-		if nodeObj.Spec.Events.Enabled {
+		if nodeObj.Spec.Enabled {
 			retNodes = append(retNodes, nodeObj)
 		}
 	}

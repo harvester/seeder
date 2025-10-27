@@ -99,7 +99,7 @@ func (r *AddressPoolReconciler) reconcilePoolCapacity(ctx context.Context, poolO
 
 		if !controllerutil.ContainsFinalizer(pool, seederv1alpha1.AddressPoolFinalizer) {
 			controllerutil.AddFinalizer(pool, seederv1alpha1.AddressPoolFinalizer)
-			return r.Client.Update(ctx, pool)
+			return r.Update(ctx, pool)
 		}
 	}
 	// reconcile reserved addresses
@@ -116,7 +116,7 @@ func (r *AddressPoolReconciler) reconcilePoolCapacity(ctx context.Context, poolO
 			}
 		}
 		if !reflect.DeepEqual(pool.Status.AddressAllocation, poolObj.Status.AddressAllocation) {
-			return r.Client.Status().Update(ctx, pool)
+			return r.Status().Update(ctx, pool)
 		}
 
 	}
@@ -125,12 +125,12 @@ func (r *AddressPoolReconciler) reconcilePoolCapacity(ctx context.Context, poolO
 
 	if pool.Status.Status == seederv1alpha1.PoolReady && len(pool.Status.AddressAllocation) == pool.Status.AvailableAddresses {
 		pool.Status.Status = seederv1alpha1.PoolExhausted
-		return r.Client.Status().Update(ctx, pool)
+		return r.Status().Update(ctx, pool)
 	}
 
 	if pool.Status.Status == seederv1alpha1.PoolExhausted && len(pool.Status.AddressAllocation) < pool.Status.AvailableAddresses {
 		pool.Status.Status = seederv1alpha1.PoolReady
-		return r.Client.Status().Update(ctx, pool)
+		return r.Status().Update(ctx, pool)
 	}
 
 	return nil
@@ -162,7 +162,7 @@ func (r *AddressPoolReconciler) deleteAddressPool(ctx context.Context, poolObj *
 			return fmt.Errorf("one of the address in addresspool %s is still in use, requeuing", pool.Name)
 		}
 		controllerutil.RemoveFinalizer(pool, seederv1alpha1.AddressPoolFinalizer)
-		return r.Client.Update(ctx, pool)
+		return r.Update(ctx, pool)
 	}
 
 	return nil
@@ -203,7 +203,7 @@ func (r *AddressPoolReconciler) lookupInventoryAddress(ctx context.Context, obj 
 		return false, err
 	}
 
-	if c.Status.PXEBootInterface.Address == address {
+	if c.Status.Address == address {
 		return true, nil
 	}
 

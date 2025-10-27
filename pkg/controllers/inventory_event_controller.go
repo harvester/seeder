@@ -57,7 +57,7 @@ func (r *InventoryEventReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	}
 
 	// if Event lookup is disabled, ignore the objects
-	if !i.Spec.Events.Enabled {
+	if !i.Spec.Enabled {
 		return ctrl.Result{}, nil
 	}
 
@@ -100,13 +100,13 @@ func (r *InventoryEventReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 func (r *InventoryEventReconciler) getInventoryInfo(ctx context.Context, i *seederv1alpha1.Inventory) error {
 
 	// next reconcile duration
-	duration, err := time.ParseDuration(i.Spec.Events.PollingInterval)
+	duration, err := time.ParseDuration(i.Spec.PollingInterval)
 	if err != nil {
 		return err
 	}
 	// fetch bmc secret first
 	s := &corev1.Secret{}
-	err = r.Client.Get(ctx, types.NamespacedName{Namespace: i.Spec.BaseboardManagementSpec.Connection.AuthSecretRef.Namespace,
+	err = r.Get(ctx, types.NamespacedName{Namespace: i.Spec.BaseboardManagementSpec.Connection.AuthSecretRef.Namespace,
 		Name: i.Spec.BaseboardManagementSpec.Connection.AuthSecretRef.Name}, s)
 
 	if err != nil {
@@ -165,7 +165,7 @@ func (r *InventoryEventReconciler) getInventoryInfo(ctx context.Context, i *seed
 	}
 
 	for _, v := range status {
-		r.EventRecorder.Event(i, "Normal", "RedfishStatusEvent", fmt.Sprintf("current inventory status: %s", v))
+		r.Event(i, "Normal", "RedfishStatusEvent", fmt.Sprintf("current inventory status: %s", v))
 	}
 	return nil
 }

@@ -52,7 +52,10 @@ func GenerateKubeConfig(serverURL, port, prefix, token string) ([]byte, error) {
 	if resp.Status != "200 OK" {
 		return nil, fmt.Errorf("expected status code 200, got %s", resp.Status)
 	}
-	defer resp.Body.Close()
+
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 
 	content, err := io.ReadAll(resp.Body)
 	if err != nil {
