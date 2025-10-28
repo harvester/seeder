@@ -101,7 +101,7 @@ func chartSeederCrdTemplatesBmcTinkerbellOrg_baseboardmanagementsYaml() (*asset,
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/bmc.tinkerbell.org_baseboardmanagements.yaml", size: 5154, mode: os.FileMode(420), modTime: time.Unix(1688446779, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/bmc.tinkerbell.org_baseboardmanagements.yaml", size: 5154, mode: os.FileMode(420), modTime: time.Unix(1761694341, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -121,7 +121,7 @@ func chartSeederCrdTemplatesBmcTinkerbellOrg_bmctasksYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/bmc.tinkerbell.org_bmctasks.yaml", size: 6779, mode: os.FileMode(420), modTime: time.Unix(1688446779, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/bmc.tinkerbell.org_bmctasks.yaml", size: 6779, mode: os.FileMode(420), modTime: time.Unix(1761694341, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -141,7 +141,7 @@ func chartSeederCrdTemplatesBmcTinkerbellOrg_jobsYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/bmc.tinkerbell.org_jobs.yaml", size: 8575, mode: os.FileMode(420), modTime: time.Unix(1761523094, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/bmc.tinkerbell.org_jobs.yaml", size: 8575, mode: os.FileMode(420), modTime: time.Unix(1761694598, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -161,7 +161,7 @@ func chartSeederCrdTemplatesBmcTinkerbellOrg_machinesYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/bmc.tinkerbell.org_machines.yaml", size: 13020, mode: os.FileMode(420), modTime: time.Unix(1761523094, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/bmc.tinkerbell.org_machines.yaml", size: 13020, mode: os.FileMode(420), modTime: time.Unix(1761694598, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -181,7 +181,7 @@ func chartSeederCrdTemplatesBmcTinkerbellOrg_tasksYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/bmc.tinkerbell.org_tasks.yaml", size: 6447, mode: os.FileMode(420), modTime: time.Unix(1688446779, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/bmc.tinkerbell.org_tasks.yaml", size: 6447, mode: os.FileMode(420), modTime: time.Unix(1761694341, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -201,7 +201,7 @@ func chartSeederCrdTemplatesMetalHarvesterhciIo_addresspoolsYaml() (*asset, erro
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/metal.harvesterhci.io_addresspools.yaml", size: 3227, mode: os.FileMode(420), modTime: time.Unix(1761526191, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/metal.harvesterhci.io_addresspools.yaml", size: 3227, mode: os.FileMode(420), modTime: time.Unix(1761694598, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -221,7 +221,7 @@ func chartSeederCrdTemplatesMetalHarvesterhciIo_clustersYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/metal.harvesterhci.io_clusters.yaml", size: 4750, mode: os.FileMode(420), modTime: time.Unix(1761526191, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/metal.harvesterhci.io_clusters.yaml", size: 4750, mode: os.FileMode(420), modTime: time.Unix(1761694598, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -241,7 +241,7 @@ func chartSeederCrdTemplatesMetalHarvesterhciIo_inventoriesYaml() (*asset, error
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/metal.harvesterhci.io_inventories.yaml", size: 15658, mode: os.FileMode(420), modTime: time.Unix(1761526191, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/metal.harvesterhci.io_inventories.yaml", size: 15658, mode: os.FileMode(420), modTime: time.Unix(1761694598, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -261,7 +261,7 @@ func chartSeederCrdTemplatesTinkerbellOrg_hardwareYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "chart/seeder-crd/templates/tinkerbell.org_hardware.yaml", size: 27602, mode: os.FileMode(420), modTime: time.Unix(1688446779, 0)}
+	info := bindataFileInfo{name: "chart/seeder-crd/templates/tinkerbell.org_hardware.yaml", size: 27602, mode: os.FileMode(420), modTime: time.Unix(1761694341, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

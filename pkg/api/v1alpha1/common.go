@@ -28,4 +28,7 @@ const (
 	DefaultEndpointPort                  = 9090
 	DefaultSeederDeploymentService       = "harvester-seeder-endpoint"
 	DefaultHegelDeploymentEndpointLookup = "smee"
+	ClusterOwnerKey                      = "harvesterhci.io/clusterOwner"
+	ClusterOwnerDetailsKey               = "harvesterhci.io/clusterOwnerDetails"
+	ExtraFieldKey                        = "username"
 )

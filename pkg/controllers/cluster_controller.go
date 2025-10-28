@@ -204,6 +204,10 @@ func (r *ClusterReconciler) patchNodesAndPools(ctx context.Context, cObj *seeder
 				continue
 			}
 
+			i, err = r.patchInventoryOwnership(ctx, cObj, i)
+			if err != nil {
+				return fmt.Errorf("error updating inventory ownership: %v", err)
+			}
 			var found bool
 			var nodeAddress string
 			for address, nodeDetails := range pool.Status.AddressAllocation {
@@ -774,4 +778,39 @@ func (r *ClusterReconciler) lockedAddressPoolUpdate(ctx context.Context, pool *s
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 	return r.Status().Update(ctx, pool)
+}
+
+// patchInventoryOwnership looks up ownership info from cluster object
+// and labels the inventory with same info
+func (r *ClusterReconciler) patchInventoryOwnership(ctx context.Context, c *seederv1alpha1.Cluster, i *seederv1alpha1.Inventory) (*seederv1alpha1.Inventory, error) {
+	if c.Annotations == nil {
+		return i, nil
+	}
+
+	clusterOwner, ok := c.Labels[seederv1alpha1.ClusterOwnerKey]
+	// no ownership details found on cluster, so no further action required
+	if !ok {
+		return i, nil
+	}
+
+	if i.Labels == nil {
+		i.Labels = make(map[string]string)
+	}
+	// apply user info
+	i.Labels[seederv1alpha1.ClusterOwnerKey] = clusterOwner
+
+	// apply user details
+	clusterOwnerDetails, ok := c.Labels[seederv1alpha1.ClusterOwnerDetailsKey]
+	if ok {
+		i.Labels[seederv1alpha1.ClusterOwnerDetailsKey] = clusterOwnerDetails
+	}
+
+	err := r.Update(ctx, i)
+	if err != nil {
+		return i, fmt.Errorf("error updating inventory with ownership details: %v", err)
+	}
+
+	iObj := &seederv1alpha1.Inventory{}
+	err = r.Get(ctx, types.NamespacedName{Name: i.Name, Namespace: i.Namespace}, iObj)
+	return iObj, err
 }
