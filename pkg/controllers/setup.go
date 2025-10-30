@@ -18,6 +18,7 @@ import (
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/config"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
@@ -69,6 +70,11 @@ func (s *Server) Start(ctx context.Context) error {
 		LeaderElection:          s.EnableLeaderElection,
 		LeaderElectionID:        "28b21117.harvesterhci.io",
 		LeaderElectionNamespace: s.LeaderElectionNamespace,
+		Controller: config.Controller{
+			GroupKindConcurrency: map[string]int{
+				"Machine.bmc.tinkerbell.org": 10,
+			},
+		},
 	})
 	if err != nil {
 		logrus.Error(err, "unable to start manager")
