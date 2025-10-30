@@ -73,7 +73,7 @@ type clusterReconciler func(context.Context, *seederv1alpha1.Cluster) error
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.0/pkg/reconcile
 func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	r.Info("Reconcilling inventory objects", req.Name, req.Namespace)
+	r.Info("Reconcilling cluster objects", req.Name, req.Namespace)
 	// TODO(user): your logic here
 	cObj := &seederv1alpha1.Cluster{}
 
@@ -117,7 +117,11 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	} else {
 		for _, reconciler := range deletionReconcileList {
 			if err := reconciler(ctx, c); err != nil {
-				return ctrl.Result{RequeueAfter: DefaultDeletionReconcileInterval}, err
+				// log error but not return it since we are manually attempting to requeue
+				// helps avoid Reconciler returned both a non-zero result and a non-nil error. The result will always be ignored if the error is non-nil and the non-nil error causes requeuing with exponential backoff. For more details, see: https://pkg.go.dev/sigs.k8s.io/controller-runtime/pkg/reconcile#Reconciler"
+				// other our predefined backoff is not used
+				r.Error(err, "error during deletion of cluster", c.Name, c.Namespace)
+				return ctrl.Result{RequeueAfter: DefaultDeletionReconcileInterval}, nil
 			}
 		}
 	}
