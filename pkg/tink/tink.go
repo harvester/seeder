@@ -184,7 +184,7 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 		hc.AfterInstallChrootCommands = []string{fmt.Sprintf("grub2-editenv /oem/grubenv set extra_cmdline=\"ifname=netboot:%s\"", hwAddress)}
 	}
 	hc.ManagementInterface.BondOptions = bondOptions
-	hc.WipeDisks = wipeDisks
+	hc.WipeAllDisks = wipeDisks
 	hc.Device = disk
 	hc.SkipChecks = true
 	// for versions older than v1.2.x where streaming image mode is not available
