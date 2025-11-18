@@ -26,6 +26,10 @@ func SetupWebhookServer(ctx context.Context, mgr manager.Manager, namespace stri
 
 	webhookServer := server.NewWebhookServer(ctx, mgr.GetConfig(), webhookServerName, opts)
 
+	if err := webhookServer.RegisterValidators(NewClusterValidator(ctx, mgr)); err != nil {
+		return err
+	}
+
 	if err := webhookServer.RegisterValidators(NewInventoryValidatory(ctx, mgr)); err != nil {
 		return err
 	}
