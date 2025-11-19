@@ -37,6 +37,7 @@ func Test_createModeCloudConfig(t *testing.T) {
 	assert.NotEmpty(hc.ManagementInterface.Gateway, "expected gateway to be set")
 	assert.NotEmpty(hc.ManagementInterface.SubnetMask, "expected subnet mask to be set")
 	assert.True(hc.WipeAllDisks, "expected wipe disks to be set")
+	assert.Contains(hc.WipeDisksList, "/dev/vda", "expected to find /dev/vda in wipeDisksList")
 }
 
 func Test_joinModeCloudConfig(t *testing.T) {
@@ -58,6 +59,7 @@ func Test_joinModeCloudConfig(t *testing.T) {
 	assert.NotEmpty(hc.ManagementInterface.Gateway, "expected gateway to be set")
 	assert.NotEmpty(hc.ManagementInterface.SubnetMask, "expected subnet mask to be set")
 	assert.True(hc.WipeAllDisks, "expected wipe disks to be set")
+	assert.Contains(hc.WipeDisksList, "/dev/vda", "expected to find /dev/vda in wipeDisksList")
 }
 
 var (
@@ -308,6 +310,7 @@ func Test_createModeCloudConfigV11(t *testing.T) {
 	assert.NotEmpty(hc.ManagementInterface.Gateway, "expected gateway to be set")
 	assert.NotEmpty(hc.ManagementInterface.SubnetMask, "expected subnet mask to be set")
 	assert.True(hc.WipeAllDisks, "expected wipe disks to be set")
+	assert.Contains(hc.WipeDisksList, "/dev/vda", "expected to find /dev/vda in wipeDisksList")
 }
 
 func Test_joinModeCloudConfigV11(t *testing.T) {
@@ -330,4 +333,5 @@ func Test_joinModeCloudConfigV11(t *testing.T) {
 	assert.NotEmpty(hc.ManagementInterface.Gateway, "expected gateway to be set")
 	assert.NotEmpty(hc.ManagementInterface.SubnetMask, "expected subnet mask to be set")
 	assert.True(hc.WipeAllDisks, "expected wipe disks to be set")
+	assert.Contains(hc.WipeDisksList, "/dev/vda", "expected to find /dev/vda in wipeDisksList")
 }

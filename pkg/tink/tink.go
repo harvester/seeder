@@ -184,7 +184,12 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 		hc.AfterInstallChrootCommands = []string{fmt.Sprintf("grub2-editenv /oem/grubenv set extra_cmdline=\"ifname=netboot:%s\"", hwAddress)}
 	}
 	hc.ManagementInterface.BondOptions = bondOptions
-	hc.WipeAllDisks = wipeDisks
+	hc.WipeAllDisks = hc.WipeAllDisks || wipeDisks
+	// append installation disk to WipeDisksList if wipeDisks is called at cluster level or via config url
+	// this should address https://github.com/harvester/harvester/issues/9536
+	if hc.WipeAllDisks {
+		hc.WipeDisksList = append(hc.WipeDisksList, disk)
+	}
 	hc.Device = disk
 	hc.SkipChecks = true
 	// for versions older than v1.2.x where streaming image mode is not available
