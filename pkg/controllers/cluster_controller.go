@@ -50,11 +50,13 @@ type ClusterReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
 	logr.Logger
-	mutex *sync.Mutex
+	mutex                     *sync.Mutex
+	ShutdownRetriggerInterval int64
 }
 
 const (
 	DefaultDeletionReconcileInterval = 30 * time.Second
+	DefaultShutdownRetriggerInterval = 600 // seconds
 )
 
 type clusterReconciler func(context.Context, *seederv1alpha1.Cluster) error
@@ -739,27 +741,21 @@ func (r *ClusterReconciler) ensureInventoryIsShutdown(ctx context.Context, c *se
 	}
 
 	if !util.ConditionExists(i, seederv1alpha1.ClusterCleanupSubmitted) {
-		iObj := i.DeepCopy()
-		util.CreateOrUpdateCondition(i, seederv1alpha1.ClusterCleanupSubmitted, c.Name)
-		i.Status.PowerAction.LastJobName = ""
-		err := r.Status().Patch(ctx, i, client.MergeFrom(iObj))
-		if err != nil {
-			return false, fmt.Errorf("error patching inventory status while triggering shutdown: %w", err)
-		}
-		// fetch i and apply conditionth
-		err = r.Get(ctx, types.NamespacedName{Name: iObj.Name, Namespace: iObj.Namespace}, i)
-		if err != nil {
-			return false, fmt.Errorf("error fetching inventory %s: %w", iObj.Name, err)
-		}
-
-		iObj = i.DeepCopy()
-
-		i.Spec.PowerActionRequested = seederv1alpha1.NodePowerActionShutdown
 
 		// return false and update from status patch
 		// on subsequent reconcile with condition is found
 		// we validate machine state
-		return false, r.Patch(ctx, i, client.MergeFrom(iObj))
+		return false, r.triggerShutdown(ctx, c, i)
+	}
+	// check if last cleanup submission time has exceeded timeout
+	// and machine job has completed which could indicate an issue
+	// with power status not reflecting correctly
+	lastUpdatedTime, err := time.Parse(time.RFC3339, seederv1alpha1.ClusterCleanupSubmitted.GetLastUpdated(i))
+	if err != nil {
+		r.Error(err, "unable to parse last updated time for ClusterCleanupSubmitted condition", i.Name, i.Namespace)
+	}
+	if time.Now().After(lastUpdatedTime.Add(time.Duration(r.ShutdownRetriggerInterval) * time.Second)) {
+		return false, r.triggerShutdown(ctx, c, i)
 	}
 
 	// patch machineObj with an annotation to trigger reconcile
@@ -778,4 +774,24 @@ func (r *ClusterReconciler) lockedAddressPoolUpdate(ctx context.Context, pool *s
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
 	return r.Status().Update(ctx, pool)
+}
+
+func (r *ClusterReconciler) triggerShutdown(ctx context.Context, c *seederv1alpha1.Cluster, i *seederv1alpha1.Inventory) error {
+	iObj := i.DeepCopy()
+	util.CreateOrUpdateCondition(i, seederv1alpha1.ClusterCleanupSubmitted, c.Name)
+	i.Status.PowerAction.LastJobName = ""
+	err := r.Status().Patch(ctx, i, client.MergeFrom(iObj))
+	if err != nil {
+		return fmt.Errorf("error patching inventory status while triggering shutdown: %w", err)
+	}
+	// fetch i and apply conditionth
+	err = r.Get(ctx, types.NamespacedName{Name: iObj.Name, Namespace: iObj.Namespace}, i)
+	if err != nil {
+		return fmt.Errorf("error fetching inventory %s: %w", iObj.Name, err)
+	}
+
+	iObj = i.DeepCopy()
+
+	i.Spec.PowerActionRequested = seederv1alpha1.NodePowerActionShutdown
+	return r.Patch(ctx, i, client.MergeFrom(iObj))
 }

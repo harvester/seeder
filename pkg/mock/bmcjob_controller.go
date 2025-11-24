@@ -3,6 +3,7 @@ package mock
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/go-logr/logr"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
@@ -12,6 +13,10 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+)
+
+const (
+	ignoreMachineNamePrefix = "ignore-"
 )
 
 // FakeBaseboardJobReconciller implements a fake reconcile loop for integration testing
@@ -74,6 +79,18 @@ func (f *FakeBaseboardJobReconciller) PatchMachinePowerStatus(ctx context.Contex
 		return fmt.Errorf("error fetching machine %s/%s: %w", j.Spec.MachineRef.Namespace, j.Spec.MachineRef.Name, err)
 	}
 
+	// skip machines with ignoreMachineNamnePrefix to help simulate when machine is not powered off
+	// and this can be used to ensure a second poweroff job is submitted by cluster controller
+	updatedMachine, err := f.skipMachinePoweroffUntilMultipleJobsExist(ctx, machineObj)
+	if err != nil {
+		return fmt.Errorf("error during method skipMachinePoweroffUntilMultipleJobsExist: %v", err)
+	}
+
+	//  do not perform machine power status updated yet
+	if !updatedMachine {
+		return nil
+	}
+
 	lastAction := j.Spec.Tasks[len(j.Spec.Tasks)-1]
 	machineObj.Status.Power = rufio.PowerState(*lastAction.PowerAction)
 	err = f.Status().Update(ctx, machineObj)
@@ -81,4 +98,31 @@ func (f *FakeBaseboardJobReconciller) PatchMachinePowerStatus(ctx context.Contex
 		return err
 	}
 	return nil
+}
+
+func (f *FakeBaseboardJobReconciller) skipMachinePoweroffUntilMultipleJobsExist(ctx context.Context, machine *rufio.Machine) (bool, error) {
+	if !strings.Contains(machine.Name, ignoreMachineNamePrefix) {
+		// no further action needed, exit function and allow power status to be updated
+		return true, nil
+	}
+	jobList := &rufio.JobList{}
+	err := f.List(ctx, jobList, client.InNamespace(machine.Namespace))
+	if err != nil {
+		return false, err
+	}
+
+	shutdownJobCount := 0
+	// found more than 1 job
+	for _, v := range jobList.Items {
+		// there will be a reboot job associated from initial provisioning
+		// so we need to filter out for shutdown jobs only
+		if strings.Contains(v.Name, "shutdown") && strings.Contains(v.Name, machine.Name) {
+			shutdownJobCount++
+		}
+	}
+
+	if shutdownJobCount > 2 {
+		return true, nil
+	}
+	return false, nil
 }

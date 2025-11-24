@@ -168,10 +168,11 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&ClusterReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-		Logger: ctrlruntimelog.Log.WithName("controller.cluster"),
-		mutex:  &sync.Mutex{},
+		Client:                    mgr.GetClient(),
+		Scheme:                    mgr.GetScheme(),
+		Logger:                    ctrlruntimelog.Log.WithName("controller.cluster"),
+		mutex:                     &sync.Mutex{},
+		ShutdownRetriggerInterval: 10,
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
