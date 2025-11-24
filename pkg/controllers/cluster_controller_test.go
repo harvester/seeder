@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"strings"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -1375,5 +1376,273 @@ var _ = Describe("multi-node cluster provisioning test", func() {
 
 			return fmt.Errorf("waiting for cluster finalizers to finish")
 		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
+})
+
+var _ = Describe("simulate machine poweroff failure", Ordered, func() {
+	var i *seederv1alpha1.Inventory
+	var c *seederv1alpha1.Cluster
+	var a *seederv1alpha1.AddressPool
+	var creds *v1.Secret
+	BeforeAll(func() {
+		a = &seederv1alpha1.AddressPool{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "ignore-cluster-test",
+				Namespace: "default",
+			},
+			Spec: seederv1alpha1.AddressSpec{
+				CIDR:    "192.168.1.1/29",
+				Gateway: "192.168.1.7",
+			},
+		}
+
+		i = &seederv1alpha1.Inventory{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "ignore-cluster-test",
+				Namespace: "default",
+			},
+			Spec: seederv1alpha1.InventorySpec{
+				PrimaryDisk:                   "/dev/sda",
+				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
+				BaseboardManagementSpec: rufio.MachineSpec{
+					Connection: rufio.Connection{
+						Host:        "localhost",
+						Port:        623,
+						InsecureTLS: true,
+						AuthSecretRef: v1.SecretReference{
+							Name:      "ignore-cluster-test",
+							Namespace: "default",
+						},
+					},
+				},
+			},
+		}
+
+		creds = &v1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "ignore-cluster-test",
+				Namespace: "default",
+			},
+			StringData: map[string]string{
+				"username": "admin",
+				"password": "password",
+			},
+		}
+
+		c = &seederv1alpha1.Cluster{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "ignore-cluster-test",
+				Namespace: "default",
+			},
+			Spec: seederv1alpha1.ClusterSpec{
+				HarvesterVersion: "harvester_1_0_2",
+				Nodes: []seederv1alpha1.NodeConfig{
+					{
+						InventoryReference: seederv1alpha1.ObjectReference{
+							Name:      "ignore-cluster-test",
+							Namespace: "default",
+						},
+						AddressPoolReference: seederv1alpha1.ObjectReference{
+							Name:      "ignore-cluster-test",
+							Namespace: "default",
+						},
+					},
+				},
+				VIPConfig: seederv1alpha1.VIPConfig{
+					AddressPoolReference: seederv1alpha1.ObjectReference{
+						Name:      "ignore-cluster-test",
+						Namespace: "default",
+					},
+				},
+				ClusterConfig: seederv1alpha1.ClusterConfig{
+					SSHKeys: []string{
+						"abc",
+						"def",
+					},
+					ConfigURL: "file:///testdata/config.yaml",
+				},
+			},
+		}
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, a)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, creds)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, i)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, c)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
+
+	It("check address pool reconcile in cluster controller workflow", func() {
+
+		Eventually(func() error {
+			obj := &seederv1alpha1.AddressPool{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: a.Namespace, Name: a.Name}, obj)
+			if err != nil {
+				return err
+			}
+
+			if obj.Status.Status != seederv1alpha1.PoolReady {
+				return fmt.Errorf("waiting for pool to be ready. current status is %s", obj.Status.Status)
+			}
+			return nil
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
+
+	It("check inventory reconcile in cluster controller workflow", func() {
+		Eventually(func() error {
+			tmpInventory := &seederv1alpha1.Inventory{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, tmpInventory)
+			if err != nil {
+				return err
+			}
+
+			// is inventory ready
+			if tmpInventory.Status.Status != seederv1alpha1.InventoryReady {
+				return fmt.Errorf("expected inventory to be ready, but current state is %v", tmpInventory)
+			}
+
+			if !util.ConditionExists(tmpInventory, seederv1alpha1.InventoryAllocatedToCluster) {
+				return fmt.Errorf("expected inventory to be allocated to cluster %v", tmpInventory.Status)
+			}
+			// is tinkerbell hardware condition present
+			if !util.ConditionExists(tmpInventory, seederv1alpha1.TinkHardwareCreated) {
+				return fmt.Errorf("expected tinkerbell hardware condition to exist %v", tmpInventory.Status.Conditions)
+			}
+
+			// is tinkerbell template condition present
+			if !util.ConditionExists(tmpInventory, seederv1alpha1.TinkTemplateCreated) {
+				return fmt.Errorf("expected tinkerbell template condition to exist %v", tmpInventory.Status.Conditions)
+			}
+
+			// is tinkerbell workflow condition present
+			if !util.ConditionExists(tmpInventory, seederv1alpha1.TinkWorkflowCreated) {
+				return fmt.Errorf("expected tinkerbell workflow condition to exist %v", tmpInventory.Status.Conditions)
+			}
+
+			if tmpInventory.Status.PowerAction.LastActionStatus != seederv1alpha1.NodeJobComplete {
+				return fmt.Errorf("expected power action to be completed but got %s", tmpInventory.Status.PowerAction.LastActionStatus)
+			}
+			return nil
+		}, "60s", "5s").ShouldNot(HaveOccurred())
+	})
+
+	// check cluster deletion and reconcilliation of hardware and inventory objects
+	// Test is flaky when using TestEnv. Disabling for now
+	It("delete cluster and check cleanup of inventory objects", func() {
+
+		Eventually(func() error {
+			// ensure that previous reboot job has been reconcilled
+			clusterObj := &seederv1alpha1.Cluster{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Name: c.Name, Namespace: c.Namespace}, clusterObj)
+			if err != nil {
+				if apierrors.IsNotFound(err) {
+					GinkgoWriter.Printf("cluster object deleted\n")
+					return nil
+				}
+			}
+			return nil
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, c)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		// Ensure multiple jobs exist for shutdown off the inventory with ignore- prefix
+		Eventually(func() error {
+			jobList := &rufio.JobList{}
+			// client.MatchingLabels(map[string]string{"inventory.metal.harvesterhci.io": "i.Name"})
+			err := k8sClient.List(ctx, jobList, client.InNamespace(i.Namespace))
+			if err != nil {
+				return err
+			}
+
+			shutdownJobCount := 0
+			// found more than 1 job
+			for _, v := range jobList.Items {
+				// there will be a reboot job associated from initial provisioning
+				// so we need to filter out for shutdown jobs only
+				if strings.Contains(v.Name, "shutdown") && strings.Contains(v.Name, i.Name) {
+					shutdownJobCount++
+				}
+			}
+
+			if shutdownJobCount > 1 {
+				return nil
+			}
+			return fmt.Errorf("expected to find more than 1 shutdown jobs but found %d", shutdownJobCount)
+		}, "120s", "30s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			clusterObj := &seederv1alpha1.Cluster{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Name: c.Name, Namespace: c.Namespace}, clusterObj)
+			if err != nil {
+				if apierrors.IsNotFound(err) {
+					GinkgoWriter.Printf("cluster object deleted\n")
+					return nil
+				}
+			}
+			return fmt.Errorf("waiting for cluster object to be deleted")
+		}, "90s", "10s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			machineObj := &rufio.Machine{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, machineObj)
+			if err != nil {
+				return err
+			}
+			if machineObj.Status.Power != rufio.Off {
+				return fmt.Errorf("expected to get rufio power state %s but got %s", rufio.Off, machineObj.Status.Power)
+			}
+			return nil
+		}, "120s", "10s").ShouldNot(HaveOccurred())
+	})
+
+	AfterAll(func() {
+		Eventually(func() error {
+			// check and delete cluster if needed. Need this since one of the tests simulates removing cluster
+			// and checking gc of hardware objects
+			cObj := &seederv1alpha1.Cluster{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
+			if err != nil {
+				if apierrors.IsNotFound(err) {
+					return nil
+				}
+				return err
+			}
+			return k8sClient.Delete(ctx, c)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, i)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, creds)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, a)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			cObj := &seederv1alpha1.Cluster{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: c.Namespace, Name: c.Name}, cObj)
+			if err != nil {
+				if apierrors.IsNotFound(err) {
+					return nil
+				}
+				return err
+			}
+
+			return fmt.Errorf("waiting for cluster finalizers to finish")
+		}, "90s", "10s").ShouldNot(HaveOccurred())
 	})
 })

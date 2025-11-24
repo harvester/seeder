@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
-	"github.com/harvester/seeder/pkg/endpoint"
 	"github.com/sirupsen/logrus"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	rufiocontrollers "github.com/tinkerbell/rufio/controller"
@@ -23,12 +22,15 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
+	"github.com/harvester/seeder/pkg/endpoint"
+
+	ctrlruntimelog "sigs.k8s.io/controller-runtime/pkg/log"
+
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/crd"
 	"github.com/harvester/seeder/pkg/rufiojobwrapper"
 	"github.com/harvester/seeder/pkg/util"
 	"github.com/harvester/seeder/pkg/webhook"
-	ctrlruntimelog "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 var (
@@ -93,10 +95,11 @@ func (s *Server) Start(ctx context.Context) error {
 	var enabledControllers []controller
 	var coreControllers = []controller{
 		&ClusterReconciler{
-			Client: mgr.GetClient(),
-			Scheme: mgr.GetScheme(),
-			Logger: s.logger.WithName("cluster-controller"),
-			mutex:  &sync.Mutex{},
+			Client:                    mgr.GetClient(),
+			Scheme:                    mgr.GetScheme(),
+			Logger:                    s.logger.WithName("cluster-controller"),
+			mutex:                     &sync.Mutex{},
+			ShutdownRetriggerInterval: DefaultShutdownRetriggerInterval,
 		},
 		&InventoryReconciler{
 			Client: mgr.GetClient(),
