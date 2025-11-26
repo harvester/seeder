@@ -1,0 +1,60 @@
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: NestedCluster
+metadata:
+  name: nested-cluster-test
+  namespace: tink-system
+spec:
+  version: v1.6.1
+  clusterConfig:
+    nameservers:
+    - 8.8.8.8
+    vlanID: 1
+    wipeDisks: true
+  imageURL: http://10.115.1.6/iso
+  vipConfig:
+    addressPoolReference:
+      name: vlan2017
+      namespace: tink-system
+  inventoryTemplateConfig:
+  - name: pool-1
+    inventoryTemplateSpec:
+      credentials:
+        name: cpu-model
+        namespace: tink-system
+      vmSpec:
+        cpu: 8
+        memory: 32Gi
+        disks:
+        - size: 300Gi
+          driver: virtio
+          storageClass: dell-140-lvm
+        networks:
+        - vmNetwork: "default/vlan2017"
+          nicModel: virtio
+        namespace: default
+        count: 2
+        ingressClassName: nginx
+    addressPoolReference:
+      name: vlan2017
+      namespace: tink-system  
+  - name: pool-2
+    inventoryTemplateSpec:
+      credentials:
+        name: cpu-model
+        namespace: tink-system
+      vmSpec:
+        cpu: 8
+        memory: 32Gi
+        disks:
+        - size: 300Gi
+          driver: virtio
+          storageClass: dell-140-lvm
+        networks:
+        - vmNetwork: "default/vlan2017"
+          nicModel: virtio
+        namespace: default
+        count: 1
+        ingressClassName: nginx
+    addressPoolReference:
+      name: vlan2017
+      namespace: tink-system
