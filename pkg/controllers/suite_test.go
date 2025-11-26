@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -31,9 +32,14 @@ import (
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
+	apiextensionv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/client-go/tools/clientcmd/api"
+	kubevirtv1 "kubevirt.io/api/core/v1"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
@@ -45,6 +51,8 @@ import (
 	"github.com/harvester/seeder/pkg/crd"
 	"github.com/harvester/seeder/pkg/endpoint"
 	"github.com/harvester/seeder/pkg/mock"
+	nadv1 "github.com/k8snetworkplumbingwg/network-attachment-definition-client/pkg/apis/k8s.cni.cncf.io/v1"
+	storagev1 "k8s.io/api/storage/v1"
 )
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
@@ -65,9 +73,12 @@ var (
 )
 
 const (
-	defaultToken = "token"
-	k3sPort      = "6443"
-	redfishPort  = "8000"
+	defaultToken             = "token"
+	k3sPort                  = "6443"
+	redfishPort              = "8000"
+	localHarvesterSecretName = "local-harvester"
+	storageClass             = "fake-sc"
+	nadName                  = "default/fakevlan"
 )
 
 func TestAPIs(t *testing.T) {
@@ -88,17 +99,8 @@ func TestAPIs(t *testing.T) {
 var _ = BeforeSuite(func() {
 	ctrlruntimelog.SetLogger(zap.New(zap.WriteTo(GinkgoWriter), zap.UseDevMode(true)))
 	ctx, cancel = context.WithCancel(context.TODO())
-	By("bootstrapping test environment")
-	testEnv = &envtest.Environment{}
 
-	cfg, err := testEnv.Start()
-	Expect(err).NotTo(HaveOccurred())
-	Expect(cfg).NotTo(BeNil())
-
-	// install CRD's
-	err = crd.Create(ctx, cfg)
-	Expect(err).NotTo(HaveOccurred())
-	err = seederv1alpha1.AddToScheme(scheme)
+	err := seederv1alpha1.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = rufio.AddToScheme(scheme)
@@ -109,6 +111,38 @@ var _ = BeforeSuite(func() {
 
 	err = tinkv1alpha1.AddToScheme(scheme)
 	Expect(err).NotTo(HaveOccurred())
+
+	err = kubevirtv1.AddToScheme(scheme)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = nadv1.AddToScheme(scheme)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = storagev1.AddToScheme(scheme)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = apiextensionv1.AddToScheme(scheme)
+	Expect(err).NotTo(HaveOccurred())
+
+	By("bootstrapping test environment")
+	testEnv = &envtest.Environment{
+		Scheme: scheme,
+		CRDInstallOptions: envtest.CRDInstallOptions{
+			Paths: []string{
+				"crds",
+			},
+		},
+		ErrorIfCRDPathMissing: true,
+	}
+
+	cfg, err := testEnv.Start()
+	Expect(err).NotTo(HaveOccurred())
+	Expect(cfg).NotTo(BeNil())
+
+	// install CRD's
+	err = crd.Create(ctx, cfg)
+	Expect(err).NotTo(HaveOccurred())
+
 	//+kubebuilder:scaffold:scheme
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme})
@@ -121,6 +155,14 @@ var _ = BeforeSuite(func() {
 	err = createTinkStackService(ctx, k8sClient)
 	Expect(err).NotTo(HaveOccurred())
 	err = createSeederDeploymentService(ctx, k8sClient)
+	Expect(err).NotTo(HaveOccurred())
+	err = createIngressExposeService(ctx, k8sClient)
+	Expect(err).NotTo(HaveOccurred())
+	err = generateLocalKubeconfigSecret(ctx, cfg, k8sClient)
+	Expect(err).NotTo(HaveOccurred())
+	err = createStorageClass(ctx, k8sClient)
+	Expect(err).NotTo(HaveOccurred())
+	err = createNetAttachDef(ctx, k8sClient)
 	Expect(err).NotTo(HaveOccurred())
 
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
@@ -218,6 +260,20 @@ var _ = BeforeSuite(func() {
 		Client: mgr.GetClient(),
 		Scheme: mgr.GetScheme(),
 		Logger: ctrlruntimelog.Log.WithName("controller.cluster-tinkerbell-workflow"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&InventoryTemplateReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: ctrlruntimelog.Log.WithName("controller.inventory-template-reconciler"),
+	}).SetupWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
+	err = (&NestedClusterReconciler{
+		Client: mgr.GetClient(),
+		Scheme: mgr.GetScheme(),
+		Logger: ctrlruntimelog.Log.WithName("controller.nested-cluster-reconciler"),
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
@@ -399,5 +455,128 @@ func cleanupObjects(ctx context.Context, k8sclient client.Client) error {
 			return err
 		}
 	}
+	return nil
+}
+
+func generateLocalKubeconfigSecret(ctx context.Context, cfg *rest.Config, k8sclient client.Client) error {
+	kubeConfig := api.NewConfig()
+	clusterName := "envtest-cluster"
+	kubeConfig.Clusters[clusterName] = &api.Cluster{
+		Server:                   cfg.Host,
+		CertificateAuthorityData: cfg.CAData,
+	}
+	// Define user
+	userName := "admin"
+	kubeConfig.AuthInfos[userName] = &api.AuthInfo{
+		ClientCertificateData: cfg.CertData,
+		ClientKeyData:         cfg.KeyData,
+	}
+
+	// Define context
+	contextName := "envtest-context"
+	kubeConfig.Contexts[contextName] = &api.Context{
+		Cluster:  clusterName,
+		AuthInfo: userName,
+	}
+	kubeConfig.CurrentContext = contextName
+	output, err := clientcmd.Write(*kubeConfig)
+	if err != nil {
+		return fmt.Errorf("error generating kubeconfig: %w", err)
+	}
+	secret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      localHarvesterSecretName,
+			Namespace: "default",
+		},
+		Data: map[string][]byte{
+			seederv1alpha1.SecretKubeconfigFieldKey: output,
+		},
+	}
+
+	if err := k8sclient.Create(ctx, secret); err != nil {
+		return fmt.Errorf("error creating kubeconfig secret")
+	}
+	watchedObjects = append(watchedObjects, secret)
+	return nil
+}
+
+func createIngressExposeService(ctx context.Context, k8sclient client.Client) error {
+	ns := &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: seederv1alpha1.KubeBMCNS,
+		},
+	}
+
+	err := k8sclient.Create(ctx, ns)
+	if err != nil {
+		return err
+	}
+
+	watchedObjects = append(watchedObjects, ns)
+
+	svc := &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      seederv1alpha1.IngressExposeService,
+			Namespace: seederv1alpha1.KubeSystemNS,
+		},
+		Spec: corev1.ServiceSpec{
+			Type: corev1.ServiceTypeLoadBalancer,
+			Ports: []corev1.ServicePort{
+				{
+					Port: 443,
+				},
+			},
+		},
+	}
+	err = k8sclient.Create(ctx, svc)
+	if err != nil {
+		return err
+	}
+
+	err = k8sclient.Get(ctx, types.NamespacedName{Name: svc.Name, Namespace: svc.Namespace}, svc)
+	if err != nil {
+		return err
+	}
+
+	svc.Status = corev1.ServiceStatus{
+		LoadBalancer: corev1.LoadBalancerStatus{
+			Ingress: []corev1.LoadBalancerIngress{{
+				IP: "192.168.1.2",
+			},
+			},
+		},
+	}
+
+	watchedObjects = append(watchedObjects, svc)
+	return k8sclient.Status().Update(ctx, svc)
+}
+
+func createStorageClass(ctx context.Context, k8sclient client.Client) error {
+	sc := &storagev1.StorageClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: storageClass,
+		},
+		Provisioner: "fake-provisioner",
+	}
+
+	if err := k8sclient.Create(ctx, sc); err != nil {
+		return fmt.Errorf("error creating storage class: %w", err)
+	}
+	watchedObjects = append(watchedObjects, sc)
+	return nil
+}
+
+func createNetAttachDef(ctx context.Context, k8sclient client.Client) error {
+	name := strings.Split(nadName, "/")
+	nad := &nadv1.NetworkAttachmentDefinition{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name[1],
+			Namespace: name[0],
+		},
+	}
+	if err := k8sclient.Create(ctx, nad); err != nil {
+		return fmt.Errorf("error creating net-attach-definition: %w", err)
+	}
+	watchedObjects = append(watchedObjects, nad)
 	return nil
 }
