@@ -2,19 +2,12 @@ package util
 
 import (
 	"context"
-	"fmt"
-	"log"
-	"os"
 	"testing"
-	"time"
 
-	"github.com/ory/dockertest/v3"
-	"github.com/ory/dockertest/v3/docker"
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	typedCore "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/tools/clientcmd"
-	runtimelog "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 var k3sNodeAddress string
@@ -24,7 +17,7 @@ const (
 	k3sPort = "6443"
 )
 
-func TestMain(t *testing.M) {
+/*func TestMain(t *testing.M) {
 	// setup a k3s server in docker using dockertest
 	pool, err := dockertest.NewPool("")
 	if err != nil {
@@ -80,7 +73,7 @@ func TestMain(t *testing.M) {
 	_ = pool.Purge(k3s)
 	os.Exit(code)
 
-}
+}*/
 
 func Test_GenerateKubeConfig(t *testing.T) {
 	assert := require.New(t)

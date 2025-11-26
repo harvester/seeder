@@ -1,5 +1,9 @@
 package v1alpha1
 
+import (
+	"k8s.io/apimachinery/pkg/runtime/schema"
+)
+
 // common constants not associated with a particular type
 const (
 	DefaultNS                      = "metal-system"
@@ -13,7 +17,11 @@ const (
 )
 
 var (
-	DefaultAPIPrefix = "rke2"
+	DefaultAPIPrefix                  = "rke2"
+	InventoryGroupVersionKind         = schema.GroupVersionKind{Group: GroupVersion.Group, Version: GroupVersion.Version, Kind: "Inventory"}
+	ClusterGroupVersionKind           = schema.GroupVersionKind{Group: GroupVersion.Group, Version: GroupVersion.Version, Kind: "Cluster"}
+	InventoryTemplateGroupVersionKind = schema.GroupVersionKind{Group: GroupVersion.Group, Version: GroupVersion.Version, Kind: "InventoryTemplate"}
+	NestedClusterGroupVersionKind     = schema.GroupVersionKind{Group: GroupVersion.Group, Version: GroupVersion.Version, Kind: "NestedCluster"}
 )
 
 const (
