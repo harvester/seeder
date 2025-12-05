@@ -62,6 +62,7 @@ func (s *Server) Start(ctx context.Context) error {
 
 	utilruntime.Must(seederv1alpha1.AddToScheme(scheme))
 	utilruntime.Must(tinkv1alpha1.AddToScheme(scheme))
+
 	s.initLogs()
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
 		Scheme: scheme,
@@ -154,6 +155,16 @@ func (s *Server) Start(ctx context.Context) error {
 			Client: mgr.GetClient(),
 			Scheme: mgr.GetScheme(),
 			Logger: s.logger.WithName("cluster-tinkerbell-workflow-controller"),
+		},
+		&InventoryTemplateReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+			Logger: s.logger.WithName("inventory-template-controller"),
+		},
+		&NestedClusterReconciler{
+			Client: mgr.GetClient(),
+			Scheme: mgr.GetScheme(),
+			Logger: s.logger.WithName("nested-cluster-controller"),
 		},
 	}
 

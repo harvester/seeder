@@ -1,0 +1,22 @@
+apiVersion: metal.harvesterhci.io/v1alpha1
+kind: InventoryTemplate
+metadata:
+  name: vm-test
+  namespace: tink-system
+spec:
+  credentials:
+    name: cpu-model
+    namespace: tink-system
+  vmSpec:
+    cpu: 8
+    memory: 8Gi
+    disks:
+    - size: 250Gi
+      driver: virtio
+      storageClass: dell-140-lvm
+    networks:
+    - vmNetwork: "default/vlan2017"
+      nicModel: virtio
+    namespace: default
+    count: 3
+    ingressClassName: nginx
