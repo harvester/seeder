@@ -95,6 +95,7 @@ type InventoryStatus struct {
 	PXEBootInterface  `json:"pxeBootConfig,omitempty"`
 	Cluster           ObjectReference    `json:"ownerCluster,omitempty"`
 	PowerAction       PowerActionDetails `json:"powerAction,omitempty"`
+	MachinePowerState rufio.PowerState   `json:"machinePowerState,omitempty"`
 }
 
 type Conditions struct {

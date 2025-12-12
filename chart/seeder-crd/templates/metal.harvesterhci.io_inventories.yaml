@@ -298,6 +298,9 @@ spec:
                 type: string
               hardwareID:
                 type: string
+              machinePowerState:
+                description: PowerState represents power state of a Machine.
+                type: string
               ownerCluster:
                 properties:
                   name:
