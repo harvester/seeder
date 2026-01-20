@@ -79,7 +79,7 @@ func (r *InventoryReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	}
 
 	reconcileList := []inventoryReconciler{r.triggerPowerAction, r.manageBaseboardObject, r.checkAndMarkNodeReady,
-		r.handleBaseboardDeletion, r.reconcileBMCJob, r.housekeepingBMCJob, r.hasMachineSpecChanged}
+		r.handleBaseboardDeletion, r.reconcileBMCJob, r.housekeepingBMCJob, r.hasMachineSpecChanged, r.reconcileMachinePowerState}
 	// if inventory object has LocalInventoryAnnotation then skip reconcile as this will be handled by the local_cluster_controller
 	if _, ok := inventoryObj.Annotations[seederv1alpha1.LocalInventoryAnnotation]; !ok {
 		reconcileList = append(reconcileList, r.triggerReboot, r.inventoryFreed)
@@ -444,6 +444,27 @@ func (r *InventoryReconciler) jobWrapper(ctx context.Context, i *seederv1alpha1.
 		if err := r.Create(ctx, j); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+// reconcilleMachinePowerState will update the machine power state in inventory status
+func (r *InventoryReconciler) reconcileMachinePowerState(ctx context.Context, iObj *seederv1alpha1.Inventory) error {
+	i := iObj.DeepCopy()
+	if i.Status.Status != seederv1alpha1.InventoryReady {
+		return nil
+	}
+	b := &rufio.Machine{}
+	err := r.Get(ctx, types.NamespacedName{Name: i.Name, Namespace: i.Namespace}, b)
+	if err != nil {
+		return err
+	}
+
+	powerState := b.Status.Power
+
+	if i.Status.MachinePowerState != powerState {
+		i.Status.MachinePowerState = powerState
+		return r.Status().Update(ctx, i)
 	}
 	return nil
 }
