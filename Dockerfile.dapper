@@ -1,18 +1,17 @@
-FROM golang:1.25
+FROM registry.suse.com/bci/golang:1.25.7
 
 ARG DAPPER_HOST_ARCH
 ENV ARCH="$DAPPER_HOST_ARCH"
 
-RUN export K8S_VERSION=1.33.0 && \
-    curl -sSLo envtest-bins.tar.gz "https://github.com/kubernetes-sigs/controller-tools/releases/download/envtest-v${K8S_VERSION}/envtest-v${K8S_VERSION}-$(go env GOOS)-$(go env GOARCH).tar.gz" && \
+RUN export K8S_VERSION=v1.34.0 && \
+    export OS=$(go env GOOS) && \
+    export ARCH=$(go env GOARCH) && \
+    curl -sSLo envtest-bins.tar.gz "https://github.com/kubernetes-sigs/controller-tools/releases/download/envtest-${K8S_VERSION}/envtest-${K8S_VERSION}-${OS}-${ARCH}.tar.gz" && \
     mkdir /usr/local/kubebuilder && \
     tar -C /usr/local/kubebuilder --strip-components=1 -zvxf envtest-bins.tar.gz && \
-    curl -sSLo kustomize.tar.gz "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.5.7/kustomize_v4.5.7_linux_amd64.tar.gz" && \
-    tar -C /usr/bin --strip-components=1 -zxvf kustomize.tar.gz && \
-    go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.17.0
+    go install sigs.k8s.io/controller-tools/cmd/controller-gen@v0.20.1
 
-RUN apt update && \
-    apt install -y bash git gcc docker.io vim less file curl wget ca-certificates qemu-utils
+RUN zypper -n install bash git gcc docker vim less file curl wget ca-certificates
 
 ## install golangci
 RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s latest

@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"reflect"
 
+	"context"
+
 	"github.com/go-logr/logr"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
-	"golang.org/x/net/context"
 	v1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
