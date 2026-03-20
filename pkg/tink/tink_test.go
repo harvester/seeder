@@ -271,7 +271,7 @@ func Test_GenerateWorkflow(t *testing.T) {
 
 func Test_generateIPXEScript(t *testing.T) {
 	assert := require.New(t)
-	_, err := generateIPXEScript("v1.1.3", "http://imagestore/iso", "hegelEndpoint", "ab:cd:ef:gh:ij", "amd64", 1)
+	_, err := generateIPXEScript("v1.1.3", "http://imagestore/iso", "hegelEndpoint", "ab:cd:ef:gh:ij", "amd64", 1, "192.168.1.101", "255.255.255.0", "192.168.1.1")
 	assert.NoError(err, "expect no error during generation of ipxe script")
 }
 
