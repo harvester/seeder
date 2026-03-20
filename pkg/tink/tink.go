@@ -107,7 +107,7 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster, s
 	// if not using StreamImage mode then define a custom ipxe url with info needed to provision harvester
 	if !c.Spec.StreamImageMode {
 		customIPXEScript, err := generateIPXEScript(c.Spec.HarvesterVersion, c.Spec.ImageURL, fmt.Sprintf("http://%s:%s/2009-04-04/user-data",
-			tinkStackService.Status.LoadBalancer.Ingress[0].IP, HegelDefaultPort), i.Spec.ManagementInterfaceMacAddress, i.Spec.Arch, c.Spec.VlanID)
+			tinkStackService.Status.LoadBalancer.Ingress[0].IP, HegelDefaultPort), i.Spec.ManagementInterfaceMacAddress, i.Spec.Arch, c.Spec.VlanID, i.Status.Address, i.Status.Netmask, i.Status.Gateway)
 		if err != nil {
 			return nil, fmt.Errorf("error generating custom ipxe script for inventory %s: %v", i.Name, err)
 		}
@@ -180,9 +180,9 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 	hc.DNSNameservers = append(hc.DNSNameservers, Nameservers...)
 	hc.SSHAuthorizedKeys = append(hc.SSHAuthorizedKeys, SSHKeys...)
 	hc.Hostname = hostname
-	if vlanID > 1 {
-		hc.AfterInstallChrootCommands = []string{fmt.Sprintf("grub2-editenv /oem/grubenv set extra_cmdline=\"ifname=netboot:%s\"", hwAddress)}
-	}
+
+	hc.AfterInstallChrootCommands = []string{fmt.Sprintf("grub2-editenv /oem/grubenv set extra_cmdline=\"ifname=netboot:%s\"", hwAddress)}
+
 	hc.ManagementInterface.BondOptions = bondOptions
 	hc.WipeAllDisks = hc.WipeAllDisks || wipeDisks
 	// append installation disk to WipeDisksList if wipeDisks is called at cluster level or via config url
@@ -214,7 +214,7 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 
 // generateIPXEScript will generate an inline ipxe script similar to https://github.com/harvester/ipxe-examples/blob/main/general/ipxe-create
 // and uses the same for create / join of node
-func generateIPXEScript(harvesterVersion, isoURL, hegelEndpoint, macAddress, arch string, vlanID int) (string, error) {
+func generateIPXEScript(harvesterVersion, isoURL, hegelEndpoint, macAddress, arch string, vlanID int, ip string, netmask string, gateway string) (string, error) {
 
 	ipxeTemplateStruct := struct {
 		Version       string
@@ -223,6 +223,9 @@ func generateIPXEScript(harvesterVersion, isoURL, hegelEndpoint, macAddress, arc
 		MacAddress    string
 		Arch          string
 		VlanID        int
+		IP            string
+		Netmask       string
+		Gateway       string
 	}{
 		Version:       harvesterVersion,
 		ISOURL:        isoURL,
@@ -230,6 +233,9 @@ func generateIPXEScript(harvesterVersion, isoURL, hegelEndpoint, macAddress, arc
 		MacAddress:    macAddress,
 		Arch:          arch,
 		VlanID:        vlanID,
+		IP:            ip,
+		Netmask:       netmask,
+		Gateway:       gateway,
 	}
 
 	var output bytes.Buffer
@@ -240,7 +246,7 @@ set base {{ .ISOURL}}/{{ .Version }}
 set arch {{ .Arch }}
 dhcp
 iflinkwait -t 5000
-kernel ${base}/harvester-${version}-vmlinuz-${arch} initrd=harvester-${version}-initrd-${arch} ip=dhcp net.ifnames=1 rd.cos.disable rd.noverifyssl BOOTIF={{ .MacAddress }} root=live:${base}/harvester-${version}-rootfs-${arch}.squashfs console=tty1 harvester.install.automatic=true boot_cmd='echo include_ping_test=yes >> /etc/conf.d/net-online' harvester.install.config_url={{ .HegelEndpoint }} {{if gt .VlanID 1}}ifname=netboot:{{ .MacAddress }}  vlan=vlan{{ .VlanID }}:netboot {{end}}
+kernel ${base}/harvester-${version}-vmlinuz-${arch} initrd=harvester-${version}-initrd-${arch} ip={{ .IP }}::{{ .Gateway }}:{{ .Netmask }}::netboot:off net.ifnames=1 rd.cos.disable rd.noverifyssl BOOTIF={{ .MacAddress }} ifname=netboot:{{ .MacAddress }} root=live:${base}/harvester-${version}-rootfs-${arch}.squashfs console=tty1 harvester.install.automatic=true boot_cmd='echo include_ping_test=yes >> /etc/conf.d/net-online' harvester.install.config_url={{ .HegelEndpoint }} {{if gt .VlanID 1}}vlan=vlan{{ .VlanID }}:netboot {{end}}
 initrd ${base}/harvester-${version}-initrd-${arch}
 boot
 `
