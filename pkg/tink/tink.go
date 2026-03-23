@@ -246,7 +246,7 @@ set base {{ .ISOURL}}/{{ .Version }}
 set arch {{ .Arch }}
 dhcp
 iflinkwait -t 5000
-kernel ${base}/harvester-${version}-vmlinuz-${arch} initrd=harvester-${version}-initrd-${arch} ip={{ .IP }}::{{ .Gateway }}:{{ .Netmask }}::netboot:off net.ifnames=1 rd.cos.disable rd.noverifyssl BOOTIF={{ .MacAddress }} ifname=netboot:{{ .MacAddress }} root=live:${base}/harvester-${version}-rootfs-${arch}.squashfs console=tty1 harvester.install.automatic=true boot_cmd='echo include_ping_test=yes >> /etc/conf.d/net-online' harvester.install.config_url={{ .HegelEndpoint }} {{if gt .VlanID 1}}vlan=vlan{{ .VlanID }}:netboot {{end}}
+kernel ${base}/harvester-${version}-vmlinuz-${arch} initrd=harvester-${version}-initrd-${arch} {{if gt .VlanID 1}}ip={{ .IP }}::{{ .Gateway }}:{{ .Netmask }}::vlan{{ .VlanID }}:off{{else}}ip={{ .IP }}::{{ .Gateway }}:{{ .Netmask }}::netboot:off{{end}} net.ifnames=1 rd.cos.disable rd.noverifyssl BOOTIF={{ .MacAddress }} ifname=netboot:{{ .MacAddress }} root=live:${base}/harvester-${version}-rootfs-${arch}.squashfs console=tty1 harvester.install.automatic=true boot_cmd='echo include_ping_test=yes >> /etc/conf.d/net-online' harvester.install.config_url={{ .HegelEndpoint }} {{if gt .VlanID 1}}vlan=vlan{{ .VlanID }}:netboot {{end}}
 initrd ${base}/harvester-${version}-initrd-${arch}
 boot
 `
