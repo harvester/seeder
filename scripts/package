@@ -18,7 +18,7 @@ fi
 IMAGE=${REPO}/harvester-seeder:${TAG}
 DOCKERFILE=package/Dockerfile
 
-buildx build --load \
+docker buildx build --load \
   -f ${DOCKERFILE} -t ${IMAGE} .
   
 echo Built ${IMAGE}
