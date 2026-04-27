@@ -62,7 +62,7 @@ var _ = Describe("NestedCluster Controller", func() {
 								Memory: memory,
 								Disks: []seederv1alpha1.DiskConfig{
 									{
-										Bus:          "virtio",
+										DiskBus:      "virtio",
 										Size:         disk,
 										StorageClass: storageClass,
 									},
@@ -95,7 +95,7 @@ var _ = Describe("NestedCluster Controller", func() {
 								Memory: memory,
 								Disks: []seederv1alpha1.DiskConfig{
 									{
-										Bus:          "virtio",
+										DiskBus:      "virtio",
 										Size:         disk,
 										StorageClass: storageClass,
 									},

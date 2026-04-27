@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -34,12 +33,12 @@ func Test_GenerateVMPool(t *testing.T) {
 				Count:     3,
 				Disks: []seederv1alpha1.DiskConfig{
 					{
-						Bus:          kubevirtv1.DiskBusVirtio,
+						DiskBus:      kubevirtv1.DiskBusVirtio,
 						Size:         diskQuantity,
 						StorageClass: "harvester-longhorn",
 					},
 					{
-						Bus:          kubevirtv1.DiskBusVirtio,
+						DiskBus:      kubevirtv1.DiskBusVirtio,
 						Size:         diskQuantity,
 						StorageClass: "harvester-longhorn",
 					},
@@ -65,9 +64,8 @@ func Test_GenerateVMPool(t *testing.T) {
 	assert.Len(vmObjs[0].Spec.DataVolumeTemplates, len(inventoryTempate.Spec.VMSpec.Disks), "expected to find datavolumetemplates matching vm definition")
 	assert.Len(vmObjs[0].Spec.Template.Spec.Volumes, len(inventoryTempate.Spec.VMSpec.Disks), "expected to find datavolumetemplates matching vm definition")
 	assert.Len(vmObjs[0].Spec.Template.Spec.Networks, len(inventoryTempate.Spec.VMSpec.Networks), "expected to find networks matching vm definition")
-	contents, err := yaml.Marshal(vmObjs[0])
+	_, err = yaml.Marshal(vmObjs[0])
 	assert.NoError(err)
-	fmt.Println(string(contents))
 
 }
 
@@ -102,7 +100,7 @@ func Test_GenerateClusterFromNestedCluster(t *testing.T) {
 							Memory: memory,
 							Disks: []seederv1alpha1.DiskConfig{
 								{
-									Bus:          "virtio",
+									DiskBus:      "virtio",
 									Size:         disk,
 									StorageClass: storageClass,
 								},
@@ -134,7 +132,7 @@ func Test_GenerateClusterFromNestedCluster(t *testing.T) {
 							Memory: memory,
 							Disks: []seederv1alpha1.DiskConfig{
 								{
-									Bus:          "virtio",
+									DiskBus:      "virtio",
 									Size:         disk,
 									StorageClass: storageClass,
 								},

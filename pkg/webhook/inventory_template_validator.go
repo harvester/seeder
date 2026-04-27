@@ -31,7 +31,7 @@ type InventoryTemplateValidator struct {
 	client client.Client
 }
 
-func NewInventoryTemplateValidtor(ctx context.Context, mgr manager.Manager) *InventoryTemplateValidator {
+func NewInventoryTemplateValidator(ctx context.Context, mgr manager.Manager) *InventoryTemplateValidator {
 	return &InventoryTemplateValidator{
 		ctx:    ctx,
 		client: mgr.GetClient(),

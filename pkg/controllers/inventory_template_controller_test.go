@@ -38,7 +38,7 @@ var _ = Describe("Create and validate inventory template", func() {
 					Memory: memory,
 					Disks: []seederv1alpha1.DiskConfig{
 						{
-							Bus:          "virtio",
+							DiskBus:      "virtio",
 							Size:         disk,
 							StorageClass: storageClass,
 						},
