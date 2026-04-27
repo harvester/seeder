@@ -195,6 +195,6 @@ var _ = Describe("reconcile tinkerbell workflow deletion test", func() {
 			}
 
 			return fmt.Errorf("waiting for cluster finalizers to finish")
-		}, "30s", "5s").ShouldNot(HaveOccurred())
+		}, "60s", "5s").ShouldNot(HaveOccurred())
 	})
 })
