@@ -73,7 +73,7 @@ spec:
                   disks:
                     items:
                       properties:
-                        driver:
+                        diskBus:
                           default: virtio
                           enum:
                           - virtio
@@ -89,7 +89,7 @@ spec:
                         storageClass:
                           type: string
                       required:
-                      - driver
+                      - diskBus
                       - size
                       - storageClass
                       type: object

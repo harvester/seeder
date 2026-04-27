@@ -77,7 +77,7 @@ func GenerateVMPool(iObj *seederv1alpha1.InventoryTemplate) ([]*kubevirtv1.Virtu
 				Name: diskName,
 				DiskDevice: kubevirtv1.DiskDevice{
 					Disk: &kubevirtv1.DiskTarget{
-						Bus: diskReq.Bus,
+						Bus: diskReq.DiskBus,
 					},
 				},
 				BootOrder: ptr.To(uint(bootOrder)),
@@ -175,6 +175,7 @@ func GenerateVMPool(iObj *seederv1alpha1.InventoryTemplate) ([]*kubevirtv1.Virtu
 								Cores:      iObj.Spec.VMSpec.CPU,
 								Threads:    1,
 								MaxSockets: 1,
+								Model:      kubevirtv1.CPUModeHostPassthrough,
 							},
 							Memory: &kubevirtv1.Memory{
 								Guest: &iObj.Spec.VMSpec.Memory,
@@ -326,7 +327,7 @@ func GenerateIngressAndInventoryPool(vmObjs []*kubevirtv1.VirtualMachine, endpoi
 		// default disk will be /dev/sda unless virtio driver is used in which case it changes to /dev/vda
 		// scsi and sata based devices show up as /dev/sda in the guest
 		var disk = "/dev/sda"
-		if inventoryTemplate.Spec.VMSpec.Disks[0].Bus == kubevirtv1.DiskBusVirtio {
+		if inventoryTemplate.Spec.VMSpec.Disks[0].DiskBus == kubevirtv1.DiskBusVirtio {
 			disk = "/dev/vda"
 		}
 

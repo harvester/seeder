@@ -34,7 +34,7 @@ func SetupWebhookServer(ctx context.Context, mgr manager.Manager, namespace stri
 		return err
 	}
 
-	if err := webhookServer.RegisterValidators(NewInventoryTemplateValidtor(ctx, mgr)); err != nil {
+	if err := webhookServer.RegisterValidators(NewInventoryTemplateValidator(ctx, mgr)); err != nil {
 		return err
 	}
 	// since webhook and manager start run as two go routines, need to wait for caches to sync

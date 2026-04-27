@@ -13,7 +13,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
 
 	seederv1alpha1 "github.com/harvester/seeder/pkg/api/v1alpha1"
 	"github.com/harvester/seeder/pkg/util"
@@ -55,7 +54,7 @@ func (r *InventoryTemplateReconciler) Reconcile(ctx context.Context, req ctrl.Re
 func (r *InventoryTemplateReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&seederv1alpha1.InventoryTemplate{}).
-		Watches(&seederv1alpha1.Inventory{}, &handler.EnqueueRequestForObject{}).
+		Owns(&seederv1alpha1.Inventory{}).
 		Named("inventorytemplates").
 		Complete(r)
 }
@@ -73,13 +72,13 @@ func (r *InventoryTemplateReconciler) CleanupMachines(ctx context.Context, i *se
 	// clean up VM's on remote cluster
 	err = harvesterClient.DeleteAllOf(ctx, &kubevirtv1.VirtualMachine{}, client.InNamespace(i.Spec.VMSpec.Namespace), client.MatchingLabels{seederv1alpha1.InventoryUUIDLabelKey: string(i.GetUID())})
 	if err != nil {
-		return fmt.Errorf("error listing vms from remote harvester cluster: %w", err)
+		return fmt.Errorf("error deleting vms from remote harvester cluster: %w", err)
 	}
 
 	// clean up ingress related to kubevirtbmc on remote cluster
 	err = harvesterClient.DeleteAllOf(ctx, &networkingv1.Ingress{}, client.InNamespace(seederv1alpha1.KubeBMCNS), client.MatchingLabels{seederv1alpha1.InventoryUUIDLabelKey: string(i.GetUID())})
 	if err != nil {
-		return fmt.Errorf("error listing vms from remote harvester cluster: %w", err)
+		return fmt.Errorf("error deleting ingress from remote harvester cluster: %w", err)
 	}
 
 	// no cleanup of inventory / auth secret is needed as it is controlled by owner references

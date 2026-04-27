@@ -11,7 +11,7 @@ const (
 	InventoryTemplateProvisioned       InventoryTemplateProvisioningStatus = "templateProvisioned"
 	InventoryTemplateProvisioningError InventoryTemplateProvisioningStatus = "error"
 	SecretKubeconfigFieldKey                                               = "kubeconfig"
-	InventoryTemplateFinalizer                                             = "metal.harvesterhci.io/nestedcluster"
+	InventoryTemplateFinalizer                                             = "metal.harvesterhci.io/inventorytemplate"
 	InventoryUUIDLabelKey                                                  = "inventorytemplate.harvesterhci.io/uuid"
 	KubeBMCNS                                                              = "kubevirtbmc-system"
 	KubeBMCIngressAnnotationKey                                            = "cert-manager.io/issuer"
@@ -44,7 +44,7 @@ type VMSpec struct {
 type DiskConfig struct {
 	// +kubebuilder:validation:Enum=virtio;sata;scsi
 	// +kubebuilder:default=virtio
-	Bus          kubevirtv1.DiskBus `json:"driver"`
+	DiskBus      kubevirtv1.DiskBus `json:"diskBus"`
 	Size         resource.Quantity  `json:"size"`
 	StorageClass string             `json:"storageClass"`
 }
