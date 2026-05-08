@@ -2,30 +2,67 @@ name: nightly
 
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch or tag to build (leave empty for the full nightly run: main + v1.7+ release branches)'
+        required: false
+        default: ''
+      tag:
+        description: 'Image tag override (defaults to <ref>-head; only used when ref is set)'
+        required: false
+        default: ''
   schedule:
     # run at 03:30 UTC every night
     - cron:  '30 3 * * *'
 
 jobs:
+  # Manual single-ref build (only when ref input is provided)
+  build-for-ref:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.ref != '' }}
+    uses: ./.github/workflows/template-build.yml
+    with:
+      refs: ${{ inputs.ref }}
+      release-tag-name: ${{ inputs.tag != '' && inputs.tag || format('{0}-head', inputs.ref) }}
+      push: true
+    secrets: inherit
+
+  # Full nightly run: schedule, or workflow_dispatch without a specific ref
+  discover-branches:
+    if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.ref == '') }}
+    runs-on: ubuntu-latest
+    outputs:
+      branches: ${{ steps.list.outputs.branches }}
+    steps:
+      - name: List release branches to build (v1.7+)
+        id: list
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branches=$(gh api "repos/${{ github.repository }}/branches" --paginate --jq '.[].name' \
+            | awk -F. '/^v1\.[0-9]+$/ && $2+0 >= 7 {print}' \
+            | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          echo "branches=$branches" >> "$GITHUB_OUTPUT"
+          echo "Discovered: $branches"
+
   build-for-main:
+    if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.ref == '') }}
     uses: ./.github/workflows/template-build.yml
     with:
-      release-tag-name: ${{ github.ref_name }}-head
+      refs: main
+      release-tag-name: main-head
       push: true
     secrets: inherit
 
-  build-for-v1_7:
+  build-for-release-branches:
+    needs: discover-branches
+    if: ${{ needs.discover-branches.outputs.branches != '[]' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: ${{ fromJson(needs.discover-branches.outputs.branches) }}
     uses: ./.github/workflows/template-build.yml
     with:
-      refs: v1.7
-      release-tag-name: v1.7-head
-      push: true
-    secrets: inherit
-
-  build-for-v1_6:
-    uses: ./.github/workflows/template-build.yml
-    with:
-      refs: v1.6
-      release-tag-name: v1.6-head
+      refs: ${{ matrix.branch }}
+      release-tag-name: ${{ matrix.branch }}-head
       push: true
     secrets: inherit
