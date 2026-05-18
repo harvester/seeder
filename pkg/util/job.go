@@ -19,6 +19,18 @@ func GenerateJob(name, namespace, powerAction string) *rufio.Job {
 		PowerAction: rufio.PowerOn.Ptr(),
 	}
 
+	/*
+		doc: Making sure to remove remote media that may be attached,
+		if media is attached network boot mode may not work, the node
+		may previously have been used to do an iso based install
+	*/
+	ensureMediaIsEjected := rufio.Action{
+		VirtualMediaAction: &rufio.VirtualMediaAction{
+			MediaURL: "",
+			Kind:     "CD",
+		},
+	}
+
 	pxeBoot := rufio.Action{
 		OneTimeBootDeviceAction: &rufio.OneTimeBootDeviceAction{
 			Devices: []rufio.BootDevice{
@@ -33,7 +45,7 @@ func GenerateJob(name, namespace, powerAction string) *rufio.Job {
 	case seederv1alpha1.NodePowerActionShutdown:
 		tasks = append(tasks, powerOffTask)
 	case seederv1alpha1.NodePowerActionReboot:
-		tasks = append(tasks, powerOffTask, pxeBoot, powerOnTask)
+		tasks = append(tasks, powerOffTask, ensureMediaIsEjected, pxeBoot, powerOnTask)
 	default:
 		return nil
 	}
