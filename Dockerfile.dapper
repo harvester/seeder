@@ -1,4 +1,4 @@
-FROM registry.suse.com/bci/golang:1.25.7
+FROM registry.suse.com/bci/golang:1.26
 
 ARG DAPPER_HOST_ARCH
 ENV ARCH="$DAPPER_HOST_ARCH"
@@ -30,7 +30,7 @@ RUN export K8S_VERSION=v1.34.0 && \
 RUN zypper -n install bash git gcc docker vim less file curl wget ca-certificates docker-buildx
 
 ## install golangci
-RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.11.4
+RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
 
     
 ENV DAPPER_ENV="REPO TAG DRONE_TAG CROSS SKIPINDRONE"
