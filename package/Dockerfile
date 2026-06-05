@@ -2,7 +2,7 @@
 
 # Build the manager binary
 FROM registry.suse.com/bci/bci-base:16.0
-RUN zypper -n install ipmitool=1.8.18.238.gb7adc1d-150600.8.3 && zypper clean
+RUN zypper -n install ipmitool=1.8.19.13.gbe11d94-160000.3.1 && zypper clean
 ARG TARGETPLATFORM
 
 RUN if [ "$TARGETPLATFORM" != "linux/amd64" ] && [ "$TARGETPLATFORM" != "linux/arm64" ]; then \
