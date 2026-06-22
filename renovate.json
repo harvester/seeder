@@ -1,9 +1,5 @@
 {
-    "extends": [
-        "github>harvester/renovate:renovate-default"
-    ],
-    "baseBranches": [
-        "main",
-        "/^v.*/"
-    ]
+  "extends": [
+    "github>harvester/dependency-automation:renovate"
+  ]
 }
