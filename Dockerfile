@@ -1,7 +1,9 @@
-FROM registry.suse.com/bci/golang:1.26
+FROM registry.suse.com/bci/golang:1.26 AS builder
 
-ARG DAPPER_HOST_ARCH
-ENV ARCH="$DAPPER_HOST_ARCH"
+ARG MK_HOST_ARCH
+ENV ARCH=$MK_HOST_ARCH
+ENV GOTOOLCHAIN=auto
+ARG CONTAINER_WORKDIR=/go/src/github.com/harvester/seeder
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -33,13 +35,46 @@ RUN zypper -n install bash git gcc docker vim less file curl wget ca-certificate
 RUN go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.12.2
 
     
-ENV DAPPER_ENV="REPO TAG DRONE_TAG CROSS SKIPINDRONE"
-ENV DAPPER_SOURCE="/go/src/github.com/harvester/seeder"
-ENV DAPPER_OUTPUT="./bin ./pkg ./config ./chart"
-ENV DAPPER_DOCKER_SOCKET=true
 ENV KUBEBUILDER_ASSETS="/usr/local/kubebuilder/envtest"
 
-WORKDIR ${DAPPER_SOURCE}
+ENV HOME=/go/src/github.com/harvester/seeder
 
-ENTRYPOINT ["./scripts/entry"]
-CMD ["ci"]
+# ---- base ----
+FROM builder AS base
+WORKDIR /go/src/github.com/harvester/seeder
+
+# to exclude some files, add them in .dockerignore
+COPY . .
+
+FROM base AS build
+ARG MK_REPO_ID
+
+RUN --mount=type=cache,target=/go/pkg/mod,id=seeder-go-mod-${MK_REPO_ID} \
+    --mount=type=cache,target=/go/src/github.com/harvester/seeder/.cache/go-build,id=seeder-go-build-${MK_REPO_ID} \
+    ./scripts/build
+
+FROM scratch AS build-output
+COPY --from=build /go/src/github.com/harvester/seeder/bin/ /bin/
+
+
+# ---- validate ----
+FROM base AS validate
+ARG MK_REPO_ID
+
+RUN --mount=type=cache,target=/go/pkg/mod,id=seeder-go-mod-${MK_REPO_ID} \
+    --mount=type=cache,target=/go/src/github.com/harvester/seeder/.cache/go-build,id=seeder-go-build-${MK_REPO_ID} \
+    ./scripts/validate
+
+# ---- test ----
+FROM base AS test
+
+# ---- generate ----
+FROM base AS generate
+ARG MK_REPO_ID
+
+RUN --mount=type=cache,target=/go/pkg/mod,id=seeder-go-mod-${MK_REPO_ID} \
+    --mount=type=cache,target=/go/src/github.com/harvester/seeder/.cache/go-build,id=seeder-go-build-${MK_REPO_ID} \
+    ./scripts/generate
+
+FROM scratch AS generate-bin-data
+COPY --from=generate /go/src/github.com/harvester/seeder/pkg/data/ /data/
