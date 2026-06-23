@@ -156,7 +156,7 @@ replace (
 	github.com/tinkerbell/rufio => github.com/tinkerbell/rufio v0.3.2
 	github.com/tinkerbell/tink v0.6.0 => github.com/tinkerbell/tink v0.6.1-0.20220524234633-0a800a4b5e25
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20211027215541-db492cf91b37 => go4.org/unsafe/assume-no-moving-gc v0.0.0-20220617031537-928513b29760
-	google.golang.org/protobuf => google.golang.org/protobuf v1.33.0
+	google.golang.org/protobuf => google.golang.org/protobuf v1.36.11
 	k8s.io/api => k8s.io/api v0.34.3
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.34.3
 	k8s.io/apimachinery => k8s.io/apimachinery v0.34.3
