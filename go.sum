@@ -1787,8 +1787,8 @@ github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3/go.mod h1:o//XUCC/F+yRGJoPO/VU
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0/go.mod h1:YN5jB8ie0yfIUg6VvR9Kz84aCaG7AsGZnLjhHbUqwPg=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.25.1/go.mod h1:RBRO7fro65R6tjKzYgLAFo0t1QEXY1Dp+i/bvpRiqiQ=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3/go.mod h1:ndYquD05frm2vACXE1nsccT4oJzjhw2arTS2cpUD1PI=
-github.com/harvester/harvester-installer v1.7.1 h1:uVq9AkIBA2uBPnSRCA3TDkvUqEUqt/LV4c0CC+KZaQk=
-github.com/harvester/harvester-installer v1.7.1/go.mod h1:aOAC9roKGdGAtCQ+AEXnSuDkdkNrsfMr7CHaq0HMEkc=
+github.com/harvester/harvester-installer v1.8.0 h1:yzAaBCVAT8ro1Wvw0El/ceJJN6YRdMoM+hnvgAmTZsA=
+github.com/harvester/harvester-installer v1.8.0/go.mod h1:aOAC9roKGdGAtCQ+AEXnSuDkdkNrsfMr7CHaq0HMEkc=
 github.com/harvester/webhook v0.1.4 h1:6g5MkYXlGm0wABQ/Dm8g5sM7WAtPq2aiWOH9wmf2vUQ=
 github.com/harvester/webhook v0.1.4/go.mod h1:vfRPB26WHSPxMF/ONpUVzaEaewTUxpP9qAqu1ZyonR0=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=

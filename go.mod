@@ -6,7 +6,7 @@ require (
 	github.com/go-bindata/go-bindata/v3 v3.1.3
 	github.com/go-logr/logr v1.4.3
 	github.com/google/uuid v1.6.0
-	github.com/harvester/harvester-installer v1.7.1
+	github.com/harvester/harvester-installer v1.8.0
 	github.com/harvester/webhook v0.1.4
 	github.com/k8snetworkplumbingwg/network-attachment-definition-client v1.7.7
 	github.com/onsi/ginkgo/v2 v2.22.0
