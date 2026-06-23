@@ -1,10 +1,5 @@
 {
   "extends": [
     "github>harvester/dependency-automation:renovate"
-  ],
-  "baseBranchPatterns": [
-    "main",
-    "v1.8",
-    "v1.7"
   ]
 }
