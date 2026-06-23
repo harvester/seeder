@@ -15,7 +15,7 @@ require (
 	github.com/rancher/dynamiclistener v0.3.5
 	github.com/rancher/wrangler/v3 v3.4.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/stmcginnis/gofish v0.14.1-0.20230920133920-77490fd98fa2
+	github.com/stmcginnis/gofish v0.22.0
 	github.com/stretchr/testify v1.11.1
 	github.com/tinkerbell/rufio v0.6.1
 	github.com/tinkerbell/tink v0.12.2
