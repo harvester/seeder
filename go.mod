@@ -20,7 +20,7 @@ require (
 	github.com/tinkerbell/rufio v0.6.1
 	github.com/tinkerbell/tink v0.12.2
 	github.com/urfave/cli/v2 v2.25.3
-	golang.org/x/sync v0.18.0
+	golang.org/x/sync v0.21.0
 	inet.af/netaddr v0.0.0-20211027220019-c74959edd3b6
 	k8s.io/api v0.35.0
 	k8s.io/apimachinery v0.35.0
