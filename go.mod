@@ -16,7 +16,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stmcginnis/gofish v0.14.1-0.20230920133920-77490fd98fa2
 	github.com/stretchr/testify v1.11.1
-	github.com/tinkerbell/rufio v0.6.1
+	github.com/tinkerbell/rufio v0.6.5
 	github.com/tinkerbell/tink v0.12.2
 	github.com/urfave/cli/v2 v2.25.3
 	golang.org/x/sync v0.18.0
