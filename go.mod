@@ -15,9 +15,9 @@ require (
 	github.com/rancher/dynamiclistener v0.3.5
 	github.com/rancher/wrangler/v3 v3.4.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/stmcginnis/gofish v0.14.1-0.20230920133920-77490fd98fa2
+	github.com/stmcginnis/gofish v0.20.0
 	github.com/stretchr/testify v1.11.1
-	github.com/tinkerbell/rufio v0.6.1
+	github.com/tinkerbell/rufio v0.6.5
 	github.com/tinkerbell/tink v0.12.2
 	github.com/urfave/cli/v2 v2.25.3
 	golang.org/x/sync v0.18.0
@@ -33,7 +33,8 @@ require (
 require (
 	dario.cat/mergo v1.0.1 // indirect
 	github.com/Jeffail/gabs/v2 v2.7.0 // indirect
-	github.com/bmc-toolbox/bmclib/v2 v2.1.1-0.20231017114451-153e11d62a71 // indirect
+	github.com/bmc-toolbox/bmclib/v2 v2.3.5-0.20250117163502-d621fb6aeb76 // indirect
+	github.com/ccoveille/go-safecast v1.5.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.9.0 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
@@ -53,6 +54,8 @@ require (
 	github.com/tredoe/osutil v1.5.0 // indirect
 	github.com/twpayne/go-vfs/v4 v4.3.0 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
+	go.opentelemetry.io/otel v1.36.0 // indirect
+	go.opentelemetry.io/otel/trace v1.36.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/net v0.47.0 // indirect
@@ -68,7 +71,7 @@ require (
 	github.com/VictorLowther/simplexml v0.0.0-20180716164440-0bff93621230 // indirect
 	github.com/VictorLowther/soap v0.0.0-20150314151524-8e36fca84b22 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bmc-toolbox/common v0.0.0-20230220061748-93ff001f4a1d // indirect
+	github.com/bmc-toolbox/common v0.0.0-20250112191656-b6de52e8303d // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/containerd/continuity v0.4.5 // indirect
@@ -123,7 +126,6 @@ require (
 	go4.org/intern v0.0.0-20211027215823-ae77deb06f29 // indirect
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 // indirect
 	golang.org/x/crypto v0.44.0 // indirect
-	golang.org/x/exp v0.0.0-20240808152545-0cdaa3abc0fa // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/mod v0.30.0 // indirect
 	golang.org/x/tools v0.39.0 // indirect
@@ -153,7 +155,7 @@ require (
 )
 
 replace (
-	github.com/tinkerbell/rufio => github.com/tinkerbell/rufio v0.3.2
+	github.com/tinkerbell/rufio => github.com/tinkerbell/rufio v0.6.5
 	github.com/tinkerbell/tink v0.6.0 => github.com/tinkerbell/tink v0.6.1-0.20220524234633-0a800a4b5e25
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20211027215541-db492cf91b37 => go4.org/unsafe/assume-no-moving-gc v0.0.0-20220617031537-928513b29760
 	google.golang.org/protobuf => google.golang.org/protobuf v1.33.0
