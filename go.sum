@@ -1770,8 +1770,8 @@ github.com/grpc-ecosystem/grpc-gateway/v2 v2.25.1/go.mod h1:RBRO7fro65R6tjKzYgLA
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3/go.mod h1:ndYquD05frm2vACXE1nsccT4oJzjhw2arTS2cpUD1PI=
 github.com/harvester/harvester-installer v1.7.1 h1:uVq9AkIBA2uBPnSRCA3TDkvUqEUqt/LV4c0CC+KZaQk=
 github.com/harvester/harvester-installer v1.7.1/go.mod h1:aOAC9roKGdGAtCQ+AEXnSuDkdkNrsfMr7CHaq0HMEkc=
-github.com/harvester/webhook v0.1.4 h1:6g5MkYXlGm0wABQ/Dm8g5sM7WAtPq2aiWOH9wmf2vUQ=
-github.com/harvester/webhook v0.1.4/go.mod h1:vfRPB26WHSPxMF/ONpUVzaEaewTUxpP9qAqu1ZyonR0=
+github.com/harvester/webhook v0.1.5 h1:LSredtpCpr5n6XzGRW/qMeZDiSX2W206rI9UFFSHPdY=
+github.com/harvester/webhook v0.1.5/go.mod h1:3KHilfYv/vsGfL0QHaXmZ/o2lR6QGqpFpmO3UBOcV9Y=
 github.com/hashicorp/errwrap v1.0.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
 github.com/hashicorp/errwrap v1.1.0 h1:OxrOeh75EUXMY8TBjag2fzXGZ40LB6IKw45YeGUDY2I=
 github.com/hashicorp/errwrap v1.1.0/go.mod h1:YH+1FKiLXxHSkmPseP+kNlulaMuP3n2brvKWEqk/Jc4=
@@ -2033,8 +2033,8 @@ github.com/prometheus/procfs v0.12.0/go.mod h1:pcuDEFsWDnvcgNzo4EEweacyhjeA9Zk3c
 github.com/prometheus/procfs v0.15.1/go.mod h1:fB45yRUv8NstnjriLhBQLuOUt+WW4BsoGhij/e3PBqk=
 github.com/prometheus/procfs v0.16.1 h1:hZ15bTNuirocR6u0JZ6BAHHmwS1p8B4P6MRqxtzMyRg=
 github.com/prometheus/procfs v0.16.1/go.mod h1:teAbpZRB1iIAJYREa1LsoWUXykVXA1KlTmWl8x/U+Is=
-github.com/rancher/dynamiclistener v0.3.5 h1:5TaIHvkDGmZKvc96Huur16zfTKOiLhDtK4S+WV0JA6A=
-github.com/rancher/dynamiclistener v0.3.5/go.mod h1:dW/YF6/m2+uEyJ5VtEcd9THxda599HP6N9dSXk81+k0=
+github.com/rancher/dynamiclistener v0.6.0 h1:M7x8Nq+GY0UORULANuW/AH1ocnyZaqlmTuviMQAHL1Q=
+github.com/rancher/dynamiclistener v0.6.0/go.mod h1:7VNEQhAwzbYJ08S1MYb6B4vili6K7CcrG4cNZXq1j+s=
 github.com/rancher/lasso v0.2.6 h1:/QNO491vWlTNYgwOOopRlILcTv+pI/wBHYdPFD2Pk5E=
 github.com/rancher/lasso v0.2.6/go.mod h1:L3ol8PdO21KoMhNa3RWjpR3ZBnE70JCAod1nJuOvT1E=
 github.com/rancher/mapper v0.0.0-20190814232720-058a8b7feb99 h1:rGnt9h1Uk7Yw4qNPyGq0LWHGdPyag/+Fg/wJWSTkKx4=
