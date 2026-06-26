@@ -145,7 +145,7 @@ require (
 
 replace (
 	github.com/google/gnostic-models => github.com/google/gnostic-models v0.6.9
-	github.com/harvester/harvester-install => github.com/harvester/harvester-installer v1.5.1
+	github.com/harvester/harvester-install => github.com/harvester/harvester-installer v1.6.0
 	github.com/rancher/lasso => github.com/rancher/lasso v0.2.3
 	github.com/tinkerbell/rufio => github.com/tinkerbell/rufio v0.3.2
 	github.com/tinkerbell/tink v0.6.0 => github.com/tinkerbell/tink v0.6.1-0.20220524234633-0a800a4b5e25
