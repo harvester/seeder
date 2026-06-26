@@ -18,7 +18,7 @@ require (
 	github.com/tinkerbell/rufio v0.3.2
 	github.com/tinkerbell/tink v0.9.0
 	github.com/urfave/cli/v2 v2.25.3
-	golang.org/x/net v0.44.0
+	golang.org/x/net v0.55.0
 	golang.org/x/sync v0.17.0
 	inet.af/netaddr v0.0.0-20230525184311-b8eac61e914a
 	k8s.io/api v0.34.1
