@@ -19,6 +19,8 @@ package controllers
 import (
 	"context"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"strings"
 	"sync"
@@ -54,6 +56,18 @@ import (
 	nadv1 "github.com/k8snetworkplumbingwg/network-attachment-definition-client/pkg/apis/k8s.cni.cncf.io/v1"
 	storagev1 "k8s.io/api/storage/v1"
 )
+
+// alwaysOKTransport answers every request with a 200 so the cluster config audit can
+// run against fixture image URLs without any real network access.
+type alwaysOKTransport struct{}
+
+func (alwaysOKTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	return &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       io.NopCloser(strings.NewReader("")),
+		Request:    req,
+	}, nil
+}
 
 // These tests use Ginkgo (BDD-style Go testing framework). Refer to
 // http://onsi.github.io/ginkgo/ to learn more about Ginkgo.
@@ -215,6 +229,9 @@ var _ = BeforeSuite(func() {
 		Logger:                    ctrlruntimelog.Log.WithName("controller.cluster"),
 		mutex:                     &sync.Mutex{},
 		ShutdownRetriggerInterval: 10,
+		// the config audit probes artifact URLs over http; stub the transport so the
+		// suite does not depend on an image server being reachable
+		HTTPClient: &http.Client{Transport: alwaysOKTransport{}},
 	}).SetupWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
