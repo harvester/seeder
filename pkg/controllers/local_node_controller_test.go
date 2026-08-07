@@ -41,6 +41,7 @@ var _ = Describe("test local node controller", func() {
 				Annotations: map[string]string{
 					seederv1alpha1.LocalInventoryAnnotation: "true",
 					seederv1alpha1.LocalInventoryNodeName:   n.Name,
+					seederv1alpha1.SkipDiskWipeKey:          seederv1alpha1.SkipDiskWipeValue,
 				},
 			},
 			Spec: seederv1alpha1.InventorySpec{

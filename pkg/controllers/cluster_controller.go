@@ -17,6 +17,7 @@ limitations under the License.
 package controllers
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"sync"
@@ -26,6 +27,7 @@ import (
 	"github.com/rancher/wrangler/v3/pkg/condition"
 	rufio "github.com/tinkerbell/rufio/api/v1alpha1"
 	tinkv1alpha1 "github.com/tinkerbell/tink/api/v1alpha1"
+	"golang.org/x/crypto/ssh"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -388,7 +390,7 @@ func (r *ClusterReconciler) reconcileNodes(ctx context.Context, cObj *seederv1al
 					return err
 				}
 			}
-			ok, err := r.ensureInventoryIsShutdown(ctx, c, iObj)
+			ok, err := r.ensureInventoryIsCleaned(ctx, c, iObj)
 			if err != nil {
 				return fmt.Errorf("error ensuring inventory %s is shutdown %v", i.Name, err)
 			}
@@ -535,7 +537,7 @@ func (r *ClusterReconciler) cleanupClusterDeps(ctx context.Context, cObj *seeder
 				return fmt.Errorf("waiting for existing bmcjob to be reconcilled from inventory %s before triggering cleanup", i.Name)
 			}
 
-			ok, err := r.ensureInventoryIsShutdown(ctx, c, i)
+			ok, err := r.ensureInventoryIsCleaned(ctx, c, i)
 			if err != nil {
 				return fmt.Errorf("error ensuring inventory %s is shutdown %v", i.Name, err)
 			}
@@ -726,8 +728,16 @@ func (r *ClusterReconciler) createOrUpdateHardware(ctx context.Context, hardware
 	return createOrUpdateInventoryConditions(ctx, inventory, seederv1alpha1.TinkHardwareCreated, "tink hardware created", r.Client)
 }
 
-// ensureInventoryIsShutdown ensures underlying Machine is shutdown before inventory is freed from cluster
-func (r *ClusterReconciler) ensureInventoryIsShutdown(ctx context.Context, c *seederv1alpha1.Cluster, i *seederv1alpha1.Inventory) (bool, error) {
+// ensureInventoryIsCleaned ensures underlying Machine has install disk wiped if needed
+// and node is shutdown before cluster deletion can proceed. Returns true if inventory is shutdown and cleaned up, false if not yet cleaned up
+func (r *ClusterReconciler) ensureInventoryIsCleaned(ctx context.Context, c *seederv1alpha1.Cluster, i *seederv1alpha1.Inventory) (bool, error) {
+	// attempt to wipe disks unless SkipDiskWipe annotation is set to true
+	// this is needed for integration tests where we mock clusters as containers
+
+	if i.Annotations == nil || i.Annotations[seederv1alpha1.SkipDiskWipeKey] != seederv1alpha1.SkipDiskWipeValue {
+		r.wipeDisk(i)
+	}
+
 	r.Info("ensuring inventory is shutdown", "inventory", i.Name)
 	machineObj := &rufio.Machine{}
 	err := r.Get(ctx, types.NamespacedName{Name: i.Name, Namespace: i.Namespace}, machineObj)
@@ -794,4 +804,65 @@ func (r *ClusterReconciler) triggerShutdown(ctx context.Context, c *seederv1alph
 
 	i.Spec.PowerActionRequested = seederv1alpha1.NodePowerActionShutdown
 	return r.Patch(ctx, i, client.MergeFrom(iObj))
+}
+
+// wipeDisk will wipe the disk of the node using the provided address and credentials
+// it will log the error but will not be a blocking operation for cluster deletion. This is a best effort attempt to wipe the disk and will not be retried if it fails
+func (r *ClusterReconciler) wipeDisk(iObj *seederv1alpha1.Inventory) {
+	defaultLoginUser := "rancher"
+	address := iObj.Status.Address
+	credentials := iObj.Status.GeneratedPassword
+
+	// setup ssh client config for remote connection
+	config := &ssh.ClientConfig{
+		User: defaultLoginUser,
+		Auth: []ssh.AuthMethod{
+			ssh.Password(credentials),
+		},
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		Timeout:         10 * time.Second,
+	}
+
+	addr := fmt.Sprintf("%s:22", address)
+	client, err := ssh.Dial("tcp", addr, config)
+	if err != nil {
+		r.Error(err, "ssh: failed to dial client", iObj.Name, iObj.Namespace)
+		return
+	}
+
+	defer func() {
+		err := client.Close()
+		if err != nil {
+			r.Error(err, "ssh: failed to close client after wiping disk on node", iObj.Name, iObj.Namespace)
+		}
+	}()
+
+	session, err := client.NewSession()
+	if err != nil {
+		r.Error(err, "ssh: failed to create session for wiping disk on node", iObj.Name, iObj.Namespace)
+		return
+	}
+	defer func() {
+		err := session.Close()
+		if err != nil {
+			r.Error(err, "ssh: failed to close session after wiping disk on node", iObj.Name, iObj.Namespace)
+		}
+	}()
+
+	var stdoutBuf, stderrBuf bytes.Buffer
+	session.Stdout = &stdoutBuf
+	session.Stderr = &stderrBuf
+
+	// retry command 3 times in case of errors
+	for range 3 {
+		command := fmt.Sprintf("sudo su -c '/usr/sbin/sgdisk -Z %s'", iObj.Spec.PrimaryDisk)
+		if err := session.Run(command); err != nil {
+			r.Error(err, "ssh: command returned error while wiping disk on node", iObj.Name, iObj.Namespace)
+			r.Error(fmt.Errorf("stderr output: %s", stderrBuf.String()), "ssh: command stderr while wiping disk on node", iObj.Name, iObj.Namespace)
+		} else {
+			r.V(1).Info(fmt.Sprintf("ssh: remote stdout:\n%s\n", stdoutBuf.String()), iObj.Name, iObj.Namespace)
+			return
+		}
+	}
+	r.Error(fmt.Errorf("failed to wipe disk on node after 3 attempts, manual intervention may be needed"), "ssh: command failed", iObj.Name, iObj.Namespace)
 }

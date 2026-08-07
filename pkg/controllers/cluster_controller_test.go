@@ -39,6 +39,9 @@ var _ = Describe("Create cluster tests", Ordered, func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "cluster-test",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -423,6 +426,9 @@ var _ = Describe("add inventory to cluster tests", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "node1",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -445,6 +451,9 @@ var _ = Describe("add inventory to cluster tests", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "node2",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -659,6 +668,9 @@ var _ = Describe("delete inventory from cluster tests", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "del-node1",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -681,6 +693,9 @@ var _ = Describe("delete inventory from cluster tests", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "del-node2",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -958,6 +973,9 @@ var _ = Describe("cluster running test", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "kc-test",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -1153,6 +1171,9 @@ var _ = Describe("multi-node cluster provisioning test", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "multi-node1",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -1175,6 +1196,9 @@ var _ = Describe("multi-node cluster provisioning test", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "multi-node2",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -1197,6 +1221,9 @@ var _ = Describe("multi-node cluster provisioning test", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "multi-node3",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -1400,6 +1427,9 @@ var _ = Describe("simulate machine poweroff failure", Ordered, func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "ignore-cluster-test",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",

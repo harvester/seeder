@@ -27,6 +27,9 @@ var _ = Describe("Create and validate inventory template", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "template-test",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventoryTemplateSpec{
 				Credentials: &corev1.SecretReference{

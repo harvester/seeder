@@ -14,6 +14,8 @@ const (
 	EventLoggerName                = "HarvesterHardwareDiscovery"
 	WorkflowLoggerName             = "WorkflowEvent"
 	MachineReconcileAnnotationName = "harvesterhci.io/machine-reconcile"
+	SkipDiskWipeKey                = "harvesterhci.io/skip-disk-wipe"
+	SkipDiskWipeValue              = "true"
 )
 
 var (

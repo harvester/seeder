@@ -30,6 +30,7 @@ var _ = Describe("Create and run local cluster tests", func() {
 				Annotations: map[string]string{
 					seederv1alpha1.LocalInventoryAnnotation: "true",
 					seederv1alpha1.LocalInventoryNodeName:   "local-one",
+					seederv1alpha1.SkipDiskWipeKey:          seederv1alpha1.SkipDiskWipeValue,
 				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
@@ -56,6 +57,7 @@ var _ = Describe("Create and run local cluster tests", func() {
 				Annotations: map[string]string{
 					seederv1alpha1.LocalInventoryAnnotation: "true",
 					seederv1alpha1.LocalInventoryNodeName:   "local-two",
+					seederv1alpha1.SkipDiskWipeKey:          seederv1alpha1.SkipDiskWipeValue,
 				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
@@ -79,6 +81,9 @@ var _ = Describe("Create and run local cluster tests", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "local-three",
 				Namespace: seederv1alpha1.DefaultLocalClusterNamespace,
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
