@@ -36,6 +36,9 @@ var _ = Describe("Successful workflow and hardware reconcile", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "workflow-cluster-test",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -204,6 +207,9 @@ var _ = Describe("Failed workflow and hardware reconcile", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "workflow-cluster-fail-test",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",

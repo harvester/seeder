@@ -24,6 +24,9 @@ var _ = Describe("Inventory controller and baseboard tests", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "sample",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -155,6 +158,9 @@ var _ = Describe("inventory object deletion tests", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "sample-deletion",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -229,6 +235,9 @@ var _ = Describe("update inventory spec and reconcile machine spec", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "sample",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
@@ -365,6 +374,9 @@ var _ = Describe("reconcile out of band machine power operation", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "out-of-band-sample",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",

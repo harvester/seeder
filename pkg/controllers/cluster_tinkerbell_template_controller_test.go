@@ -36,6 +36,9 @@ var _ = Describe("reconcile tinkerbell template deletion test", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "cluster-template-test",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",

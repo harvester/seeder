@@ -51,6 +51,9 @@ var _ = Describe("cluster events test", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "cluster-event-test",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",

@@ -36,6 +36,9 @@ var _ = Describe("reconcile tinkerbell workflow deletion test", func() {
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "cluster-workflow-test",
 				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
 			},
 			Spec: seederv1alpha1.InventorySpec{
 				PrimaryDisk:                   "/dev/sda",
