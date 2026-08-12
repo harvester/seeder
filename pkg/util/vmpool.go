@@ -54,10 +54,9 @@ func GenerateVMPool(iObj *seederv1alpha1.InventoryTemplate) ([]*kubevirtv1.Virtu
 					Source: &cdiv1.DataVolumeSource{
 						Blank: &cdiv1.DataVolumeBlankImage{},
 					},
-					PVC: &corev1.PersistentVolumeClaimSpec{
-						AccessModes: []corev1.PersistentVolumeAccessMode{
-							corev1.ReadWriteMany,
-						},
+					// Storage (rather than PVC) lets CDI resolve accessModes and
+					// volumeMode from the StorageProfile of the requested sc.
+					Storage: &cdiv1.StorageSpec{
 						StorageClassName: &diskReq.StorageClass,
 						Resources: corev1.VolumeResourceRequirements{
 							Requests: map[corev1.ResourceName]resource.Quantity{
