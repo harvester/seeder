@@ -42,7 +42,7 @@ require (
 	github.com/coreos/yaml v0.0.0-20141224210557-6b16a5714269 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.6 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/docker/cli v20.10.20+incompatible // indirect
+	github.com/docker/cli v29.2.0+incompatible // indirect
 	github.com/docker/docker v24.0.2+incompatible // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
