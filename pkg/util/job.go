@@ -24,6 +24,7 @@ func GenerateJob(name, namespace, powerAction string) *rufio.Job {
 			Devices: []rufio.BootDevice{
 				rufio.PXE,
 			},
+			EFIBoot: true,
 		},
 	}
 
