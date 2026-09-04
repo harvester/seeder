@@ -19,7 +19,10 @@ package controllers
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
+	"net/http"
+	"net/url"
 	"sync"
 	"time"
 
@@ -54,12 +57,26 @@ type ClusterReconciler struct {
 	logr.Logger
 	mutex                     *sync.Mutex
 	ShutdownRetriggerInterval int64
+	// HTTPClient is used by the config audit to probe artifact URLs. Tests can
+	// inject a client with a custom transport. Defaults to defaultAuditClient.
+	HTTPClient *http.Client
 }
 
 const (
 	DefaultDeletionReconcileInterval = 30 * time.Second
 	DefaultShutdownRetriggerInterval = 600 // seconds
+	// DefaultAuditRequestTimeout bounds a single artifact HEAD request.
+	DefaultAuditRequestTimeout = 5 * time.Second
+	// DefaultAuditTimeout bounds the entire audit so a slow or blackholed image
+	// server cannot hold a reconcile worker for request-timeout * artifact-count.
+	DefaultAuditTimeout = 30 * time.Second
+	// DefaultArch is used when a cluster's inventories cannot be resolved yet.
+	DefaultArch = "amd64"
 )
+
+var defaultAuditClient = &http.Client{
+	Timeout: DefaultAuditRequestTimeout,
+}
 
 type clusterReconciler func(context.Context, *seederv1alpha1.Cluster) error
 
@@ -98,6 +115,7 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	reconcileList := []clusterReconciler{
+		r.auditConfigForPossibleIssues,
 		r.generateClusterConfig,
 		r.patchNodesAndPools,
 		r.createTinkerbellHardware,
@@ -131,6 +149,178 @@ func (r *ClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	return ctrl.Result{}, nil
+}
+
+// auditConfigForPossibleIssues proactively checks that the dependencies needed for
+// provisioning to succeed actually exist, so a misconfigured cluster fails fast here
+// rather than at netboot time. It checks that:
+//   - a version and an imageURL are set
+//   - the configURL is reachable, if provided
+//   - the netboot artifacts are reachable, e.g. for imageURL http://a.b.c.d/iso and
+//     version v1.9.0-rc3:
+//   - http://a.b.c.d/iso/v1.9.0-rc3/harvester-v1.9.0-rc3-vmlinuz-amd64
+//   - http://a.b.c.d/iso/v1.9.0-rc3/harvester-v1.9.0-rc3-initrd-amd64
+//   - http://a.b.c.d/iso/v1.9.0-rc3/harvester-v1.9.0-rc3-rootfs-amd64.squashfs
+//   - http://a.b.c.d/iso/v1.9.0-rc3/harvester-v1.9.0-rc3-amd64.iso
+//   - http://a.b.c.d/iso/v1.9.0-rc3/harvester-v1.9.0-rc3-amd64.raw.gz (stream mode only)
+func (r *ClusterReconciler) auditConfigForPossibleIssues(ctx context.Context, cObj *seederv1alpha1.Cluster) error {
+	// Only audit before provisioning has started. Re-probing artifacts on every
+	// reconcile of a cluster which is already progressing costs a network round trip
+	// per artifact, and writing status here would reset the workflow state machine.
+	if cObj.Status.Status != "" && cObj.Status.Status != seederv1alpha1.ClusterValidationError {
+		return nil
+	}
+
+	r.Info("auditing cluster manifest for missing provisioning dependencies", "name", cObj.Name, "namespace", cObj.Namespace)
+
+	auditCtx, cancel := context.WithTimeout(ctx, DefaultAuditTimeout)
+	defer cancel()
+
+	problems := r.auditProblems(auditCtx, cObj)
+
+	desiredStatus := seederv1alpha1.ClusterWorkflowStatus("")
+	var desiredMessage string
+	if len(problems) > 0 {
+		joined := errors.Join(problems...)
+		r.Error(joined, "cluster manifest failed guardrail checks, please fix or delete the cluster",
+			"name", cObj.Name, "namespace", cObj.Namespace)
+		desiredStatus = seederv1alpha1.ClusterValidationError
+		desiredMessage = joined.Error()
+	}
+
+	// Skip the write when nothing changed: a status update triggers another watch
+	// event, and it would leave the remaining reconcilers in this pass holding a
+	// stale object whose own status updates then conflict.
+	if cObj.Status.Status == desiredStatus && cObj.Status.ValidationMessage == desiredMessage {
+		return nil
+	}
+
+	c := cObj.DeepCopy()
+	c.Status.Status = desiredStatus
+	c.Status.ValidationMessage = desiredMessage
+	return r.Status().Update(ctx, c)
+}
+
+// auditProblems returns every issue found with the cluster spec. It does not stop at
+// the first failure so a user can fix everything in one pass.
+func (r *ClusterReconciler) auditProblems(ctx context.Context, c *seederv1alpha1.Cluster) []error {
+	var problems []error
+
+	if c.Spec.HarvesterVersion == "" {
+		problems = append(problems, fmt.Errorf("spec.version is empty"))
+	}
+
+	if c.Spec.ImageURL == "" {
+		problems = append(problems, fmt.Errorf("spec.imageURL is empty, artifact location is unknown"))
+	}
+
+	if c.Spec.ConfigURL != "" {
+		if err := checkURLReachable(ctx, r.httpClient(), c.Spec.ConfigURL); err != nil {
+			problems = append(problems, fmt.Errorf("spec.configURL: %w", err))
+		}
+	}
+
+	if c.Spec.HarvesterVersion == "" || c.Spec.ImageURL == "" {
+		return problems
+	}
+
+	for _, arch := range r.nodeArchitectures(ctx, c) {
+		urls, err := harvesterArtifactURLs(c.Spec.ImageURL, c.Spec.HarvesterVersion, arch, c.Spec.StreamImageMode)
+		if err != nil {
+			problems = append(problems, err)
+			continue
+		}
+		for _, u := range urls {
+			if err := checkURLReachable(ctx, r.httpClient(), u); err != nil {
+				problems = append(problems, err)
+			}
+		}
+	}
+
+	return problems
+}
+
+// nodeArchitectures returns the distinct architectures of the inventories referenced by
+// the cluster, so the audit probes the artifacts the nodes will actually request.
+// Inventories which cannot be resolved yet are skipped; they are validated by
+// patchNodesAndPools later. Falls back to DefaultArch when none resolve.
+func (r *ClusterReconciler) nodeArchitectures(ctx context.Context, c *seederv1alpha1.Cluster) []string {
+	seen := make(map[string]bool)
+	var arches []string
+
+	for _, nc := range c.Spec.Nodes {
+		i := &seederv1alpha1.Inventory{}
+		if err := r.Get(ctx, types.NamespacedName{Namespace: nc.InventoryReference.Namespace,
+			Name: nc.InventoryReference.Name}, i); err != nil {
+			continue
+		}
+
+		arch := i.Spec.Arch
+		if arch == "" {
+			arch = DefaultArch
+		}
+		if !seen[arch] {
+			seen[arch] = true
+			arches = append(arches, arch)
+		}
+	}
+
+	if len(arches) == 0 {
+		return []string{DefaultArch}
+	}
+	return arches
+}
+
+// harvesterArtifactURLs returns the netboot artifacts a node will fetch. The layout
+// must stay in sync with generateIPXEScript and DefaultStreamHarvesterAction in
+// pkg/tink: {imageURL}/{version}/harvester-{version}-{artifact}-{arch}
+func harvesterArtifactURLs(imageURL, version, arch string, streamImageMode bool) ([]string, error) {
+	base, err := url.Parse(imageURL)
+	if err != nil {
+		return nil, fmt.Errorf("spec.imageURL %q is not a parsable URL: %w", imageURL, err)
+	}
+
+	names := []string{
+		fmt.Sprintf("harvester-%s-vmlinuz-%s", version, arch),
+		fmt.Sprintf("harvester-%s-initrd-%s", version, arch),
+		fmt.Sprintf("harvester-%s-rootfs-%s.squashfs", version, arch),
+		fmt.Sprintf("harvester-%s-%s.iso", version, arch),
+	}
+	if streamImageMode {
+		names = append(names, fmt.Sprintf("harvester-%s-%s.raw.gz", version, arch))
+	}
+
+	urls := make([]string, 0, len(names))
+	for _, n := range names {
+		urls = append(urls, base.JoinPath(version, n).String())
+	}
+	return urls, nil
+}
+
+// checkURLReachable issues a HEAD request and reports whether the object is served.
+func checkURLReachable(ctx context.Context, hc *http.Client, rawURL string) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodHead, rawURL, nil)
+	if err != nil {
+		return fmt.Errorf("%s is not a parsable URL: %w", rawURL, err)
+	}
+
+	resp, err := hc.Do(req)
+	if err != nil {
+		return fmt.Errorf("%s is unreachable, check dns/routing/tls: %w", rawURL, err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= http.StatusBadRequest {
+		return fmt.Errorf("%s returned status %d", rawURL, resp.StatusCode)
+	}
+	return nil
+}
+
+func (r *ClusterReconciler) httpClient() *http.Client {
+	if r.HTTPClient != nil {
+		return r.HTTPClient
+	}
+	return defaultAuditClient
 }
 
 // generateClusterConfig will generate the clusterConfig

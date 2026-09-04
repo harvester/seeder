@@ -74,6 +74,10 @@ type ClusterStatus struct {
 	ClusterToken   string                `json:"token,omitempty"`
 	Status         ClusterWorkflowStatus `json:"status,omitempty"`
 	ClusterAddress string                `json:"clusterAddress,omitempty"`
+	// ValidationMessage contains the guardrail check failures which caused the
+	// cluster to enter the clusterValidationError status. It is cleared once the
+	// checks pass.
+	ValidationMessage string `json:"validationMessage,omitempty"`
 }
 
 type ClusterWorkflowStatus string
@@ -83,6 +87,7 @@ const (
 	ClusterNodesPatched          ClusterWorkflowStatus = "clusterNodesPatched"
 	ClusterTinkHardwareSubmitted ClusterWorkflowStatus = "tinkConfigReady"
 	ClusterRunning               ClusterWorkflowStatus = "clusterRunning"
+	ClusterValidationError       ClusterWorkflowStatus = "clusterValidationError"
 )
 
 //+kubebuilder:object:root=true

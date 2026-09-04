@@ -75,6 +75,7 @@ var _ = Describe("Successful workflow and hardware reconcile", func() {
 			},
 			Spec: seederv1alpha1.ClusterSpec{
 				HarvesterVersion: "harvester_1_0_2",
+				ImageURL:         "http://image-server.example.com/iso",
 				Nodes: []seederv1alpha1.NodeConfig{
 					{
 						InventoryReference: seederv1alpha1.ObjectReference{
@@ -246,6 +247,7 @@ var _ = Describe("Failed workflow and hardware reconcile", func() {
 			},
 			Spec: seederv1alpha1.ClusterSpec{
 				HarvesterVersion: "harvester_1_0_2",
+				ImageURL:         "http://image-server.example.com/iso",
 				Nodes: []seederv1alpha1.NodeConfig{
 					{
 						InventoryReference: seederv1alpha1.ObjectReference{
