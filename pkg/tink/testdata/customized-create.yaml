@@ -1,0 +1,40 @@
+os:
+  persistentStatePaths:
+    - /var/lib/rook
+    - /var/lib/ceph
+    - /etc/ceph
+    - /etc/webhook
+  modules:
+    - rbd
+    - nbd
+  sshAuthorizedKeys:
+    - ssh-rsa blah test@test
+  ntpServers:
+    - time1.google.com
+    - time2.google.com
+    - time3.google.com
+    - time.cloudflare.com
+install:
+  mode: create
+  management_interface:
+    interfaces:
+      - name: ens5
+    default_route: true
+    method: dhcp
+    bond_options:
+      mode: balance-tlb
+      miimon: 100
+  device: /dev/nvme0n1 # The target disk to install
+  iso_url: https://releases.rancher.com/harvester/master/harvester-master-amd64.iso
+  #  tty: ttyS1,115200n8   # For machines without a VGA console
+  vip: 10.10.0.19
+  vip_mode: dhcp # Or static
+  vip_hw_addr: 52:54:00:ec:0e:0b # Leave empty when vip_mode is static
+  wipediskslist:
+    - /dev/vda
+    - /dev/nvme0n1
+    - /dev/sda
+    - /dev/sdb
+system_settings:
+  containerd-registry: '{"Mirrors":{"*":{"Endpoints":["https://registry.1.2.3.4.sslip.io:5000"],"Rewrites":null}},"Configs":{"registry.1.2.3.4.sslip.io:5000":{"Auth":null,"TLS":{"CAFile":"","CertFile":"","KeyFile":"","InsecureSkipVerify":true}}},"Auths":null}'
+  backup-target: '{"type":"s3","endpoint":"http://4.5.6.7:9000/","accessKeyId":"","secretAccessKey":"","bucketName":"test-bucket","bucketRegion":"us-east-1","cert":"","virtualHostedStyle":false,"refreshIntervalInSeconds":0}'
