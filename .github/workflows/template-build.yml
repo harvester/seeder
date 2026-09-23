@@ -43,7 +43,7 @@ jobs:
 
       - name: Resolve registries
         id: resolve
-        uses: harvester/harvester-actions/actions/resolve-registries@a6fc1cfb81904c08e2267675fd5ac7b11a5092a9 # main
+        uses: harvester/harvester-actions/actions/resolve-registries@7559473a7a262c9b17553af48fdf1decc4bc94be # main
         with:
           release-tag-name: ${{ inputs.release-tag-name }}
           is-release: ${{ github.event_name == 'release' && github.event.action == 'published' }}
@@ -56,11 +56,11 @@ jobs:
       - name: Login to Docker Hub
         id: login-docker
         if: ${{ inputs.push == true && steps.resolve.outputs.use-docker-io == 'true' }}
-        uses: harvester/harvester-actions/actions/login-docker-hub@a6fc1cfb81904c08e2267675fd5ac7b11a5092a9 # main
+        uses: harvester/harvester-actions/actions/login-docker-hub@7559473a7a262c9b17553af48fdf1decc4bc94be # main
 
       - name: Publish public ${{ env.imageName }} image
         if: ${{ inputs.push == true && steps.resolve.outputs.use-docker-io == 'true' }}
-        uses: harvester/harvester-actions/actions/publish-public-image@a6fc1cfb81904c08e2267675fd5ac7b11a5092a9 # main
+        uses: harvester/harvester-actions/actions/publish-public-image@7559473a7a262c9b17553af48fdf1decc4bc94be # main
         with:
           context: .
           dockerfile: ${{ env.dockerfile }}
@@ -73,11 +73,11 @@ jobs:
       - name: Login to Staging Registry
         id: login-staging
         if: ${{ inputs.push == true && steps.resolve.outputs.use-staging == 'true' }}
-        uses: harvester/harvester-actions/actions/login-staging-registry@a6fc1cfb81904c08e2267675fd5ac7b11a5092a9 # main
+        uses: harvester/harvester-actions/actions/login-staging-registry@7559473a7a262c9b17553af48fdf1decc4bc94be # main
 
       - name: Publish staging ${{ env.imageName }} image
         if: ${{ inputs.push == true && steps.resolve.outputs.use-staging == 'true' }}
-        uses: harvester/harvester-actions/actions/publish-prime-image@a6fc1cfb81904c08e2267675fd5ac7b11a5092a9 # main
+        uses: harvester/harvester-actions/actions/publish-prime-image@7559473a7a262c9b17553af48fdf1decc4bc94be # main
         with:
           context: .
           dockerfile: ${{ env.dockerfile }}
@@ -90,11 +90,11 @@ jobs:
       - name: Login to Prime Registry
         id: login-prime
         if: ${{ inputs.push == true && steps.resolve.outputs.use-prime == 'true' }}
-        uses: harvester/harvester-actions/actions/login-prime-registry@a6fc1cfb81904c08e2267675fd5ac7b11a5092a9 # main
+        uses: harvester/harvester-actions/actions/login-prime-registry@7559473a7a262c9b17553af48fdf1decc4bc94be # main
 
       - name: Publish prime ${{ env.imageName }} image
         if: ${{ inputs.push == true && steps.resolve.outputs.use-prime == 'true' }}
-        uses: harvester/harvester-actions/actions/publish-prime-image@a6fc1cfb81904c08e2267675fd5ac7b11a5092a9 # main
+        uses: harvester/harvester-actions/actions/publish-prime-image@7559473a7a262c9b17553af48fdf1decc4bc94be # main
         with:
           context: .
           dockerfile: ${{ env.dockerfile }}
