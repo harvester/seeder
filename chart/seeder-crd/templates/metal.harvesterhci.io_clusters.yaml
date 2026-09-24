@@ -141,6 +141,12 @@ spec:
                 type: string
               token:
                 type: string
+              validationMessage:
+                description: |-
+                  ValidationMessage contains the guardrail check failures which caused the
+                  cluster to enter the clusterValidationError status. It is cleared once the
+                  checks pass.
+                type: string
             type: object
         type: object
     served: true
