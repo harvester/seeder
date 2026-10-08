@@ -45,7 +45,7 @@ require (
 	github.com/jacobweinstock/iamt v0.0.0-20230502042727-d7cdbe67d9ef // indirect
 	github.com/mattn/go-shellwords v1.0.10 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
-	github.com/moby/sys/user v0.3.0 // indirect
+	github.com/moby/sys/user v0.4.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rancher/mapper v0.0.0-20190814232720-058a8b7feb99 // indirect
 	github.com/rancher/wrangler v1.1.1 // indirect
