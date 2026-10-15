@@ -3,10 +3,12 @@ package events
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/stmcginnis/gofish"
 	"github.com/stmcginnis/gofish/redfish"
+	"k8s.io/apimachinery/pkg/util/validation"
 )
 
 type EventFetcher struct {
@@ -49,16 +51,32 @@ func (ef *EventFetcher) GetConfig() (map[string]string, []string, error) {
 
 	retMap := make(map[string]string)
 
-	retMap["manufacturer"] = trimString(manufacturer)
-	retMap["model"] = trimString(model)
-	retMap["serialNumber"] = trimString(serialNumber)
+	retMap["manufacturer"] = sanitizeLabelValue(manufacturer)
+	retMap["model"] = sanitizeLabelValue(model)
+	retMap["serialNumber"] = sanitizeLabelValue(serialNumber)
 
 	health, err := ef.getChassisInfo()
 	return retMap, health, err
 }
 
-func trimString(input string) string {
-	return strings.ReplaceAll(strings.ReplaceAll(input, " ", ""), ".", "")
+// invalidLabelValueChars matches runs of characters that are not allowed in a Kubernetes label value.
+var invalidLabelValueChars = regexp.MustCompile(`[^A-Za-z0-9_-]+`)
+
+// sanitizeLabelValue converts a raw Redfish string (Manufacturer, Model,
+// SerialNumber) into a valid Kubernetes label value.
+func sanitizeLabelValue(input string) string {
+	v := strings.ReplaceAll(strings.ReplaceAll(input, " ", ""), ".", "")
+	v = invalidLabelValueChars.ReplaceAllString(v, "-")
+	// v is pure ASCII at this point, so byte-based truncation is safe.
+	if len(v) > validation.LabelValueMaxLength {
+		v = v[:validation.LabelValueMaxLength]
+	}
+	return strings.TrimFunc(v, func(r rune) bool { return !isASCIIAlnum(r) })
+}
+
+// isASCIIAlnum reports whether r is an ASCII letter or digit.
+func isASCIIAlnum(r rune) bool {
+	return (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9')
 }
 
 func (ef *EventFetcher) getChassisInfo() ([]string, error) {
