@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
 	dockertest "github.com/ory/dockertest/v3"
 	"github.com/stretchr/testify/require"
+	"k8s.io/apimachinery/pkg/util/validation"
 )
 
 var ef *EventFetcher
@@ -65,4 +67,34 @@ func Test_GetInventory(t *testing.T) {
 	assert.Len(health, 1, "expected to find Thermal Health")
 	ef.Close()
 
+}
+
+func Test_sanitizeLabelValue(t *testing.T) {
+	cases := []struct {
+		name string
+		in   string
+		want string
+	}{
+		{"hpe synergy backplane", "HPE 2SFF NVMe/SAS/uFF Backplane", "HPE2SFFNVMe-SAS-uFFBackplane"},
+		{"already valid is unchanged", "ProLiantDL380Gen10", "ProLiantDL380Gen10"},
+		{"spaces stripped as before", "ProLiant DL380 Gen10", "ProLiantDL380Gen10"},
+		{"dots stripped as before", "Dell Inc.", "DellInc"},
+		{"underscore and hyphen kept", "SYS-1029P_WTR", "SYS-1029P_WTR"},
+		{"empty stays empty", "", ""},
+		{"comma", "Super Micro Computer, Inc.", "SuperMicroComputer-Inc"},
+		{"trailing bracket", "Server (Rev 2)", "Server-Rev2"},
+		{"trailing hyphen", "Model X -", "ModelX"},
+		{"non-ascii", "Modèle 1", "Mod-le1"},
+		{"only invalid characters", "///", ""},
+		{"truncated to 63", strings.Repeat("A", 70), strings.Repeat("A", 63)},
+		{"truncate then trim", strings.Repeat("A", 62) + "/B", strings.Repeat("A", 62)},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			got := sanitizeLabelValue(tc.in)
+			require.Equal(t, tc.want, got)
+			require.Empty(t, validation.IsValidLabelValue(got), "output must be a valid label value")
+		})
+	}
 }
