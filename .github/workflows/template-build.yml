@@ -11,7 +11,6 @@ on:
         required: true
         type: boolean
 env:
-  PLATFORMS: linux/amd64,linux/arm64
   imageName: "harvester-seeder"
   dockerfile: "package/Dockerfile"
 
@@ -41,65 +40,10 @@ jobs:
       - name: Run dapper
         run: make ci
 
-      - name: Resolve registries
-        id: resolve
-        uses: harvester/harvester-actions/actions/resolve-registries@f9d3081c0b7241e65cc2ffe8701a5e7ffd4c5ee2 # main
+      - name: Build and publish ${{ env.imageName }} image
+        if: ${{ inputs.push == true }}
+        uses: harvester/harvester-actions/actions/build-and-publish@18134d283bc63c5a7ffb25191e6cd2f367a10932 # main
         with:
           release-tag-name: ${{ inputs.release-tag-name }}
-          is-release: ${{ github.event_name == 'release' && github.event.action == 'published' }}
-
-      - name: Set image tag
-        run: echo "IMAGE_TAG=${RELEASE_TAG_NAME#prime-}" >> "$GITHUB_ENV"
-        env:
-          RELEASE_TAG_NAME: ${{ inputs.release-tag-name }}
-
-      - name: Login to Docker Hub
-        id: login-docker
-        if: ${{ inputs.push == true && steps.resolve.outputs.use-docker-io == 'true' }}
-        uses: harvester/harvester-actions/actions/login-docker-hub@f9d3081c0b7241e65cc2ffe8701a5e7ffd4c5ee2 # main
-
-      - name: Publish public ${{ env.imageName }} image
-        if: ${{ inputs.push == true && steps.resolve.outputs.use-docker-io == 'true' }}
-        uses: harvester/harvester-actions/actions/publish-public-image@f9d3081c0b7241e65cc2ffe8701a5e7ffd4c5ee2 # main
-        with:
-          context: .
           dockerfile: ${{ env.dockerfile }}
           image: ${{ env.imageName }}
-          tag: ${{ env.IMAGE_TAG }}
-          platforms: ${{ env.PLATFORMS }}
-          registry: ${{ steps.login-docker.outputs.registry }}
-          repository: ${{ steps.login-docker.outputs.repository }}
-
-      - name: Login to Staging Registry
-        id: login-staging
-        if: ${{ inputs.push == true && steps.resolve.outputs.use-staging == 'true' }}
-        uses: harvester/harvester-actions/actions/login-staging-registry@f9d3081c0b7241e65cc2ffe8701a5e7ffd4c5ee2 # main
-
-      - name: Publish staging ${{ env.imageName }} image
-        if: ${{ inputs.push == true && steps.resolve.outputs.use-staging == 'true' }}
-        uses: harvester/harvester-actions/actions/publish-prime-image@f9d3081c0b7241e65cc2ffe8701a5e7ffd4c5ee2 # main
-        with:
-          context: .
-          dockerfile: ${{ env.dockerfile }}
-          image: ${{ env.imageName }}
-          tag: ${{ env.IMAGE_TAG }}
-          platforms: ${{ env.PLATFORMS }}
-          registry: ${{ steps.login-staging.outputs.registry }}
-          repository: ${{ steps.login-staging.outputs.repository }}
-
-      - name: Login to Prime Registry
-        id: login-prime
-        if: ${{ inputs.push == true && steps.resolve.outputs.use-prime == 'true' }}
-        uses: harvester/harvester-actions/actions/login-prime-registry@f9d3081c0b7241e65cc2ffe8701a5e7ffd4c5ee2 # main
-
-      - name: Publish prime ${{ env.imageName }} image
-        if: ${{ inputs.push == true && steps.resolve.outputs.use-prime == 'true' }}
-        uses: harvester/harvester-actions/actions/publish-prime-image@f9d3081c0b7241e65cc2ffe8701a5e7ffd4c5ee2 # main
-        with:
-          context: .
-          dockerfile: ${{ env.dockerfile }}
-          image: ${{ env.imageName }}
-          tag: ${{ env.IMAGE_TAG }}
-          platforms: ${{ env.PLATFORMS }}
-          registry: ${{ steps.login-prime.outputs.registry }}
-          repository: ${{ steps.login-prime.outputs.repository }}
