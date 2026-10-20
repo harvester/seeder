@@ -52,7 +52,7 @@ require (
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/moby/api v1.55.0 // indirect
 	github.com/moby/moby/client v0.5.1 // indirect
-	github.com/moby/sys/user v0.3.0 // indirect
+	github.com/moby/sys/user v0.4.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rancher/mapper v0.0.0-20190814232720-058a8b7feb99 // indirect
 	github.com/rancher/wrangler v1.1.1 // indirect
