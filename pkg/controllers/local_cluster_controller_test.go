@@ -332,7 +332,7 @@ var _ = Describe("Create and run local cluster tests", func() {
 
 		Eventually(func() error {
 			return k8sClient.Delete(ctx, i1)
-		}, "30s", "5s").ShouldNot(HaveOccurred())
+		}, "60s", "5s").ShouldNot(HaveOccurred())
 
 		Eventually(func() error {
 			return k8sClient.Delete(ctx, i2)

@@ -18,7 +18,7 @@ import (
 
 func Test_createModeCloudConfig(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "default", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
@@ -38,11 +38,12 @@ func Test_createModeCloudConfig(t *testing.T) {
 	assert.NotEmpty(hc.ManagementInterface.SubnetMask, "expected subnet mask to be set")
 	assert.True(hc.WipeAllDisks, "expected wipe disks to be set")
 	assert.Contains(hc.WipeDisksList, "/dev/vda", "expected to find /dev/vda in wipeDisksList")
+	assert.Equal(hc.Role, "default")
 }
 
 func Test_joinModeCloudConfig(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.2.1", "witness", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
@@ -60,6 +61,7 @@ func Test_joinModeCloudConfig(t *testing.T) {
 	assert.NotEmpty(hc.ManagementInterface.SubnetMask, "expected subnet mask to be set")
 	assert.True(hc.WipeAllDisks, "expected wipe disks to be set")
 	assert.Contains(hc.WipeDisksList, "/dev/vda", "expected to find /dev/vda in wipeDisksList")
+	assert.Equal(hc.Role, "witness")
 }
 
 var (
@@ -290,7 +292,7 @@ func Test_GenerateHardwareRequestV11(t *testing.T) {
 
 func Test_createModeCloudConfigV11(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "create", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "default", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
@@ -315,7 +317,7 @@ func Test_createModeCloudConfigV11(t *testing.T) {
 
 func Test_joinModeCloudConfigV11(t *testing.T) {
 	assert := require.New(t)
-	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
+	cloudConfig, err := generateCloudConfig("file:///testdata/create.yaml", "ab:cd:ef:gh:ij:kl", "join", "192.168.1.100", "token", "password", "192.168.1.101", "255.255.255.0", "192.168.1.1", []string{"8.8.8.8"}, []string{"ssh-key 1", "ssh-key 2"}, nil, "http://imagestore/iso", "v1.1.2", "default", "http://seeder-endpoint", "sample", "harvester-system", false, true, 1, "amd64", "/dev/vda", "test")
 	assert.NoError(err)
 	hc := config.NewHarvesterConfig()
 	err = yaml.Unmarshal([]byte(cloudConfig), hc)
