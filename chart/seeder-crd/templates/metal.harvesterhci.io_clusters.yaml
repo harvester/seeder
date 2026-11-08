@@ -101,6 +101,14 @@ spec:
                       - name
                       - namespace
                       type: object
+                    role:
+                      default: default
+                      enum:
+                      - default
+                      - management
+                      - witness
+                      - worker
+                      type: string
                     staticAddress:
                       type: string
                   required:

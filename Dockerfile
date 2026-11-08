@@ -74,7 +74,7 @@ ARG MK_REPO_ID
 
 RUN --mount=type=cache,target=/go/pkg/mod,id=seeder-go-mod-${MK_REPO_ID} \
     --mount=type=cache,target=/go/src/github.com/harvester/seeder/.cache/go-build,id=seeder-go-build-${MK_REPO_ID} \
-    ./scripts/generate
+    ./scripts/generate-manifest && ./scripts/generate
 
 FROM scratch AS generate-bin-data
 COPY --from=generate /go/src/github.com/harvester/seeder/pkg/data/ /data/

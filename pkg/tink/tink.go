@@ -43,8 +43,15 @@ func GenerateHWRequest(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster, s
 		bondOptions["mode"] = "balance-tlb"
 		bondOptions["miimon"] = "100"
 	}
+	role := string(seederv1alpha1.NodeRoleDefault)
+	for _, node := range c.Spec.Nodes {
+		if node.InventoryReference.Name == i.Name {
+			role = string(node.Role)
+			break
+		}
+	}
 	userdata, err := generateCloudConfig(c.Spec.ConfigURL, i.Spec.ManagementInterfaceMacAddress, mode, c.Status.ClusterAddress,
-		c.Status.ClusterToken, i.Status.GeneratedPassword, i.Status.Address, i.Status.Netmask, i.Status.Gateway, c.Spec.Nameservers, c.Spec.SSHKeys, bondOptions, c.Spec.ImageURL, c.Spec.HarvesterVersion, seederDeploymentService.Status.LoadBalancer.Ingress[0].IP, i.Name, i.Namespace, c.Spec.StreamImageMode, c.Spec.WipeDisks, c.Spec.VlanID, i.Spec.Arch, i.Spec.PrimaryDisk, fmt.Sprintf("%s-%s", i.Name, i.Namespace))
+		c.Status.ClusterToken, i.Status.GeneratedPassword, i.Status.Address, i.Status.Netmask, i.Status.Gateway, c.Spec.Nameservers, c.Spec.SSHKeys, bondOptions, c.Spec.ImageURL, c.Spec.HarvesterVersion, role, seederDeploymentService.Status.LoadBalancer.Ingress[0].IP, i.Name, i.Namespace, c.Spec.StreamImageMode, c.Spec.WipeDisks, c.Spec.VlanID, i.Spec.Arch, i.Spec.PrimaryDisk, fmt.Sprintf("%s-%s", i.Name, i.Namespace))
 
 	if err != nil {
 		return nil, fmt.Errorf("error during HW generation: %v", err)
@@ -144,7 +151,7 @@ func GenerateWorkflow(i *seederv1alpha1.Inventory, c *seederv1alpha1.Cluster) (w
 	return workflow
 }
 
-func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, subnetMask, gateway string, Nameservers, SSHKeys []string, bondOptions map[string]string, imageURL string, harvesterVersion string, webhookURL string, hwName string, hwNamespace string, streamImage bool, wipeDisks bool, vlanID int, arch string, disk string, hostname string) (string, error) {
+func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, subnetMask, gateway string, Nameservers, SSHKeys []string, bondOptions map[string]string, imageURL string, harvesterVersion string, role string, webhookURL string, hwName string, hwNamespace string, streamImage bool, wipeDisks bool, vlanID int, arch string, disk string, hostname string) (string, error) {
 	hc := config.NewHarvesterConfig()
 	if configURL != "" {
 		if err := readConfigURL(hc, configURL); err != nil {
@@ -154,12 +161,13 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 	hc.SchemeVersion = 1
 	hc.Token = token
 	if mode == "join" {
-		hc.ServerURL = fmt.Sprintf("https://%s:443", vip)
+		hc.ServerURL = fmt.Sprintf("https://%s", vip)
 	} else {
 		hc.Vip = vip
 		hc.VipMode = "static"
 	}
 	hc.Mode = mode
+	hc.Role = role
 	hc.ManagementInterface = config.Network{
 		Method:       "static",
 		IP:           ip,

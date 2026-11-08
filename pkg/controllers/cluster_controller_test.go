@@ -1676,3 +1676,215 @@ var _ = Describe("simulate machine poweroff failure", Ordered, func() {
 		}, "90s", "10s").ShouldNot(HaveOccurred())
 	})
 })
+
+var _ = Describe("node roles test", Ordered, func() {
+	var i, i2 *seederv1alpha1.Inventory
+	var c *seederv1alpha1.Cluster
+	var a *seederv1alpha1.AddressPool
+	var creds *v1.Secret
+	var creds2 *v1.Secret
+	BeforeAll(func() {
+		a = &seederv1alpha1.AddressPool{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "role-test-pool",
+				Namespace: "default",
+			},
+			Spec: seederv1alpha1.AddressSpec{
+				CIDR:    "192.168.1.1/29",
+				Gateway: "192.168.1.7",
+			},
+		}
+
+		i = &seederv1alpha1.Inventory{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "role-node1",
+				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
+			},
+			Spec: seederv1alpha1.InventorySpec{
+				PrimaryDisk:                   "/dev/sda",
+				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
+				BaseboardManagementSpec: rufio.MachineSpec{
+					Connection: rufio.Connection{
+						Host:        "localhost",
+						Port:        623,
+						InsecureTLS: true,
+						AuthSecretRef: v1.SecretReference{
+							Name:      "role-node1",
+							Namespace: "default",
+						},
+					},
+				},
+			},
+		}
+
+		i2 = &seederv1alpha1.Inventory{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "role-node2",
+				Namespace: "default",
+				Annotations: map[string]string{
+					seederv1alpha1.SkipDiskWipeKey: seederv1alpha1.SkipDiskWipeValue,
+				},
+			},
+			Spec: seederv1alpha1.InventorySpec{
+				PrimaryDisk:                   "/dev/sda",
+				ManagementInterfaceMacAddress: "xx:xx:xx:xx:xx",
+				BaseboardManagementSpec: rufio.MachineSpec{
+					Connection: rufio.Connection{
+						Host:        "localhost",
+						Port:        623,
+						InsecureTLS: true,
+						AuthSecretRef: v1.SecretReference{
+							Name:      "role-node2",
+							Namespace: "default",
+						},
+					},
+				},
+			},
+		}
+
+		creds = &v1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "role-node1",
+				Namespace: "default",
+			},
+			StringData: map[string]string{
+				"username": "admin",
+				"password": "password",
+			},
+		}
+
+		creds2 = &v1.Secret{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "role-node2",
+				Namespace: "default",
+			},
+			StringData: map[string]string{
+				"username": "admin",
+				"password": "password",
+			},
+		}
+
+		c = &seederv1alpha1.Cluster{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "role-test-cluster",
+				Namespace: "default",
+			},
+			Spec: seederv1alpha1.ClusterSpec{
+				HarvesterVersion: "harvester_1_0_2",
+				Nodes: []seederv1alpha1.NodeConfig{
+					{
+						InventoryReference: seederv1alpha1.ObjectReference{
+							Name:      "role-node1",
+							Namespace: "default",
+						},
+						AddressPoolReference: seederv1alpha1.ObjectReference{
+							Name:      "role-test-pool",
+							Namespace: "default",
+						},
+						Role: seederv1alpha1.NodeRoleManagement,
+					},
+					{
+						InventoryReference: seederv1alpha1.ObjectReference{
+							Name:      "role-node2",
+							Namespace: "default",
+						},
+						AddressPoolReference: seederv1alpha1.ObjectReference{
+							Name:      "role-test-pool",
+							Namespace: "default",
+						},
+						Role: seederv1alpha1.NodeRoleWorker,
+					},
+				},
+				VIPConfig: seederv1alpha1.VIPConfig{
+					AddressPoolReference: seederv1alpha1.ObjectReference{
+						Name:      "role-test-pool",
+						Namespace: "default",
+					},
+				},
+				ClusterConfig: seederv1alpha1.ClusterConfig{
+					SSHKeys: []string{
+						"abc",
+						"def",
+					},
+					ConfigURL: "file:///testdata/config.yaml",
+				},
+			},
+		}
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, a)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, creds)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, creds2)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, i)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, i2)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			return k8sClient.Create(ctx, c)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
+
+	It("check if roles are applied as expected in inventory conditions", func() {
+		Eventually(func() error {
+			iObj := &seederv1alpha1.Inventory{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i.Namespace, Name: i.Name}, iObj)
+			if err != nil {
+				return err
+			}
+
+			if !util.ConditionExists(iObj, seederv1alpha1.InventoryAllocatedToCluster) {
+				return fmt.Errorf("waiting for inventory %s to be allocated to cluster", i.Name)
+			}
+			return nil
+		}, "60s", "5s").ShouldNot(HaveOccurred())
+
+		Eventually(func() error {
+			i2Obj := &seederv1alpha1.Inventory{}
+			err := k8sClient.Get(ctx, types.NamespacedName{Namespace: i2.Namespace, Name: i2.Name}, i2Obj)
+			if err != nil {
+				return err
+			}
+
+			if !util.ConditionExists(i2Obj, seederv1alpha1.InventoryAllocatedToCluster) {
+				return fmt.Errorf("waiting for inventory %s to be allocated to cluster", i2.Name)
+			}
+			return nil
+		}, "60s", "5s").ShouldNot(HaveOccurred())
+	})
+
+	AfterAll(func() {
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, c)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, i)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, i2)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, creds)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, creds2)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+		Eventually(func() error {
+			return k8sClient.Delete(ctx, a)
+		}, "30s", "5s").ShouldNot(HaveOccurred())
+	})
+})
