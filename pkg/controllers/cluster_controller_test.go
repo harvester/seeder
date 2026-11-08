@@ -78,6 +78,7 @@ var _ = Describe("Create cluster tests", Ordered, func() {
 			},
 			Spec: seederv1alpha1.ClusterSpec{
 				HarvesterVersion: "harvester_1_0_2",
+				ImageURL:         "http://image-server.example.com/iso",
 				Nodes: []seederv1alpha1.NodeConfig{
 					{
 						InventoryReference: seederv1alpha1.ObjectReference{
@@ -501,6 +502,7 @@ var _ = Describe("add inventory to cluster tests", func() {
 			},
 			Spec: seederv1alpha1.ClusterSpec{
 				HarvesterVersion: "harvester_1_0_2",
+				ImageURL:         "http://image-server.example.com/iso",
 				Nodes: []seederv1alpha1.NodeConfig{
 					{
 						InventoryReference: seederv1alpha1.ObjectReference{
@@ -743,6 +745,7 @@ var _ = Describe("delete inventory from cluster tests", func() {
 			},
 			Spec: seederv1alpha1.ClusterSpec{
 				HarvesterVersion: "harvester_1_0_2",
+				ImageURL:         "http://image-server.example.com/iso",
 				Nodes: []seederv1alpha1.NodeConfig{
 					{
 						InventoryReference: seederv1alpha1.ObjectReference{
@@ -1012,6 +1015,7 @@ var _ = Describe("cluster running test", func() {
 			},
 			Spec: seederv1alpha1.ClusterSpec{
 				HarvesterVersion: "harvester_1_0_2",
+				ImageURL:         "http://image-server.example.com/iso",
 				Nodes: []seederv1alpha1.NodeConfig{
 					{
 						InventoryReference: seederv1alpha1.ObjectReference{
@@ -1260,6 +1264,7 @@ var _ = Describe("multi-node cluster provisioning test", func() {
 			},
 			Spec: seederv1alpha1.ClusterSpec{
 				HarvesterVersion: "harvester_1_0_2",
+				ImageURL:         "http://image-server.example.com/iso",
 				Nodes: []seederv1alpha1.NodeConfig{
 					{
 						InventoryReference: seederv1alpha1.ObjectReference{
@@ -1466,6 +1471,7 @@ var _ = Describe("simulate machine poweroff failure", Ordered, func() {
 			},
 			Spec: seederv1alpha1.ClusterSpec{
 				HarvesterVersion: "harvester_1_0_2",
+				ImageURL:         "http://image-server.example.com/iso",
 				Nodes: []seederv1alpha1.NodeConfig{
 					{
 						InventoryReference: seederv1alpha1.ObjectReference{
