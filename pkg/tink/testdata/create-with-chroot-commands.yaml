@@ -1,0 +1,5 @@
+scheme_version: 1
+os:
+  after_install_chroot_commands:
+    - 'echo "configured command 1"'
+    - 'echo "configured command 2"'

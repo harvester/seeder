@@ -181,7 +181,7 @@ func generateCloudConfig(configURL, hwAddress, mode, vip, token, password, ip, s
 	hc.SSHAuthorizedKeys = append(hc.SSHAuthorizedKeys, SSHKeys...)
 	hc.Hostname = hostname
 
-	hc.AfterInstallChrootCommands = []string{fmt.Sprintf("grub2-editenv /oem/grubenv set extra_cmdline=\"ifname=netboot:%s\"", hwAddress)}
+	hc.AfterInstallChrootCommands = append(hc.AfterInstallChrootCommands, fmt.Sprintf("grub2-editenv /oem/grubenv set extra_cmdline=\"ifname=netboot:%s\"", hwAddress))
 
 	hc.ManagementInterface.BondOptions = bondOptions
 	hc.WipeAllDisks = hc.WipeAllDisks || wipeDisks
@@ -280,6 +280,10 @@ func readConfigURL(hc *config.HarvesterConfig, url string) error {
 	if err != nil {
 		return fmt.Errorf("error reading url response body: %v", err)
 	}
-	err = yaml.Unmarshal(content, hc)
-	return err
+	loaded, err := config.LoadHarvesterConfig(content)
+	if err != nil {
+		return fmt.Errorf("error parsing config url %s: %v", url, err)
+	}
+	*hc = *loaded
+	return nil
 }
