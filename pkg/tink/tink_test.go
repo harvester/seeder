@@ -32,7 +32,7 @@ func Test_createModeCloudConfig(t *testing.T) {
 	assert.Empty(hc.ConfigURL, "expected configURL to be set")
 	assert.NotEmpty(hc.Password, "expected password to be set")
 	assert.Len(hc.DNSNameservers, 1, "expected to find 1 dns server")
-	assert.Len(hc.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
+	assert.Len(hc.SSHAuthorizedKeys, 3, "expected to find 3 ssh keys specified")
 	assert.NotEmpty(hc.ManagementInterface.IP, "expected IP to be set")
 	assert.NotEmpty(hc.ManagementInterface.Gateway, "expected gateway to be set")
 	assert.NotEmpty(hc.ManagementInterface.SubnetMask, "expected subnet mask to be set")
@@ -54,7 +54,7 @@ func Test_joinModeCloudConfig(t *testing.T) {
 	assert.Empty(hc.ConfigURL, "expected configURL to be set")
 	assert.NotEmpty(hc.Password, "expected password to be set")
 	assert.Len(hc.DNSNameservers, 1, "expected to find 1 dns server")
-	assert.Len(hc.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
+	assert.Len(hc.SSHAuthorizedKeys, 3, "expected to find 3 ssh keys specified")
 	assert.NotEmpty(hc.ManagementInterface.IP, "expected IP to be set")
 	assert.NotEmpty(hc.ManagementInterface.Gateway, "expected gateway to be set")
 	assert.NotEmpty(hc.ManagementInterface.SubnetMask, "expected subnet mask to be set")
@@ -304,7 +304,7 @@ func Test_createModeCloudConfigV11(t *testing.T) {
 	assert.Empty(hc.ConfigURL, "expected configURL to be empty")
 	assert.NotEmpty(hc.Password, "expected password to be set")
 	assert.Len(hc.DNSNameservers, 1, "expected to find 1 dns server")
-	assert.Len(hc.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
+	assert.Len(hc.SSHAuthorizedKeys, 3, "expected to find 3 ssh keys specified")
 	assert.Len(hc.Webhooks, 1, "expected to find atleast 1 webhook definition")
 	assert.NotEmpty(hc.ManagementInterface.IP, "expected IP to be set")
 	assert.NotEmpty(hc.ManagementInterface.Gateway, "expected gateway to be set")
@@ -327,11 +327,85 @@ func Test_joinModeCloudConfigV11(t *testing.T) {
 	assert.Empty(hc.ConfigURL, "expected configURL to be empty")
 	assert.NotEmpty(hc.Password, "expected password to be set")
 	assert.Len(hc.DNSNameservers, 1, "expected to find 1 dns server")
-	assert.Len(hc.SSHAuthorizedKeys, 2, "expected to find 2 ssh keys specified")
+	assert.Len(hc.SSHAuthorizedKeys, 3, "expected to find 3 ssh keys specified")
 	assert.Len(hc.Webhooks, 1, "expected to find atleast 1 webhook definition")
 	assert.NotEmpty(hc.ManagementInterface.IP, "expected IP to be set")
 	assert.NotEmpty(hc.ManagementInterface.Gateway, "expected gateway to be set")
 	assert.NotEmpty(hc.ManagementInterface.SubnetMask, "expected subnet mask to be set")
 	assert.True(hc.WipeAllDisks, "expected wipe disks to be set")
 	assert.Contains(hc.WipeDisksList, "/dev/vda", "expected to find /dev/vda in wipeDisksList")
+}
+
+func Test_readConfigURLSupportsDocumentedKeys(t *testing.T) {
+	assert := require.New(t)
+	hc := config.NewHarvesterConfig()
+	assert.NoError(readConfigURL(hc, "file:///testdata/create-with-chroot-commands.yaml"))
+	assert.Equal([]string{
+		`echo "configured command 1"`,
+		`echo "configured command 2"`,
+	}, hc.AfterInstallChrootCommands)
+}
+
+func Test_createModeCloudConfigPreservesConfiguredChrootCommands(t *testing.T) {
+	assert := require.New(t)
+	const hwAddress = "ab:cd:ef:gh:ij:kl"
+
+	cloudConfig, err := generateCloudConfig(
+		"file:///testdata/create-with-chroot-commands.yaml",
+		hwAddress, "create", "192.168.1.100", "token", "password",
+		"192.168.1.101", "255.255.255.0", "192.168.1.1",
+		[]string{"8.8.8.8"}, []string{"ssh-key 1"}, nil,
+		"http://imagestore/iso", "v1.2.1", "http://seeder-endpoint",
+		"sample", "harvester-system", false, true, 2, "amd64", "/dev/vda", "test",
+	)
+	assert.NoError(err)
+
+	hc := config.NewHarvesterConfig()
+	assert.NoError(yaml.Unmarshal([]byte(cloudConfig), hc))
+
+	assert.Equal([]string{
+		`echo "configured command 1"`,
+		`echo "configured command 2"`,
+		fmt.Sprintf(`grub2-editenv /oem/grubenv set extra_cmdline="ifname=netboot:%s"`, hwAddress),
+	}, hc.AfterInstallChrootCommands)
+}
+
+func Test_createModeCloudConfigChrootCommandsDefault(t *testing.T) {
+	const hwAddress = "ab:cd:ef:gh:ij:kl"
+	expectedCommands := []string{
+		fmt.Sprintf(`grub2-editenv /oem/grubenv set extra_cmdline="ifname=netboot:%s"`, hwAddress),
+	}
+
+	testCases := []struct {
+		name      string
+		configURL string
+	}{
+		{
+			name:      "after_install_chroot_commands not specified",
+			configURL: "file:///testdata/create.yaml",
+		},
+		{
+			name:      "after_install_chroot_commands is empty",
+			configURL: "file:///testdata/create-with-empty-chroot-commands.yaml",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert := require.New(t)
+			cloudConfig, err := generateCloudConfig(
+				tc.configURL,
+				hwAddress, "create", "192.168.1.100", "token", "password",
+				"192.168.1.101", "255.255.255.0", "192.168.1.1",
+				[]string{"8.8.8.8"}, []string{"ssh-key 1"}, nil,
+				"http://imagestore/iso", "v1.2.1", "http://seeder-endpoint",
+				"sample", "harvester-system", false, true, 2, "amd64", "/dev/vda", "test",
+			)
+			assert.NoError(err)
+
+			hc := config.NewHarvesterConfig()
+			assert.NoError(yaml.Unmarshal([]byte(cloudConfig), hc))
+			assert.Equal(expectedCommands, hc.AfterInstallChrootCommands)
+		})
+	}
 }

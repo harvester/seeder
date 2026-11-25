@@ -1,0 +1,3 @@
+scheme_version: 1
+os:
+  after_install_chroot_commands: []
